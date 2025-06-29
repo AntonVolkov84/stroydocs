@@ -4,6 +4,7 @@ interface LoginData {
   username: string;
   password: string;
   email: string;
+  recaptchaToken: string;
 }
 
 interface User {

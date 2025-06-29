@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import "./RegisterPage.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as authServices from "../services/authServices";
 interface User {
@@ -18,6 +18,12 @@ interface DataRegister {
 interface RegisterPageProps {
   setUser: (user: User | null) => void;
 }
+declare global {
+  interface Window {
+    grecaptcha: any;
+  }
+}
+const RECAPTCHA_SITE_KEY = "6Lc8nXErAAAAAHPZDnc6DEPkLQ6iHX_8xv-kN5BA";
 
 export default function RegistrationPage({ setUser }: RegisterPageProps) {
   const {
@@ -30,23 +36,41 @@ export default function RegistrationPage({ setUser }: RegisterPageProps) {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${RECAPTCHA_SITE_KEY}`;
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
   const onSubmit = async (data: DataRegister) => {
     if (data.password !== data.confirmPassword) {
       alert("Пароли не совпадают");
       return;
     }
     setLoading(true);
-    const success = await authServices.register({
-      username: data.username,
-      email: data.email,
-      password: data.password,
-    });
-    if (success) {
-      alert("На почту отправлено письмо! Пожалуйста, подтвердите почту для входа");
-      reset();
-      navigate("/login");
-    } else {
-      alert("Ошибка регистрации");
+    if (!window.grecaptcha) {
+      alert("Ошибка: reCAPTCHA не загружена");
+      setLoading(false);
+      return;
+    }
+    try {
+      const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: "register" });
+      const success = await authServices.register({
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        recaptchaToken: token,
+      });
+      if (success) {
+        alert("На почту отправлено письмо! Пожалуйста, подтвердите почту для входа");
+        reset();
+        navigate("/login");
+      } else {
+        alert("Ошибка регистрации");
+      }
+    } catch (error) {
+      console.error("Ошибка при регистрации:", error);
     }
     setLoading(false);
   };

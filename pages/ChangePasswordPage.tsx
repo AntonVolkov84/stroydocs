@@ -42,7 +42,6 @@ export default function ChangePasswordPage() {
         token,
         password: data.password,
       });
-
       if (response) {
         setSubmitted(true);
         setTimeout(() => navigate("/login"), 3000);
