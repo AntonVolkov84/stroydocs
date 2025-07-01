@@ -4,7 +4,7 @@ interface LoginData {
   username: string;
   password: string;
   email: string;
-  recaptchaToken: string;
+  recaptchaToken?: string;
 }
 
 interface User {
@@ -22,9 +22,11 @@ interface changePasswordData {
   password: string;
 }
 
+const apiUrl: string = import.meta.env.VITE_API_URL;
+
 export async function login(data: LoginData): Promise<boolean> {
   try {
-    await axios.post("https://stroymonitoring.info/stroydocs/login", data, {
+    await axios.post(`${apiUrl}/stroydocs/login`, data, {
       withCredentials: true,
     });
     return true;
@@ -39,7 +41,7 @@ export async function login(data: LoginData): Promise<boolean> {
 }
 export async function forgotPassword(data: ForgotPasswordForm): Promise<boolean> {
   try {
-    await axios.post("https://stroymonitoring.info/stroydocs/forgotpassword", data, {
+    await axios.post(`${apiUrl}/stroydocs/forgotpassword`, data, {
       withCredentials: true,
     });
     return true;
@@ -55,7 +57,7 @@ export async function forgotPassword(data: ForgotPasswordForm): Promise<boolean>
 
 export async function register(data: LoginData): Promise<boolean> {
   try {
-    await axios.post("https://stroymonitoring.info/stroydocs/register", data, {
+    await axios.post(`${apiUrl}/stroydocs/register`, data, {
       withCredentials: true,
     });
     return true;
@@ -70,7 +72,7 @@ export async function register(data: LoginData): Promise<boolean> {
 }
 export async function changePassword(data: changePasswordData): Promise<boolean> {
   try {
-    await axios.post("https://stroymonitoring.info/stroydocs/changepassword", data, {
+    await axios.post(`${apiUrl}/stroydocs/changepassword`, data, {
       withCredentials: true,
     });
     return true;
@@ -86,7 +88,7 @@ export async function changePassword(data: changePasswordData): Promise<boolean>
 
 export async function logout(): Promise<void> {
   await axios.post(
-    "https://stroymonitoring.info/stroydocs/logout",
+    `${apiUrl}/stroydocs/logout`,
     {},
     {
       withCredentials: true,
@@ -96,7 +98,7 @@ export async function logout(): Promise<void> {
 export async function getMe(): Promise<User | null> {
   try {
     const res = await axios.post(
-      "https://stroymonitoring.info/stroydocs/me",
+      `${apiUrl}/stroydocs/me`,
       {},
       {
         withCredentials: true,

@@ -1,25 +1,11 @@
-import React from "react";
+import { Link } from "react-router-dom";
 import * as authServices from "../services/authServices";
+import "./Dashboard.css";
 
-interface User {
-  id: string;
-  email: string;
-  username: string;
-  emailConfirmed: boolean;
-}
-interface DashboardProps {
-  user: User;
-  setUser: (user: User | null) => void;
-}
-
-export default function Dashboard({ user, setUser }: DashboardProps) {
-  const handleLogOut = (): void => {
-    authServices.logout();
-    setUser(null);
-  };
+export default function Dashboard() {
   return (
-    <div>
-      <button onClick={() => handleLogOut()}>Выйти</button>
+    <div className="mainContainer">
+      <Link to="/personalpage">Personal</Link>
     </div>
   );
 }

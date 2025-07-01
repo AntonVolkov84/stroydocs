@@ -4,11 +4,6 @@ import { useState } from "react";
 import * as authServices from "../services/authServices";
 import "./ChangePasswordPage.css";
 
-interface changePasswordData {
-  email: string;
-  token: string;
-  password: string;
-}
 interface ChangePasswordForm {
   password: string;
   confirmPassword: string;

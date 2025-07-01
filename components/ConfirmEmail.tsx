@@ -3,7 +3,7 @@ import "./ConfirmEmail.css";
 
 export default function ConfirmEmail() {
   const [status, setStatus] = useState("loading");
-
+  const apiUrl: string = import.meta.env.VITE_API_URL;
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const token = params.get("token");
@@ -12,7 +12,7 @@ export default function ConfirmEmail() {
       return;
     }
 
-    fetch("https://stroymonitoring.info/stroydocs/confirmmail", {
+    fetch(`${apiUrl}/stroydocs/confirmmail`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

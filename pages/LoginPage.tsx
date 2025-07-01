@@ -15,6 +15,7 @@ interface DataLogin {
   username: string;
   password: string;
   email: string;
+  recaptchaToken?: string;
 }
 export default function LoginPage({ setUser }: LoginPageProps) {
   const {
@@ -31,8 +32,12 @@ export default function LoginPage({ setUser }: LoginPageProps) {
     }
     const user = await authServices.getMe();
     if (user) {
-      console.log(user);
       setUser(user);
+      if (!user.emailConfirmed) {
+        alert("Подтвердите Вашу почту");
+      } else {
+        navigate("/personalpage");
+      }
     } else {
       alert("Не удалось получить данные пользователя");
     }
