@@ -1,0 +1,54 @@
+.personalpage {
+  display: flex;
+  height: 100vh;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+.personalpage__sidebar {
+  width: 250px;
+  background: linear-gradient(to bottom, #2f2f50, #1e1e2f 60%, #131320);
+  color: #fff;
+  padding: 20px;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+}
+
+.personalpage__sidebar h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+
+.personalpage__sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.personalpage__sidebar li {
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.personalpage__sidebar li:hover {
+  color: #ff6f61;
+}
+
+.personalpage__main {
+  flex-grow: 1;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.personalpage__main h1 {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+}
+
+.personalpage__content {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+}

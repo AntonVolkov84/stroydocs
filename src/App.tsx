@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
@@ -9,6 +9,7 @@ import ConfirmEmail from "../components/ConfirmEmail";
 import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ChangePasswordPage from "../pages/ChangePasswordPage";
 import PersonalPage from "../pages/PersonalPage";
+import NoPage from "../pages/NoPage";
 
 interface User {
   id: string;
@@ -52,7 +53,7 @@ function App() {
           }
         />
         <Route path="/" element={<Navigate to={"/dashboard"} replace />} />
-        <Route path="*" element={<div>404 - Страница не найдена</div>} />
+        <Route path="*" element={<NoPage />} />
       </Routes>
     </Router>
   );
