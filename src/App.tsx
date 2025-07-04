@@ -44,7 +44,7 @@ function App() {
         <Route path="/login" element={<LoginPage setUser={setUser} />} />
         <Route path="/confirm-email" element={<ConfirmEmail />} />
         <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
-        <Route path="/changepassword" element={<ChangePasswordPage />} />
+        <Route path="/changepassword" element={<ChangePasswordPage user={user} />} />
         <Route path="/register" element={<RegisterPage setUser={setUser} />} />
         <Route
           path="/personalpage"

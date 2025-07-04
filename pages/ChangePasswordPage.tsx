@@ -8,8 +8,17 @@ interface ChangePasswordForm {
   password: string;
   confirmPassword: string;
 }
+interface User {
+  id: string;
+  email: string;
+  username: string;
+  emailConfirmed: boolean;
+}
+interface ChangePasswordPageProps {
+  user: User | null;
+}
 
-export default function ChangePasswordPage() {
+export default function ChangePasswordPage({ user }: ChangePasswordPageProps) {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
@@ -22,21 +31,19 @@ export default function ChangePasswordPage() {
     watch,
     formState: { errors, isSubmitting },
   } = useForm<ChangePasswordForm>();
-
+  const isUserLoggedIn = !!user;
   const onSubmit = async (data: ChangePasswordForm) => {
-    if (!token) {
-      setErrorMessage("Недействительная ссылка.");
-      return;
-    }
-    if (data.password !== data.confirmPassword) {
-      setErrorMessage("Пароли не совпадают");
-      return;
-    }
     try {
-      const response = await authServices.changePassword({
-        token,
-        password: data.password,
-      });
+      if (!token && !isUserLoggedIn) {
+        setErrorMessage("Недействительная ссылка или требуется авторизация.");
+        return;
+      }
+      const payload = token ? { token, password: data.password } : { password: data.password };
+      if (!payload) {
+        setErrorMessage("Недействительная ссылка или требуется авторизация.");
+        return;
+      }
+      const response = await authServices.changePassword(payload);
       if (response) {
         setSubmitted(true);
         setTimeout(() => navigate("/login"), 3000);
@@ -44,6 +51,7 @@ export default function ChangePasswordPage() {
         setErrorMessage("Ошибка при смене пароля");
       }
     } catch (err) {
+      console.log(err);
       setErrorMessage("Ошибка сервера");
     }
   };

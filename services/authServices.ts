@@ -18,7 +18,7 @@ interface ForgotPasswordForm {
 }
 interface changePasswordData {
   email?: string;
-  token: string;
+  token?: string;
   password: string;
 }
 
