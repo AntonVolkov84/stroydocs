@@ -16,6 +16,7 @@ interface User {
   email: string;
   username: string;
   emailConfirmed: boolean;
+  isAdmin?: boolean;
 }
 
 function App() {

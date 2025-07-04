@@ -7,6 +7,7 @@ interface User {
   email: string;
   username: string;
   emailConfirmed: boolean;
+  isAdmin?: boolean;
 }
 interface LoginPageProps {
   setUser: (user: User | null) => void;

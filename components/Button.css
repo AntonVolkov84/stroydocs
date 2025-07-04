@@ -1,0 +1,10 @@
+.button_btn {
+  padding: 6px 10px;
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  background: linear-gradient(to bottom, #2f2f50, #1e1e2f 80%, #131320);
+}
+.button_btn:hover {
+  background: #387bb6;
+}
