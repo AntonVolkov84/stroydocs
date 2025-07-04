@@ -25,7 +25,6 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
   const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
 
-  console.log(isAdmin, user);
   useEffect(() => {
     if (user && typeof user.isAdmin === "boolean") {
       setIsAdmin(user.isAdmin);
