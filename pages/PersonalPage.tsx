@@ -4,6 +4,7 @@ import * as authServices from "../services/authServices";
 import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import ConstructorCalculator from "../components/ConstructorCalculator";
+import ManageCalculator from "../components/ManageCalculator";
 
 interface User {
   id: string;
@@ -21,11 +22,21 @@ interface PersonalPageProps {
 }
 
 export default function PersonalPage({ user, setUser }: PersonalPageProps) {
-  const [constructorCalculator, setConstructorCalculator] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [constructorCalculator, setConstructorCalculator] = useState<boolean>(false);
+  const [managerCalculator, setManagerCalculator] = useState<boolean>(false);
   const navigate = useNavigate();
 
+  const clearState = () => {
+    setManagerCalculator(false);
+    setConstructorCalculator(false);
+  };
+
   useEffect(() => {
+    if (user.email === "antvolkov84@gmail.com" || "aleks_e@inbox.ru") {
+      setIsSuperAdmin(true);
+    }
     if (user && typeof user.isAdmin === "boolean") {
       setIsAdmin(user.isAdmin);
     } else {
@@ -44,36 +55,61 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
         <ul>
           <li>Мой аккаунт</li>
           <li>Настройки</li>
-          {isAdmin && (
+          {isSuperAdmin && (
             <li
               onClick={() => {
-                setConstructorCalculator(true);
+                console.log("manage user");
               }}
             >
-              Создание калькулятора
+              Управление пользователями
             </li>
+          )}
+          {isAdmin && (
+            <>
+              <li
+                onClick={() => {
+                  clearState();
+                  setConstructorCalculator(true);
+                }}
+              >
+                Создание калькулятора
+              </li>
+              <li
+                onClick={() => {
+                  clearState();
+                  setManagerCalculator(true);
+                }}
+              >
+                Управление калькуляторами
+              </li>
+            </>
           )}
           <li onClick={() => navigate("/changepassword")}>Сменить пароль</li>
           <li onClick={() => handleLogOut()}>Выход</li>
         </ul>
       </aside>
-
       <main className="personalpage__main">
         <h1>Добро пожаловать, {user.username}</h1>
         {constructorCalculator ? (
           <div className="personalpage__content">
+            <ConstructorCalculator />
             <Button
               onClick={() => {
                 setConstructorCalculator(false);
               }}
               children="Отмена"
             />
-            <ConstructorCalculator />
           </div>
         ) : (
-          <div className="personalpage__content">
-            <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
-          </div>
+          <>
+            {managerCalculator ? (
+              <ManageCalculator />
+            ) : (
+              <div className="personalpage__content">
+                <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
+              </div>
+            )}
+          </>
         )}
       </main>
     </div>

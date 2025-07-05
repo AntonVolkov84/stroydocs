@@ -8,7 +8,7 @@ interface PersonalPageProps {
   className?: string;
 }
 
-function Button({ children, onClick, typeBtn = "button", styled, className = "" }: PersonalPageProps) {
+function Button({ children, onClick, typeBtn = "button", styled, className = "button_btn" }: PersonalPageProps) {
   return (
     <button style={styled} type={typeBtn} className={`button_btn ${className}`} onClick={onClick}>
       {children}

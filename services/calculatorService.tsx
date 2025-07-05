@@ -6,6 +6,16 @@ interface CalculatorForm {
   formula: string;
   resultUnit: string;
 }
+export interface Calculator {
+  id: number;
+  title: string;
+  formula: string;
+  variables: Record<string, any>;
+  author_email: string;
+  result_unit: string;
+  created_at: string;
+  updated_at: string;
+}
 
 const apiUrl: string = import.meta.env.VITE_API_URL;
 
@@ -22,5 +32,16 @@ export async function createCalculator(data: CalculatorForm): Promise<boolean> {
       console.log("login", error);
     }
     return false;
+  }
+}
+export async function getAllCalculators(): Promise<Calculator[] | null> {
+  try {
+    const response = await axios.get(`${apiUrl}/calculators`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при получении калькуляторов:", error);
+    return null;
   }
 }
