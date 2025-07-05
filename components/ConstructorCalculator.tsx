@@ -25,6 +25,7 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
     reset,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm<CalculatorForm>({
     defaultValues: {
       title: "",
@@ -53,6 +54,18 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
   const variables = watch("variables");
 
   const onSubmit = async (data: CalculatorForm) => {
+    const fieldsToCheck = [
+      data.title,
+      data.formula,
+      data.resultUnit,
+      ...data.variables.map((v) => v.name),
+      ...data.variables.map((v) => v.description || ""),
+    ];
+    const hasHTML = fieldsToCheck.some(containsHTML);
+    if (hasHTML) {
+      alert("Ввод HTML или потенциально опасного кода запрещён.");
+      return;
+    }
     try {
       if (isEditing && selectedCalculator) {
         const res = await calculatorService.updateCalculator({
@@ -87,7 +100,7 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
     const currentFormula = watch("formula");
     setValue("formula", currentFormula + name);
   };
-
+  const containsHTML = (str: string) => /<\/?[a-z][\s\S]*>/i.test(str);
   return (
     <form className="constructor-container" onSubmit={handleSubmit(onSubmit)}>
       <h2 className="constructor-title">Конструктор калькулятора</h2>
@@ -123,7 +136,7 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
                   message: "Минимум 1 символ",
                 },
                 validate: (value) => {
-                  const allNames = watch("variables").map((v) => v.name.trim());
+                  const allNames = getValues("variables").map((v) => v.name.trim());
                   const duplicates = allNames.filter((name) => name === value.trim());
                   if (duplicates.length > 1) return "Имена переменных должны быть уникальными";
                   return true;
@@ -181,7 +194,6 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
               onChange={(e) => {
                 const value = e.target.value;
                 const allowed = /^[a-zA-Zа-яА-ЯёЁ0-9_+\-*/()%.,^\s]*$/;
-
                 if (allowed.test(value)) {
                   field.onChange(e);
                 }

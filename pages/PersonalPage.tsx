@@ -110,6 +110,7 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
             <Button
               onClick={() => {
                 setConstructorCalculator(false);
+                setSelectedCalculator(null);
               }}
               children="Отмена"
             />
