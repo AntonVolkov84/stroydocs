@@ -28,7 +28,13 @@
 }
 
 .form-group-input {
-  margin-bottom: 10px;
+  margin-bottom: 25px;
+}
+.form-group-btnremove {
+  justify-self: flex-end;
+}
+.form-group-input-description {
+  margin-top: 8px;
 }
 
 .form-actions {

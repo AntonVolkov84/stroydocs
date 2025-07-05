@@ -8,3 +8,7 @@
 .button_btn:hover {
   background: #387bb6;
 }
+.button_btn--red-hover:hover {
+  background-color: #ff6f61;
+  color: rgb(16, 14, 26);
+}

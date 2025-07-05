@@ -5,7 +5,7 @@ import Input from "./Input";
 
 interface CalculatorForm {
   title: string;
-  variables: { name: string }[];
+  variables: { name: string; description: string }[];
   formula: string;
 }
 
@@ -33,7 +33,24 @@ export default function CalculatorConstructor() {
   const variables = watch("variables");
 
   const onSubmit = (data: CalculatorForm) => {
-    console.log("Сохраняем калькулятор:", data);
+    console.log("data", data);
+    try {
+      const values: Record<string, number> = {};
+      data.variables.forEach((v) => {
+        const val = prompt(`Введите значение переменной "${v.name}" в формате "${v.description}":`);
+        if (val === null || isNaN(Number(val))) {
+          throw new Error(`Некорректное значение для "${v.name}"`);
+        }
+        values[v.name] = Number(val);
+      });
+      const func = new Function(...Object.keys(values), `return ${data.formula};`);
+      const result = func(...Object.values(values));
+      console.log("Результат:", result);
+      alert(`Результат: ${result}`);
+    } catch (error: any) {
+      console.error("Ошибка при вычислении:", error.message);
+      alert(`Ошибка: ${error.message}`);
+    }
   };
 
   const handleInsertVariable = (name: string) => {
@@ -82,20 +99,30 @@ export default function CalculatorConstructor() {
                   return true;
                 },
                 pattern: {
-                  value: /^[a-zA-Z_][a-zA-Z0-9_]*$/,
-                  message: "Только латинские буквы, цифры и _",
+                  value: /^[a-zA-Zа-яА-ЯёЁ_][a-zA-Zа-яА-ЯёЁ0-9_]*$/,
+                  message: "Допустимы латинские и русские буквы, цифры и _",
                 },
               })}
             />
-            <Button typeBtn="button" onClick={() => remove(index)} styled={{ marginTop: "8px" }}>
-              Удалить
-            </Button>
+            <div className="form-group-input-description">
+              <Input placeholder="Описание переменной" {...register(`variables.${index}.description`)} />
+            </div>
+            <div className="form-group-btnremove">
+              <Button
+                className="button_btn--red-hover"
+                typeBtn="button"
+                onClick={() => remove(index)}
+                styled={{ marginTop: "8px" }}
+              >
+                Удалить
+              </Button>
+            </div>
             {errors.variables?.[index]?.name && (
               <p className="error-message">{errors.variables[index].name?.message}</p>
             )}
           </div>
         ))}
-        <Button typeBtn="button" onClick={() => append({ name: "" })}>
+        <Button typeBtn="button" onClick={() => append({ name: "", description: "" })}>
           Добавить переменную
         </Button>
       </div>
@@ -103,19 +130,34 @@ export default function CalculatorConstructor() {
         <label className="form-label" htmlFor="formula">
           Формула расчёта:
         </label>
-        <textarea
-          id="formula"
-          className="formula-textarea"
-          placeholder="например: price * count"
-          {...register("formula", {
+        <Controller
+          control={control}
+          name="formula"
+          rules={{
             required: "Формула обязательна",
             validate: (value) => {
               const definedVariables = variables.map((v) => v.name).filter(Boolean);
-              const usedVariables = Array.from(new Set(value.match(/[a-zA-Z_][a-zA-Z0-9_]*/g) || []));
+              const usedVariables = Array.from(new Set(value.match(/[a-zA-Zа-яА-ЯёЁ_][a-zA-Zа-яА-ЯёЁ0-9_]*/g) || []));
               const unknown = usedVariables.filter((v) => !definedVariables.includes(v));
               return unknown.length === 0 || `Неизвестные переменные: ${unknown.join(", ")}`;
             },
-          })}
+          }}
+          render={({ field }) => (
+            <textarea
+              id="formula"
+              className="formula-textarea"
+              placeholder="например: длина + ширина"
+              {...field}
+              onChange={(e) => {
+                const value = e.target.value;
+                const allowed = /^[a-zA-Zа-яА-ЯёЁ0-9_+\-*/()%.,^\s]*$/;
+
+                if (allowed.test(value)) {
+                  field.onChange(e);
+                }
+              }}
+            />
+          )}
         />
         {errors.formula && <p className="error-message">{errors.formula.message}</p>}
         <div className="variable-buttons">

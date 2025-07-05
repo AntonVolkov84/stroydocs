@@ -5,11 +5,12 @@ interface PersonalPageProps {
   onClick?: () => void;
   typeBtn?: "reset" | "button" | "submit";
   styled?: {};
+  className?: string;
 }
 
-function Button({ children, onClick, typeBtn = "button", styled }: PersonalPageProps) {
+function Button({ children, onClick, typeBtn = "button", styled, className = "" }: PersonalPageProps) {
   return (
-    <button style={styled} type={typeBtn} className="button_btn" onClick={onClick}>
+    <button style={styled} type={typeBtn} className={`button_btn ${className}`} onClick={onClick}>
       {children}
     </button>
   );
