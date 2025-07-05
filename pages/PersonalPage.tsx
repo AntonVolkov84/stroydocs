@@ -20,12 +20,23 @@ interface PersonalPageProps {
   user: AdminUser;
   setUser: (user: User | null) => void;
 }
+export interface Calculator {
+  id: number;
+  title: string;
+  formula: string;
+  variables: Record<string, any>;
+  author_email: string;
+  result_unit: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export default function PersonalPage({ user, setUser }: PersonalPageProps) {
   const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [constructorCalculator, setConstructorCalculator] = useState<boolean>(false);
   const [managerCalculator, setManagerCalculator] = useState<boolean>(false);
+  const [selectedCalculator, setSelectedCalculator] = useState<Calculator | null>(null);
   const navigate = useNavigate();
 
   const clearState = () => {
@@ -34,7 +45,7 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
   };
 
   useEffect(() => {
-    if (user.email === "antvolkov84@gmail.com" || "aleks_e@inbox.ru") {
+    if (user.email === "antvolkov84@gmail.com" || user.email === "aleks_e@inbox.ru") {
       setIsSuperAdmin(true);
     }
     if (user && typeof user.isAdmin === "boolean") {
@@ -92,7 +103,10 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
         <h1>Добро пожаловать, {user.username}</h1>
         {constructorCalculator ? (
           <div className="personalpage__content">
-            <ConstructorCalculator />
+            <ConstructorCalculator
+              selectedCalculator={selectedCalculator}
+              onUpdated={() => setManagerCalculator(true)}
+            />
             <Button
               onClick={() => {
                 setConstructorCalculator(false);
@@ -103,7 +117,11 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
         ) : (
           <>
             {managerCalculator ? (
-              <ManageCalculator />
+              <ManageCalculator
+                setManagerCalculator={setManagerCalculator}
+                setConstructorCalculator={setConstructorCalculator}
+                setSelectedCalculator={setSelectedCalculator}
+              />
             ) : (
               <div className="personalpage__content">
                 <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>

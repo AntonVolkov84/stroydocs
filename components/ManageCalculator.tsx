@@ -1,6 +1,7 @@
 import "./ManageCalculator.css";
 import Button from "./Button";
 import { useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import * as calculatorService from "../services/calculatorService";
 export interface Calculator {
   id: number;
@@ -12,9 +13,17 @@ export interface Calculator {
   created_at: string;
   updated_at: string;
 }
-export default function ManageCalculator() {
+interface ManageCalculatorProps {
+  setSelectedCalculator: (calc: Calculator) => void;
+  setManagerCalculator: Dispatch<SetStateAction<boolean>>;
+  setConstructorCalculator: Dispatch<SetStateAction<boolean>>;
+}
+export default function ManageCalculator({
+  setSelectedCalculator,
+  setConstructorCalculator,
+  setManagerCalculator,
+}: ManageCalculatorProps) {
   const [calculators, setCalculators] = useState<Calculator[] | null>(null);
-  console.log(calculators);
   const fetchCalculators = async (): Promise<void> => {
     try {
       const data = await calculatorService.getAllCalculators();
@@ -26,6 +35,16 @@ export default function ManageCalculator() {
   useEffect(() => {
     fetchCalculators();
   }, []);
+  const removeCalculator = async (id: number) => {
+    try {
+      const result = await calculatorService.deleteCalculator(id);
+      fetchCalculators();
+      alert(result.message);
+    } catch (error) {
+      console.error("Ошибка при удалении калькулятора:", error);
+      alert("Ошибка при удалении калькулятора");
+    }
+  };
   return (
     <div className="calculator-manager-container">
       <h2 className="calculator-manager-title">Управление калькуляторами</h2>
@@ -49,8 +68,19 @@ export default function ManageCalculator() {
                 <td>{calc.author_email}</td>
                 <td className="calculator-actions">
                   <div className="actions-buttons">
-                    <Button className="edit-btn">Изменить</Button>
-                    <Button className="button_btn--red-hover">Удалить</Button>
+                    <Button
+                      onClick={() => {
+                        setConstructorCalculator(true);
+                        setManagerCalculator(false);
+                        setSelectedCalculator(calc);
+                      }}
+                      className="edit-btn"
+                    >
+                      Изменить
+                    </Button>
+                    <Button onClick={() => removeCalculator(calc.id)} className="button_btn--red-hover">
+                      Удалить
+                    </Button>
                   </div>
                 </td>
               </tr>

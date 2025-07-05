@@ -6,6 +6,13 @@ interface CalculatorForm {
   formula: string;
   resultUnit: string;
 }
+interface UpdateCalculatorInput {
+  id: number;
+  title: string;
+  formula: string;
+  result_unit: string;
+  variables: { name: string; description: string }[];
+}
 export interface Calculator {
   id: number;
   title: string;
@@ -45,3 +52,29 @@ export async function getAllCalculators(): Promise<Calculator[] | null> {
     return null;
   }
 }
+export const deleteCalculator = async (id: number): Promise<{ message: string }> => {
+  try {
+    const response = await axios.post(
+      `${apiUrl}/calculators/delete`,
+      { id: id },
+      {
+        withCredentials: true,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при получении калькуляторов:", error);
+    return { message: "Ошибка при удалении калькулятора" };
+  }
+};
+export const updateCalculator = async (data: UpdateCalculatorInput): Promise<{ message: string }> => {
+  try {
+    const response = await axios.post(`${apiUrl}/calculators/update`, data, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при изменении калькулятора:", error);
+    return { message: "Ошибка при изменении калькулятора" };
+  }
+};

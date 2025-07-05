@@ -1,8 +1,10 @@
 import "./ConstructorCalculator.css";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import Button from "./Button";
+import { useState, useEffect } from "react";
 import Input from "./Input";
 import * as calculatorService from "../services/calculatorService";
+import { Calculator } from "../components/ManageCalculator";
 
 interface CalculatorForm {
   title: string;
@@ -10,8 +12,11 @@ interface CalculatorForm {
   formula: string;
   resultUnit: string;
 }
-
-export default function CalculatorConstructor() {
+interface Props {
+  selectedCalculator: Calculator | null;
+  onUpdated?: () => void;
+}
+export default function CalculatorConstructor({ selectedCalculator, onUpdated }: Props) {
   const {
     control,
     register,
@@ -28,21 +33,52 @@ export default function CalculatorConstructor() {
     },
   });
 
+  const [isEditing, setIsEditing] = useState(false);
   const { fields, append, remove } = useFieldArray({
     control,
     name: "variables",
   });
+  useEffect(() => {
+    if (selectedCalculator) {
+      setIsEditing(true);
 
+      reset({
+        title: selectedCalculator.title,
+        formula: selectedCalculator.formula,
+        resultUnit: selectedCalculator.result_unit,
+        variables: selectedCalculator.variables as { name: string; description: string }[],
+      });
+    }
+  }, [selectedCalculator, reset]);
   const variables = watch("variables");
 
   const onSubmit = async (data: CalculatorForm) => {
     try {
-      const response = await calculatorService.createCalculator(data);
-      if (!response) throw new Error("Не удалось сохранить");
+      if (isEditing && selectedCalculator) {
+        const res = await calculatorService.updateCalculator({
+          id: selectedCalculator.id,
+          title: data.title,
+          formula: data.formula,
+          result_unit: data.resultUnit,
+          variables: data.variables,
+        });
+        alert(`${res.message}`);
+        reset({
+          title: "",
+          variables: [{ name: "", description: "" }],
+          formula: "",
+          resultUnit: "",
+        });
+      } else {
+        await calculatorService.createCalculator(data);
+        alert("Калькулятор сохранён!");
+      }
+
+      setIsEditing(false);
       reset();
-      alert("Калькулятор сохранён!");
+      onUpdated?.();
     } catch (error: any) {
-      console.error("Ошибка при сохранении калькулятора:", error.message);
+      console.error("Ошибка:", error.message);
       alert(`Ошибка: ${error.message}`);
     }
   };
@@ -171,7 +207,7 @@ export default function CalculatorConstructor() {
       </div>
 
       <div className="form-actions">
-        <Button typeBtn="submit">Сохранить калькулятор</Button>
+        <Button typeBtn="submit">{isEditing ? "Обновить калькулятор" : "Сохранить калькулятор"}</Button>
       </div>
     </form>
   );
