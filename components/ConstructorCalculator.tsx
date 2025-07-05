@@ -2,11 +2,13 @@ import "./ConstructorCalculator.css";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import Button from "./Button";
 import Input from "./Input";
+import * as calculatorService from "../services/calculatorService";
 
 interface CalculatorForm {
   title: string;
   variables: { name: string; description: string }[];
   formula: string;
+  resultUnit: string;
 }
 
 export default function CalculatorConstructor() {
@@ -15,6 +17,7 @@ export default function CalculatorConstructor() {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
     setValue,
   } = useForm<CalculatorForm>({
@@ -32,23 +35,14 @@ export default function CalculatorConstructor() {
 
   const variables = watch("variables");
 
-  const onSubmit = (data: CalculatorForm) => {
-    console.log("data", data);
+  const onSubmit = async (data: CalculatorForm) => {
     try {
-      const values: Record<string, number> = {};
-      data.variables.forEach((v) => {
-        const val = prompt(`Введите значение переменной "${v.name}" в формате "${v.description}":`);
-        if (val === null || isNaN(Number(val))) {
-          throw new Error(`Некорректное значение для "${v.name}"`);
-        }
-        values[v.name] = Number(val);
-      });
-      const func = new Function(...Object.keys(values), `return ${data.formula};`);
-      const result = func(...Object.values(values));
-      console.log("Результат:", result);
-      alert(`Результат: ${result}`);
+      const response = await calculatorService.createCalculator(data);
+      if (!response) throw new Error("Не удалось сохранить");
+      reset();
+      alert("Калькулятор сохранён!");
     } catch (error: any) {
-      console.error("Ошибка при вычислении:", error.message);
+      console.error("Ошибка при сохранении калькулятора:", error.message);
       alert(`Ошибка: ${error.message}`);
     }
   };
@@ -169,6 +163,11 @@ export default function CalculatorConstructor() {
               </Button>
             ))}
         </div>
+        <Input
+          type="text"
+          {...register("resultUnit", { required: "Единица измерения обязательна" })}
+          placeholder="Величина ответа, например: м², рулонов, штук"
+        />
       </div>
 
       <div className="form-actions">
