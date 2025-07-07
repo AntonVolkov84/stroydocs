@@ -2,7 +2,7 @@
   position: relative;
   width: 100vw;
   height: 100vh;
-  background-color: #0e0e13;
+  background: linear-gradient(to bottom, #2f2f50, #1e1e2f 60%, #131320);
   overflow: hidden;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }

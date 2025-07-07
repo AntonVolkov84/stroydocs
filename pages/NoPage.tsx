@@ -1,4 +1,3 @@
-import React from "react";
 import "./NoPage.css";
 import catImage from "../src/catback.png";
 

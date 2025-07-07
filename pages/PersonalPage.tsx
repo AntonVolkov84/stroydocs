@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import ConstructorCalculator from "../components/ConstructorCalculator";
 import ManageCalculator from "../components/ManageCalculator";
+import ManageUsers from "../components/ManageUsers";
 
 interface User {
   id: string;
@@ -36,12 +37,15 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [constructorCalculator, setConstructorCalculator] = useState<boolean>(false);
   const [managerCalculator, setManagerCalculator] = useState<boolean>(false);
+  const [managerUser, setManagerUser] = useState<boolean>(false);
   const [selectedCalculator, setSelectedCalculator] = useState<Calculator | null>(null);
   const navigate = useNavigate();
+  const currentUserEmail = user.email;
 
   const clearState = () => {
     setManagerCalculator(false);
     setConstructorCalculator(false);
+    setManagerUser(false);
   };
 
   useEffect(() => {
@@ -69,7 +73,8 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
           {isSuperAdmin && (
             <li
               onClick={() => {
-                console.log("manage user");
+                clearState();
+                setManagerUser(true);
               }}
             >
               Управление пользователями
@@ -124,9 +129,15 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
                 setSelectedCalculator={setSelectedCalculator}
               />
             ) : (
-              <div className="personalpage__content">
-                <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
-              </div>
+              <>
+                {managerUser ? (
+                  <ManageUsers currentUserEmail={currentUserEmail} />
+                ) : (
+                  <div className="personalpage__content">
+                    <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
