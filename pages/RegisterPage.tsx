@@ -8,12 +8,16 @@ interface User {
   email: string;
   username: string;
   emailConfirmed: boolean;
+  name: string;
+  surname: string;
 }
 interface DataRegister {
   username: string;
   email: string;
   password: string;
   confirmPassword: string;
+  name: string;
+  surname: string;
 }
 interface RegisterPageProps {
   setUser: (user: User | null) => void;
@@ -61,6 +65,8 @@ export default function RegistrationPage({ setUser }: RegisterPageProps) {
         email: data.email,
         password: data.password,
         recaptchaToken: token,
+        name: data.name,
+        surname: data.surname,
       });
       if (success) {
         alert("На почту отправлено письмо! Пожалуйста, подтвердите почту для входа");
@@ -79,16 +85,48 @@ export default function RegistrationPage({ setUser }: RegisterPageProps) {
     <form className="register" onSubmit={handleSubmit(onSubmit)}>
       <div className="register__field">
         <label htmlFor="username" className="register__label">
-          Имя пользователя
+          Никнейм пользователя
         </label>
         <input
           id="username"
           className="register__input"
           type="text"
-          placeholder="Введите имя пользователя"
+          placeholder="Введите никнейм пользователя"
           {...register("username", { required: "Имя пользователя обязательно" })}
         />
         {errors.username && <p className="register__error">{errors.username.message}</p>}
+      </div>
+      <div className="register__field">
+        <label htmlFor="name" className="register__label">
+          Имя пользователя
+        </label>
+        <input
+          id="name"
+          className="register__input"
+          type="text"
+          placeholder="Введите ваше имя"
+          {...register("name", {
+            required: "Имя пользователя обязательно",
+            minLength: { value: 2, message: "Минимум 2 символа" },
+          })}
+        />
+        {errors.name && <p className="register__error">{errors.name.message}</p>}
+      </div>
+      <div className="register__field">
+        <label htmlFor="surname" className="register__label">
+          Фамилия пользователя
+        </label>
+        <input
+          id="surname"
+          className="register__input"
+          type="text"
+          placeholder="Введите вашу фамилию"
+          {...register("surname", {
+            required: "Фамилия пользователя обязательно",
+            minLength: { value: 2, message: "Минимум 2 символа" },
+          })}
+        />
+        {errors.surname && <p className="register__error">{errors.surname.message}</p>}
       </div>
 
       <div className="register__field">

@@ -13,6 +13,8 @@ interface User {
   username: string;
   emailConfirmed: boolean;
   isAdmin?: boolean;
+  name: string;
+  surname: string;
 }
 interface AdminUser extends User {
   admin?: boolean;
@@ -105,7 +107,9 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
         </ul>
       </aside>
       <main className="personalpage__main">
-        <h1>Добро пожаловать, {user.username}</h1>
+        <h1>
+          Добро пожаловать, {user.name} {user.surname}
+        </h1>
         {constructorCalculator ? (
           <div className="personalpage__content">
             <ConstructorCalculator

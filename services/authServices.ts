@@ -5,6 +5,8 @@ interface LoginData {
   password: string;
   email: string;
   recaptchaToken?: string;
+  name: string;
+  surname: string;
 }
 
 interface User {
@@ -12,6 +14,8 @@ interface User {
   username: string;
   email: string;
   emailConfirmed: boolean;
+  name: string;
+  surname: string;
 }
 interface ForgotPasswordForm {
   email: string;

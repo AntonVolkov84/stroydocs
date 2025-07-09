@@ -1,5 +1,5 @@
 import "./NoPage.css";
-import catImage from "../src/catback.png";
+import catImage from "../src/unsplash.jpg";
 
 export default function NoPage() {
   return (

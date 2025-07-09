@@ -14,7 +14,7 @@
   object-fit: cover;
   object-position: right center;
   z-index: 1;
-  animation: float 6s ease-in-out infinite;
+  /* animation: float 6s ease-in-out infinite; */
 }
 
 .no-page__code {
@@ -23,7 +23,7 @@
   top: -50px;
   font-size: 15rem;
   font-weight: 900;
-  color: #ff6f61;
+  color: #a71e11;
   text-shadow: 2px 2px 20px rgba(255, 111, 97, 0.9);
   z-index: 2;
   margin: 0;
@@ -35,7 +35,7 @@
   bottom: 10%;
   right: 10%;
   font-size: 4.5rem;
-  color: #ff6f61;
+  color: #a71e11;
   font-weight: 600;
   text-shadow: 2px 2px 20px rgba(255, 111, 97, 0.9);
   z-index: 2;

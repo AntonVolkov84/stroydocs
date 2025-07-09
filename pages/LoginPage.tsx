@@ -8,6 +8,8 @@ interface User {
   username: string;
   emailConfirmed: boolean;
   isAdmin?: boolean;
+  name: string;
+  surname: string;
 }
 interface LoginPageProps {
   setUser: (user: User | null) => void;
@@ -17,6 +19,8 @@ interface DataLogin {
   password: string;
   email: string;
   recaptchaToken?: string;
+  name: string;
+  surname: string;
 }
 export default function LoginPage({ setUser }: LoginPageProps) {
   const {
@@ -46,21 +50,21 @@ export default function LoginPage({ setUser }: LoginPageProps) {
   return (
     <form className="login" onSubmit={handleSubmit(onSubmit)}>
       <div className="login__field">
-        <label htmlFor="username" className="login__label">
-          Имя пользователя
+        <label htmlFor="email" className="login__label">
+          Эмаил пользователя
         </label>
         <input
-          id="username"
+          id="email"
           className="login__input"
-          type="username"
-          placeholder="Введите имя пользователя"
-          {...register("username", {
-            required: "username обязателен",
+          type="email"
+          placeholder="Введите эмаил пользователя"
+          {...register("email", {
+            required: "email обязателен",
           })}
         />
-        {errors.username && (
+        {errors.email && (
           <p className="login__error" role="alert">
-            {errors.username.message}
+            {errors.email.message}
             <span className="login__error-arrow" />
           </p>
         )}
