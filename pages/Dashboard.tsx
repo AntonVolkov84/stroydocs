@@ -31,7 +31,7 @@ export default function Dashboard() {
         <div className="dashboard-container">
           <ul className="dashboard-main-menu">
             <li className="dashboard-menu-item">
-              <span>О министерстве ▾</span>
+              <span>О компании ▾</span>
               <div className="dashboard-submenu">
                 <div className="dashboard-submenu-inner">
                   <a className="dashboard-submenu-href" href="#">
@@ -43,22 +43,31 @@ export default function Dashboard() {
               </div>
             </li>
             <li className="dashboard-menu-item">
-              <span>Пресс‑центр ▾</span>
+              <span>Калькулятор ▾</span>
               <div className="dashboard-submenu">
                 <div className="dashboard-submenu-inner">
                   <a className="dashboard-submenu-href" href="#">
-                    Новости
+                    Выбрать калькулятор
                   </a>
-                  <a href="#">Фото</a>
                 </div>
               </div>
             </li>
             <li className="dashboard-menu-item">
-              <span>Документы ▾</span>
+              <span>Формы ▾</span>
               <div className="dashboard-submenu">
                 <div className="dashboard-submenu-inner">
                   <a className="dashboard-submenu-href" href="#">
                     Все
+                  </a>
+                </div>
+              </div>
+            </li>
+            <li className="dashboard-menu-item">
+              <span>Отчеты ▾</span>
+              <div className="dashboard-submenu">
+                <div className="dashboard-submenu-inner">
+                  <a className="dashboard-submenu-href" href="#">
+                    Все отчеты
                   </a>
                 </div>
               </div>

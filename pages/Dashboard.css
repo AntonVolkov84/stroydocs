@@ -68,6 +68,7 @@
   width: 33%;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 .dashboard-menu-item > span {
   cursor: pointer;
@@ -104,6 +105,7 @@
   text-decoration: none;
   font-size: 14px;
   font-family: "PT Root UI", sans-serif;
+  padding-bottom: 25px;
 }
 .dashboard-submenu a:hover {
   color: #387bb6;

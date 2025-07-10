@@ -6,6 +6,7 @@ import Button from "../components/Button";
 import ConstructorCalculator from "../components/ConstructorCalculator";
 import ManageCalculator from "../components/ManageCalculator";
 import ManageUsers from "../components/ManageUsers";
+import CreatingNews from "../components/CreatingNews";
 
 interface User {
   id: string;
@@ -40,6 +41,7 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
   const [constructorCalculator, setConstructorCalculator] = useState<boolean>(false);
   const [managerCalculator, setManagerCalculator] = useState<boolean>(false);
   const [managerUser, setManagerUser] = useState<boolean>(false);
+  const [creatingNews, setCreatingNews] = useState<boolean>(false);
   const [selectedCalculator, setSelectedCalculator] = useState<Calculator | null>(null);
   const navigate = useNavigate();
   const currentUserEmail = user.email;
@@ -48,6 +50,7 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
     setManagerCalculator(false);
     setConstructorCalculator(false);
     setManagerUser(false);
+    setCreatingNews(false);
   };
 
   useEffect(() => {
@@ -70,8 +73,6 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
       <aside className="personalpage__sidebar">
         <h2>{isAdmin ? "Профиль Администратора" : "Профиль"} </h2>
         <ul>
-          <li>Мой аккаунт</li>
-          <li>Настройки</li>
           {isSuperAdmin && (
             <li
               onClick={() => {
@@ -80,6 +81,16 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
               }}
             >
               Управление пользователями
+            </li>
+          )}
+          {isAdmin && (
+            <li
+              onClick={() => {
+                clearState();
+                setCreatingNews(true);
+              }}
+            >
+              Управление новостями
             </li>
           )}
           {isAdmin && (
@@ -110,6 +121,7 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
         <h1>
           Добро пожаловать, {user.name} {user.surname}
         </h1>
+        {creatingNews && <CreatingNews />}
         {constructorCalculator ? (
           <div className="personalpage__content">
             <ConstructorCalculator
@@ -133,17 +145,14 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
                 setSelectedCalculator={setSelectedCalculator}
               />
             ) : (
-              <>
-                {managerUser ? (
-                  <ManageUsers currentUserEmail={currentUserEmail} />
-                ) : (
-                  <div className="personalpage__content">
-                    <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
-                  </div>
-                )}
-              </>
+              <>{managerUser && <ManageUsers currentUserEmail={currentUserEmail} />}</>
             )}
           </>
+        )}
+        {!managerCalculator && !constructorCalculator && !managerUser && !creatingNews && (
+          <div className="personalpage__content">
+            <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
+          </div>
         )}
       </main>
     </div>
