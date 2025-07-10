@@ -1,22 +1,39 @@
 import "./CreatingNews.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Button from "./Button";
 import * as cloudinaryServise from "../services/cloudinaryService";
 import * as newsServise from "../services/newsServise";
-interface NewsData {
+interface NewData {
   title: string;
   text: string;
   imageUrl: string;
   imagePublicId: string;
 }
+interface NewsData {
+  author_email: string;
+  created_at: string;
+  id: number;
+  imageurl: string;
+  text: string;
+  title: string;
+  updated_at: string;
+}
 function CreatingNews() {
   const [showPreview, setShowPreview] = useState(false);
+  const [newsData, setNewsData] = useState<NewsData[] | null>(null);
   const [form, setForm] = useState({
     title: "",
     text: "",
     image: null as File | null,
   });
+  useEffect(() => {
+    getData();
+  }, []);
 
+  const getData = async () => {
+    const res = await newsServise.getAllNews();
+    setNewsData(res);
+  };
   const handlePreview = () => setShowPreview(true);
   const handleClosePreview = () => setShowPreview(false);
 
@@ -49,15 +66,16 @@ function CreatingNews() {
         imageUrl = uploadResult.url;
         imagePublicId = uploadResult.publicId;
       }
-      const newsData: NewsData = {
+      const newData: NewData = {
         title: form.title,
         text: form.text,
         imageUrl,
         imagePublicId,
       };
-      const response = await newsServise.createNew(newsData);
+      const response = await newsServise.createNew(newData);
       if (response.ok) {
         alert(`${response.message}`);
+        getData();
         setForm({ title: "", text: "", image: null });
         setShowPreview(false);
       } else {
@@ -72,6 +90,12 @@ function CreatingNews() {
       console.error("Ошибка при сабмите:", error);
       alert("Произошла ошибка при создании новости");
     }
+  };
+  const deleteNew = async (id: number) => {
+    const isConfirmed = window.confirm("Вы уверены, что хотите удалить новость?");
+    if (!isConfirmed) return;
+    await newsServise.deleteNew(id);
+    getData();
   };
 
   return (
@@ -99,7 +123,6 @@ function CreatingNews() {
       <Button typeBtn="submit" styled={{ alignSelf: "center", maxWidth: "150px" }} onClick={handleSubmit}>
         Создать новость
       </Button>
-
       {showPreview && (
         <div className="creatingnews__modal">
           <div className="creatingnews__modal-content">
@@ -121,21 +144,35 @@ function CreatingNews() {
           <tr>
             <th>Заголовок</th>
             <th>Дата</th>
+            <th>Текст</th>
             <th>Действия</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Пример новости</td>
-            <td>10.07.2025</td>
-            <td>
-              <div className="news-actions">
-                <Button className="edit-btn">Изменить</Button>
-                <Button className="button_btn--red-hover">Удалить</Button>
-              </div>
-            </td>
-          </tr>
-          {/* Здесь будут рендериться реальные данные */}
+          {newsData &&
+            newsData.map((item) => (
+              <tr key={item.id}>
+                <td>{item.title}</td>
+                <td>
+                  {new Date(item.updated_at).toLocaleString("ru-RU", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </td>
+                <td className="news-text-cell">{item.text}</td>
+                <td>
+                  <div className="news-actions">
+                    <Button className="edit-btn">Изменить</Button>
+                    <Button onClick={() => deleteNew(item.id)} className="button_btn--red-hover">
+                      Удалить
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

@@ -24,3 +24,24 @@ export const createNew = async (data: NewsData): Promise<{ ok: boolean; message:
     return { ok: false, message: "Ошибка при создании новости" };
   }
 };
+export const getAllNews = async () => {
+  try {
+    const res = await axios.get(`${apiUrl}/news/getallnews`, {
+      withCredentials: true,
+    });
+    return res.data;
+  } catch (error) {
+    console.log("getAllNews", error);
+  }
+};
+export const deleteNew = async (id: number) => {
+  try {
+    const res = await axios.delete(`${apiUrl}/news/delete`, {
+      params: { id },
+      withCredentials: true,
+    });
+    return res.data;
+  } catch (error) {
+    console.log("deleteNew", error);
+  }
+};
