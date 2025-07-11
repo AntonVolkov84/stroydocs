@@ -1,7 +1,7 @@
 import "./PersonalPage.css";
 import { useState, useEffect } from "react";
 import * as authServices from "../services/authServices";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
 import ConstructorCalculator from "../components/ConstructorCalculator";
 import ManageCalculator from "../components/ManageCalculator";
@@ -73,6 +73,9 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
       <aside className="personalpage__sidebar">
         <h2>{isAdmin ? "Профиль Администратора" : "Профиль"} </h2>
         <ul>
+          <Link to="/dashboard" className="personalpage__sidebar-dashboard" onClick={() => {}}>
+            На главную
+          </Link>
           {isSuperAdmin && (
             <li
               onClick={() => {

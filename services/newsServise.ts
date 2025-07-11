@@ -6,6 +6,12 @@ interface NewsData {
   imageUrl: string;
   imagePublicId: string;
 }
+interface ChangeArticle {
+  title: string;
+  text: string;
+  imageUrl?: string;
+  imagePublicId?: string;
+}
 export const createNew = async (data: NewsData): Promise<{ ok: boolean; message: string }> => {
   try {
     await axios.post(`${apiUrl}/news/create`, data, {
@@ -43,5 +49,17 @@ export const deleteNew = async (id: number) => {
     return res.data;
   } catch (error) {
     console.log("deleteNew", error);
+  }
+};
+export const updateNew = async (id: number, data: ChangeArticle) => {
+  try {
+    const response = await axios.put(`${apiUrl}/news/changenew/${id}`, data, {
+      withCredentials: true,
+    });
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Ошибка при обновлении новости:", error);
+    return { ok: false, message: "Ошибка обновления" };
   }
 };

@@ -30,8 +30,17 @@
   cursor: pointer;
   transition: 0.3s;
 }
-
-.personalpage__sidebar li:hover {
+.personalpage__sidebar-dashboard {
+  padding: 10px 0;
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #fff;
+  display: block;
+  text-decoration: none;
+}
+.personalpage__sidebar li:hover,
+.personalpage__sidebar-dashboard:hover {
   color: #387bb6;
 }
 

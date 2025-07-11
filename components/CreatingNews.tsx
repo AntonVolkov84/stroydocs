@@ -1,5 +1,5 @@
 import "./CreatingNews.css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Button from "./Button";
 import * as cloudinaryServise from "../services/cloudinaryService";
 import * as newsServise from "../services/newsServise";
@@ -17,15 +17,23 @@ interface NewsData {
   text: string;
   title: string;
   updated_at: string;
+  imagepublicid?: string;
 }
+interface ChangeArticle extends NewsData {
+  imagepublicid: string;
+}
+
 function CreatingNews() {
   const [showPreview, setShowPreview] = useState(false);
+  const [articleChange, setArticleChange] = useState<NewsData | null>(null);
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [form, setForm] = useState({
     title: "",
     text: "",
     image: null as File | null,
   });
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   useEffect(() => {
     getData();
   }, []);
@@ -54,6 +62,7 @@ function CreatingNews() {
   };
 
   const handleSubmit = async () => {
+    setIsUpdating(true);
     try {
       let imageUrl = "";
       let imagePublicId = "";
@@ -77,6 +86,9 @@ function CreatingNews() {
         alert(`${response.message}`);
         getData();
         setForm({ title: "", text: "", image: null });
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
         setShowPreview(false);
       } else {
         const res = await cloudinaryServise.delFromStorage(imagePublicId);
@@ -89,13 +101,65 @@ function CreatingNews() {
     } catch (error) {
       console.error("Ошибка при сабмите:", error);
       alert("Произошла ошибка при создании новости");
+    } finally {
+      setIsUpdating(false);
     }
   };
-  const deleteNew = async (id: number) => {
+  const deleteNew = async (id: number, publicId: string | undefined) => {
+    if (publicId) {
+      await cloudinaryServise.delFromStorage(publicId);
+    }
     const isConfirmed = window.confirm("Вы уверены, что хотите удалить новость?");
     if (!isConfirmed) return;
     await newsServise.deleteNew(id);
+    setForm({ title: "", text: "", image: null });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
     getData();
+  };
+  const handleChangeArticle = async () => {
+    if (!articleChange) return;
+    setIsUpdating(true);
+    const latestPublicId = articleChange.imagepublicid;
+    let imageUrl;
+    let imagePublicId;
+    try {
+      if (form.image && latestPublicId) {
+        const uploaded = await cloudinaryServise.uploadImageToCloudinary(form.image);
+        if (!uploaded) {
+          alert("Ошибка при загрузке изображения");
+          return;
+        }
+        imageUrl = uploaded.url;
+        imagePublicId = uploaded.publicId;
+        await cloudinaryServise.delFromStorage(latestPublicId);
+      }
+      const updatedNews = {
+        title: form.title,
+        text: form.text,
+        imageUrl,
+        imagePublicId,
+      };
+      const response = await newsServise.updateNew(articleChange.id, updatedNews);
+      if (response.message === "Новость успешно обновлена") {
+        alert("Новость успешно обновлена");
+        setArticleChange(null);
+        setForm({ title: "", text: "", image: null });
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        setArticleChange(null);
+        getData();
+      } else {
+        alert("Ошибка при обновлении");
+      }
+    } catch (error) {
+      console.error("Ошибка при обновлении новости:", error);
+      alert("Ошибка при обновлении новости");
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   return (
@@ -116,19 +180,48 @@ function CreatingNews() {
         value={form.text}
         onChange={handleChange}
       />
-      <input type="file" accept="image/*" onChange={handleImageChange} className="creatingnews__file" />
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleImageChange}
+        className="creatingnews__file"
+      />
       <Button styled={{ maxWidth: "100px" }} onClick={handlePreview}>
         Превью
       </Button>
-      <Button typeBtn="submit" styled={{ alignSelf: "center", maxWidth: "150px" }} onClick={handleSubmit}>
-        Создать новость
-      </Button>
+      {articleChange ? (
+        <Button
+          disabled={isUpdating}
+          typeBtn="submit"
+          styled={{ alignSelf: "center", maxWidth: "150px" }}
+          onClick={handleChangeArticle}
+        >
+          {isUpdating ? "Обновление..." : "Изменить статью"}
+        </Button>
+      ) : (
+        <Button
+          disabled={isUpdating}
+          typeBtn="submit"
+          styled={{ alignSelf: "center", maxWidth: "150px" }}
+          onClick={handleSubmit}
+        >
+          {isUpdating ? "Публикую..." : "Создать новость"}
+        </Button>
+      )}
+
       {showPreview && (
         <div className="creatingnews__modal">
           <div className="creatingnews__modal-content">
             <h3>{form.title || "Без заголовка"}</h3>
             <div className="creatingnews__modal-info">
-              {form.image && <img src={URL.createObjectURL(form.image)} alt="preview" className="creatingnews__img" />}
+              {form.image ? (
+                <img src={URL.createObjectURL(form.image)} alt="preview" className="creatingnews__img" />
+              ) : (
+                articleChange?.imageurl && (
+                  <img src={articleChange.imageurl} alt="preview" className="creatingnews__img" />
+                )
+              )}
               <p>{form.text || "Нет текста"}</p>
             </div>
             <Button onClick={handleClosePreview} className="button_btn--red-hover">
@@ -165,8 +258,21 @@ function CreatingNews() {
                 <td className="news-text-cell">{item.text}</td>
                 <td>
                   <div className="news-actions">
-                    <Button className="edit-btn">Изменить</Button>
-                    <Button onClick={() => deleteNew(item.id)} className="button_btn--red-hover">
+                    <Button
+                      onClick={() => {
+                        setArticleChange(item);
+                        setForm({
+                          title: item.title,
+                          text: item.text,
+                          image: null,
+                        });
+                        console.log(item);
+                      }}
+                      className="edit-btn"
+                    >
+                      Изменить
+                    </Button>
+                    <Button onClick={() => deleteNew(item.id, item.imagepublicid)} className="button_btn--red-hover">
                       Удалить
                     </Button>
                   </div>
