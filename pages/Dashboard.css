@@ -98,6 +98,12 @@
 }
 .dashboard-submenu-href {
   padding: 6px 0;
+  border: none;
+  background-color: transparent;
+}
+.dashboard-submenu-href:hover {
+  cursor: pointer;
+  color: #387bb6;
 }
 .dashboard-submenu a {
   display: block;
@@ -107,6 +113,20 @@
   font-family: "PT Root UI", sans-serif;
   padding-bottom: 25px;
 }
+.dashboard-submenu button {
+  display: block;
+  color: #333;
+  text-decoration: none;
+  font-size: 14px;
+  font-family: "PT Root UI", sans-serif;
+  padding-bottom: 25px;
+}
 .dashboard-submenu a:hover {
   color: #387bb6;
+}
+
+@media (max-width: 1210px) {
+  .dashboard-submenu-inner {
+    justify-content: space-around;
+  }
 }

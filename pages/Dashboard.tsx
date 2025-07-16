@@ -6,6 +6,8 @@ import telegram from "../src/icons/telegram.svg";
 import youtube from "../src/icons/youtube.svg";
 import facebook from "../src/icons/facebook.svg";
 import { getAllNews } from "../services/newsServise";
+import * as calculatorService from "../services/calculatorService";
+import CalculatorComponent from "../components/Calculator";
 interface NewsData {
   author_email: string;
   created_at: string;
@@ -16,8 +18,25 @@ interface NewsData {
   updated_at: string;
   imagepublicid: string;
 }
+type ModalState<T> = T | false;
+export interface Calculator {
+  id: number;
+  title: string;
+  formula: string;
+  variables: Record<string, any>;
+  author_email: string;
+  result_unit: string;
+  created_at: string;
+  updated_at: string;
+}
+interface Mode {
+  calculators: ModalState<Calculator>;
+}
 export default function Dashboard() {
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
+  const [calculators, setCalculators] = useState<Calculator[] | null>(null);
+  const [mode, setMode] = useState<Mode>({ calculators: false });
+
   const getNewsData = async () => {
     try {
       const res = await getAllNews();
@@ -30,9 +49,21 @@ export default function Dashboard() {
       console.error("Ошибка при загрузке новостей newsData Dashboard:", error);
     }
   };
+  const fetchCalculators = async (): Promise<void> => {
+    try {
+      const data = await calculatorService.getAllCalculators();
+      setCalculators(data);
+    } catch (err) {
+      console.error("Ошибка при получении калькуляторов", err);
+    }
+  };
+  useEffect(() => {
+    fetchCalculators();
+  }, []);
   useEffect(() => {
     getNewsData();
   }, []);
+
   return (
     <>
       <header className="dashboard-header">
@@ -75,9 +106,17 @@ export default function Dashboard() {
                 <span>Калькулятор ▾</span>
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
-                    <a className="dashboard-submenu-href" href="#">
-                      Выбрать калькулятор
-                    </a>
+                    {calculators &&
+                      calculators.map((calc) => (
+                        <button
+                          onClick={() => {
+                            setMode((prev) => ({ ...prev, calculators: calc }));
+                          }}
+                          className="dashboard-submenu-href"
+                        >
+                          {calc.title}
+                        </button>
+                      ))}
                   </div>
                 </div>
               </li>
@@ -106,10 +145,16 @@ export default function Dashboard() {
         </div>
       </header>
       <main>
-        {Array.isArray(newsData) && <New item={newsData[0]} />}
-        {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
-        {Array.isArray(newsData) && newsData[2] && <New item={newsData[2]} />}
-        {Array.isArray(newsData) && newsData[3] && <New reversed item={newsData[3]} />}
+        {mode.calculators ? (
+          <CalculatorComponent mode={mode} setMode={setMode} />
+        ) : (
+          <>
+            {Array.isArray(newsData) && <New item={newsData[0]} />}
+            {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
+            {Array.isArray(newsData) && newsData[2] && <New item={newsData[2]} />}
+            {Array.isArray(newsData) && newsData[3] && <New reversed item={newsData[3]} />}
+          </>
+        )}
       </main>
     </>
   );
