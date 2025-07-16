@@ -35,6 +35,7 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
   });
 
   const [isEditing, setIsEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { fields, append, remove } = useFieldArray({
     control,
     name: "variables",
@@ -66,6 +67,7 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
       alert("Ввод HTML или потенциально опасного кода запрещён.");
       return;
     }
+    setIsSubmitting(true);
     try {
       if (isEditing && selectedCalculator) {
         const res = await calculatorService.updateCalculator({
@@ -93,6 +95,8 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
     } catch (error: any) {
       console.error("Ошибка:", error.message);
       alert(`Ошибка: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -219,7 +223,9 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
       </div>
 
       <div className="form-actions">
-        <Button typeBtn="submit">{isEditing ? "Обновить калькулятор" : "Сохранить калькулятор"}</Button>
+        <Button disabled={isSubmitting} typeBtn="submit">
+          {isSubmitting ? "Отправка..." : isEditing ? "Обновить калькулятор" : "Сохранить калькулятор"}
+        </Button>
       </div>
     </form>
   );

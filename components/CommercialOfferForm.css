@@ -1,0 +1,75 @@
+.commercial-wrapper {
+  font-family: "Arial", sans-serif;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-size: 14px;
+}
+
+.header-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.inline-input {
+  width: 200px;
+  border: none;
+  border-bottom: 1px solid black;
+}
+
+.inline-input.short {
+  width: 100px;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.offer-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.offer-table th,
+.offer-table td {
+  border: 1px solid black;
+  padding: 5px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.cell-input {
+  width: 100%;
+  border: none;
+  padding: 3px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.cell-input:focus {
+  outline: none;
+  background-color: #eef;
+}
+
+.cell-input.small {
+  width: 80px;
+}
+
+.cell-input.smaller {
+  width: 60px;
+}
+
+.cell-input.bold {
+  font-weight: bold;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 40px;
+  font-size: 14px;
+}

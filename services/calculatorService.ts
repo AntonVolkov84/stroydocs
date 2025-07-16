@@ -1,4 +1,5 @@
 import axios from "axios";
+import { CalculatorInterface } from "../type";
 
 interface CalculatorForm {
   title: string;
@@ -12,16 +13,6 @@ interface UpdateCalculatorInput {
   formula: string;
   result_unit: string;
   variables: { name: string; description: string }[];
-}
-export interface Calculator {
-  id: number;
-  title: string;
-  formula: string;
-  variables: Record<string, any>;
-  author_email: string;
-  result_unit: string;
-  created_at: string;
-  updated_at: string;
 }
 
 const apiUrl: string = import.meta.env.VITE_API_URL;
@@ -41,7 +32,7 @@ export async function createCalculator(data: CalculatorForm): Promise<boolean> {
     return false;
   }
 }
-export async function getAllCalculators(): Promise<Calculator[] | null> {
+export async function getAllCalculators(): Promise<CalculatorInterface[] | null> {
   try {
     const response = await axios.get(`${apiUrl}/calculators`, {
       withCredentials: true,

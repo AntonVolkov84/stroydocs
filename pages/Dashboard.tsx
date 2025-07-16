@@ -8,6 +8,8 @@ import facebook from "../src/icons/facebook.svg";
 import { getAllNews } from "../services/newsServise";
 import * as calculatorService from "../services/calculatorService";
 import CalculatorComponent from "../components/Calculator";
+import { CalculatorInterface, ModalState, Mode } from "../type";
+import CommercialOfferForm from "../components/CommercialOfferForm";
 interface NewsData {
   author_email: string;
   created_at: string;
@@ -18,24 +20,11 @@ interface NewsData {
   updated_at: string;
   imagepublicid: string;
 }
-type ModalState<T> = T | false;
-export interface Calculator {
-  id: number;
-  title: string;
-  formula: string;
-  variables: Record<string, any>;
-  author_email: string;
-  result_unit: string;
-  created_at: string;
-  updated_at: string;
-}
-interface Mode {
-  calculators: ModalState<Calculator>;
-}
+
 export default function Dashboard() {
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
-  const [calculators, setCalculators] = useState<Calculator[] | null>(null);
-  const [mode, setMode] = useState<Mode>({ calculators: false });
+  const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
+  const [mode, setMode] = useState<Mode>({ calculators: false, form: false });
 
   const getNewsData = async () => {
     try {
@@ -94,11 +83,9 @@ export default function Dashboard() {
                 <span>О компании ▾</span>
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
-                    <a className="dashboard-submenu-href" href="#">
-                      Руководство
-                    </a>
-                    <a href="#">Департаменты</a>
-                    <a href="#">Еще что-то там</a>
+                    <button className="dashboard-submenu-href">Руководство</button>
+                    <button className="dashboard-submenu-href">Департаменты</button>
+                    <button className="dashboard-submenu-href">Еще что-то там</button>
                   </div>
                 </div>
               </li>
@@ -110,7 +97,7 @@ export default function Dashboard() {
                       calculators.map((calc) => (
                         <button
                           onClick={() => {
-                            setMode((prev) => ({ ...prev, calculators: calc }));
+                            setMode((prev) => ({ form: false, calculators: calc }));
                           }}
                           className="dashboard-submenu-href"
                         >
@@ -124,9 +111,14 @@ export default function Dashboard() {
                 <span>Формы ▾</span>
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
-                    <a className="dashboard-submenu-href" href="#">
-                      Все
-                    </a>
+                    <button
+                      onClick={() => {
+                        setMode((prev) => ({ calculators: false, form: true }));
+                      }}
+                      className="dashboard-submenu-href"
+                    >
+                      Коммерческое предложение форма 0
+                    </button>
                   </div>
                 </div>
               </li>
@@ -134,9 +126,7 @@ export default function Dashboard() {
                 <span>Отчеты ▾</span>
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
-                    <a className="dashboard-submenu-href" href="#">
-                      Все отчеты
-                    </a>
+                    <button className="dashboard-submenu-href">Все отчеты</button>
                   </div>
                 </div>
               </li>
@@ -145,14 +135,19 @@ export default function Dashboard() {
         </div>
       </header>
       <main>
+        {mode.form && <CommercialOfferForm setMode={setMode} />}
         {mode.calculators ? (
           <CalculatorComponent mode={mode} setMode={setMode} />
         ) : (
           <>
-            {Array.isArray(newsData) && <New item={newsData[0]} />}
-            {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
-            {Array.isArray(newsData) && newsData[2] && <New item={newsData[2]} />}
-            {Array.isArray(newsData) && newsData[3] && <New reversed item={newsData[3]} />}
+            {!mode.calculators && !mode.form ? (
+              <>
+                {Array.isArray(newsData) && <New item={newsData[0]} />}
+                {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
+                {Array.isArray(newsData) && newsData[2] && <New item={newsData[2]} />}
+                {Array.isArray(newsData) && newsData[3] && <New reversed item={newsData[3]} />}
+              </>
+            ) : null}
           </>
         )}
       </main>

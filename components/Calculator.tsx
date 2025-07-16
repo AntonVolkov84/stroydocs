@@ -1,25 +1,7 @@
 import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import "./Calculator.css";
 import Button from "./Button";
-type ModalState<T> = T | false;
-
-interface Variable {
-  name: string;
-  description: string;
-}
-interface Calculator {
-  id: number;
-  title: string;
-  formula: string;
-  variables: Variable[];
-  author_email: string;
-  result_unit: string;
-  created_at: string;
-  updated_at: string;
-}
-interface Mode {
-  calculators: ModalState<Calculator>;
-}
+import { CalculatorInterface, ModalState, Mode } from "../type";
 interface CalculatorProps {
   mode: Mode;
   setMode: Dispatch<SetStateAction<Mode>>;
