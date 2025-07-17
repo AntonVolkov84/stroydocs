@@ -48,3 +48,11 @@ export type Payload = {
   variablesValues: InputValues;
   result: string | number | null;
 };
+export interface SavedCalculatorData {
+  id: string | number;
+  userId: string;
+  title: string;
+  calculator: Calculator;
+  input_values: InputValues;
+  result: string | number | null;
+}

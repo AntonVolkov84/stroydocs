@@ -78,7 +78,7 @@ export const saveCalculatorResults = async (payload: Payload) => {
     console.log("saveCalculatorResults", error);
   }
 };
-export const getSaveCalculatorResults = async (id: number | string) => {
+export const getSaveCalculatorResults = async (id: string | number) => {
   try {
     const response = await axios.get(`${apiUrl}/stroydocs/getsavecalc`, {
       params: { userId: id },
@@ -88,4 +88,7 @@ export const getSaveCalculatorResults = async (id: number | string) => {
   } catch (error) {
     console.log("getSaveCalculatorResults", error);
   }
+};
+export const deleteSavedCalculator = async (id: number | string) => {
+  console.log(id);
 };

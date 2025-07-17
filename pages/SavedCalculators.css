@@ -1,10 +1,34 @@
 .savedcalculator-container {
-  max-width: 600px;
+  margin: 24px auto;
   width: 100%;
-  margin: 0;
   padding: 24px;
   border: 1px solid #ddd;
   border-radius: 12px;
   background-color: #f9f9f9;
   box-sizing: border-box;
+}
+.calculator-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.calculator-table th,
+.calculator-table td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.details {
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
