@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, createContext, useContext } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
@@ -10,6 +10,7 @@ import ForgotPasswordPage from "../pages/ForgotPasswordPage";
 import ChangePasswordPage from "../pages/ChangePasswordPage";
 import PersonalPage from "../pages/PersonalPage";
 import NoPage from "../pages/NoPage";
+import { AppContext } from "../services/AppContext";
 
 interface User {
   id: string;
@@ -41,24 +42,24 @@ function App() {
     return <div>Загрузка...</div>;
   }
   return (
-    <Router>
-      <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/login" element={<LoginPage setUser={setUser} />} />
-        <Route path="/confirm-email" element={<ConfirmEmail />} />
-        <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
-        <Route path="/changepassword" element={<ChangePasswordPage user={user} />} />
-        <Route path="/register" element={<RegisterPage setUser={setUser} />} />
-        <Route
-          path="/personalpage"
-          element={
-            user && user.emailConfirmed ? <PersonalPage user={user} setUser={setUser} /> : <Navigate to={"/login"} />
-          }
-        />
-        <Route path="/" element={<Navigate to={"/dashboard"} replace />} />
-        <Route path="*" element={<NoPage />} />
-      </Routes>
-    </Router>
+    <AppContext.Provider value={{ user, setUser }}>
+      <Router>
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/login" element={<LoginPage setUser={setUser} />} />
+          <Route path="/confirm-email" element={<ConfirmEmail />} />
+          <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
+          <Route path="/changepassword" element={<ChangePasswordPage user={user} />} />
+          <Route path="/register" element={<RegisterPage setUser={setUser} />} />
+          <Route
+            path="/personalpage"
+            element={user && user.emailConfirmed ? <PersonalPage /> : <Navigate to={"/login"} />}
+          />
+          <Route path="/" element={<Navigate to={"/dashboard"} replace />} />
+          <Route path="*" element={<NoPage />} />
+        </Routes>
+      </Router>
+    </AppContext.Provider>
   );
 }
 

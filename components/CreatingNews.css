@@ -73,18 +73,20 @@
   gap: 16px;
 }
 .creatingnews__modal-info {
-  display: flex;
-  flex-direction: row;
-  overflow: scroll;
-  gap: 10px;
-  padding-right: 10px;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  text-align: justify;
 }
+
 .creatingnews__img {
-  max-width: 100%;
+  float: left;
+  margin-right: 16px;
+  margin-bottom: 10px;
+  width: 40%;
+  max-width: 250px;
   max-height: 250px;
   object-fit: contain;
-  display: block;
-  margin: 0 auto;
   border-radius: 8px;
 }
 .news-actions {

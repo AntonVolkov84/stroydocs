@@ -7,6 +7,8 @@ import ConstructorCalculator from "../components/ConstructorCalculator";
 import ManageCalculator from "../components/ManageCalculator";
 import ManageUsers from "../components/ManageUsers";
 import CreatingNews from "../components/CreatingNews";
+import SavedCalculators from "./SavedCalculators";
+import { useAppContext } from "../services/AppContext";
 
 interface User {
   id: string;
@@ -20,10 +22,6 @@ interface User {
 interface AdminUser extends User {
   admin?: boolean;
 }
-interface PersonalPageProps {
-  user: AdminUser;
-  setUser: (user: User | null) => void;
-}
 export interface Calculator {
   id: number;
   title: string;
@@ -35,7 +33,7 @@ export interface Calculator {
   updated_at: string;
 }
 
-export default function PersonalPage({ user, setUser }: PersonalPageProps) {
+export default function PersonalPage() {
   const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [constructorCalculator, setConstructorCalculator] = useState<boolean>(false);
@@ -43,7 +41,9 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
   const [managerUser, setManagerUser] = useState<boolean>(false);
   const [creatingNews, setCreatingNews] = useState<boolean>(false);
   const [selectedCalculator, setSelectedCalculator] = useState<Calculator | null>(null);
+  const [savedCalculator, setSavedCalculator] = useState<boolean>(false);
   const navigate = useNavigate();
+  const { user, setUser } = useAppContext();
   const currentUserEmail = user.email;
 
   const clearState = () => {
@@ -51,9 +51,11 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
     setConstructorCalculator(false);
     setManagerUser(false);
     setCreatingNews(false);
+    setSavedCalculator(false);
   };
 
   useEffect(() => {
+    if (!user) return;
     if (user.email === "antvolkov84@gmail.com" || user.email === "aleks_e@inbox.ru") {
       setIsSuperAdmin(true);
     }
@@ -65,8 +67,8 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
   }, [user]);
 
   const handleLogOut = (): void => {
-    authServices.logout();
     setUser(null);
+    authServices.logout();
   };
   return (
     <div className="personalpage">
@@ -76,6 +78,14 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
           <Link to="/dashboard" className="personalpage__sidebar-dashboard" onClick={() => {}}>
             На главную
           </Link>
+          <li
+            onClick={() => {
+              clearState();
+              setSavedCalculator(true);
+            }}
+          >
+            Сохраненные данные по калькуляторам
+          </li>
           {isSuperAdmin && (
             <li
               onClick={() => {
@@ -152,7 +162,8 @@ export default function PersonalPage({ user, setUser }: PersonalPageProps) {
             )}
           </>
         )}
-        {!managerCalculator && !constructorCalculator && !managerUser && !creatingNews && (
+        {savedCalculator && <SavedCalculators />}
+        {!managerCalculator && !constructorCalculator && !managerUser && !creatingNews && !savedCalculator && (
           <div className="personalpage__content">
             <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
           </div>

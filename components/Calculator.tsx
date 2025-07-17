@@ -1,7 +1,9 @@
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
+import { useAppContext } from "../services/AppContext";
 import "./Calculator.css";
 import Button from "./Button";
-import { CalculatorInterface, ModalState, Mode } from "../type";
+import { Mode, Payload } from "../type";
+import { saveCalculatorResults } from "../services/calculatorService";
 interface CalculatorProps {
   mode: Mode;
   setMode: Dispatch<SetStateAction<Mode>>;
@@ -9,10 +11,8 @@ interface CalculatorProps {
 function Calculator({ mode, setMode }: CalculatorProps) {
   const [variableValues, setVariableValues] = useState<Record<string, number>>({});
   const [calcResult, setCalcResult] = useState<number | string | null>(null);
-  const extractVariables = (formula: string): string[] => {
-    const matches = formula.match(/\b[а-яА-ЯёЁa-zA-Z_]+\b/g);
-    return matches ? Array.from(new Set(matches)) : [];
-  };
+  const { user } = useAppContext();
+
   const calculateFormula = (formula: string, variables: Record<string, number>): number | string => {
     try {
       let expression = formula;
@@ -25,12 +25,33 @@ function Calculator({ mode, setMode }: CalculatorProps) {
       return "Ошибка вычисления";
     }
   };
-
+  const handleSave = async () => {
+    if (!user || typeof mode.calculators !== "object") return;
+    const documentName = prompt("Введите название для сохранения расчета:");
+    if (!documentName) return;
+    const payload: Payload = {
+      userId: user.id,
+      calculator: mode.calculators,
+      variablesValues: variableValues,
+      result: calcResult,
+      title: documentName,
+    };
+    try {
+      saveCalculatorResults(payload);
+      alert("Расчёт успешно сохранён!");
+    } catch (err) {
+      console.error("Ошибка при сохранении расчета:", err);
+      alert("Ошибка при сохранении.");
+    }
+  };
   return (
     <>
       {typeof mode.calculators === "object" && (
         <div className="calculator-container">
-          <Button onClick={() => setMode((prev) => ({ ...prev, calculators: false }))}>← Назад</Button>
+          {!user && <h3 style={{ color: "red" }}>Для возможности сохранения рассчетов нужно авторизироваться!</h3>}
+          <Button styled={{ marginTop: 25 }} onClick={() => setMode((prev) => ({ ...prev, calculators: false }))}>
+            ← Назад
+          </Button>
           <h2 className="calculator-title">{mode.calculators.title}</h2>
           <p className="calculator-formula">
             Формула: <code>{mode.calculators.formula}</code>
@@ -74,6 +95,11 @@ function Calculator({ mode, setMode }: CalculatorProps) {
                 {calcResult} {mode.calculators.result_unit}
               </strong>
             </div>
+          )}
+          {user && (
+            <Button onClick={() => handleSave()} styled={{ width: 100, marginTop: 40 }}>
+              Сохранить
+            </Button>
           )}
         </div>
       )}

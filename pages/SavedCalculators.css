@@ -1,0 +1,10 @@
+.savedcalculator-container {
+  max-width: 600px;
+  width: 100%;
+  margin: 0;
+  padding: 24px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  box-sizing: border-box;
+}

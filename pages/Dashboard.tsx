@@ -96,6 +96,7 @@ export default function Dashboard() {
                     {calculators &&
                       calculators.map((calc) => (
                         <button
+                          key={calc.id}
                           onClick={() => {
                             setMode((prev) => ({ form: false, calculators: calc }));
                           }}

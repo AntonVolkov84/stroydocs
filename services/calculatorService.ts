@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CalculatorInterface } from "../type";
+import { CalculatorInterface, Payload } from "../type";
 
 interface CalculatorForm {
   title: string;
@@ -67,5 +67,25 @@ export const updateCalculator = async (data: UpdateCalculatorInput): Promise<{ m
   } catch (error) {
     console.error("Ошибка при изменении калькулятора:", error);
     return { message: "Ошибка при изменении калькулятора" };
+  }
+};
+export const saveCalculatorResults = async (payload: Payload) => {
+  try {
+    await axios.post(`${apiUrl}/stroydocs/savecalc`, payload, {
+      withCredentials: true,
+    });
+  } catch (error) {
+    console.log("saveCalculatorResults", error);
+  }
+};
+export const getSaveCalculatorResults = async (id: number | string) => {
+  try {
+    const response = await axios.get(`${apiUrl}/stroydocs/getsavecalc`, {
+      params: { userId: id },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("getSaveCalculatorResults", error);
   }
 };
