@@ -90,5 +90,12 @@ export const getSaveCalculatorResults = async (id: string | number) => {
   }
 };
 export const deleteSavedCalculator = async (id: number | string) => {
-  console.log(id);
+  try {
+    await axios.delete(`${apiUrl}/stroydocs/delsavedcalc`, {
+      params: { savedCalcId: id },
+      withCredentials: true,
+    });
+  } catch (error) {
+    console.log("deleteSavedCalculator", error);
+  }
 };

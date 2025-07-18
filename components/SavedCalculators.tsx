@@ -1,7 +1,7 @@
 import { useEffect, useState, Fragment } from "react";
 import "./SavedCalculators.css";
 import { getSaveCalculatorResults, deleteSavedCalculator } from "../services/calculatorService";
-import { Payload, SavedCalculatorData } from "../type";
+import { SavedCalculatorData } from "../type";
 import { useAppContext } from "../services/AppContext";
 import Button from "../components/Button";
 
@@ -18,6 +18,8 @@ function SavedCalculators() {
   };
 
   const handleDelete = async (id: number | string) => {
+    const confirmed = window.confirm("Ты уверен, что хочешь удалить этот калькулятор? 🗑️");
+    if (!confirmed) return;
     await deleteSavedCalculator(id);
     getSavedCalculatorData();
   };
@@ -82,14 +84,17 @@ function SavedCalculators() {
                       <div className="details">
                         <strong>Название калькулятора:</strong> {calc.calculator.title}
                         <strong>Формула:</strong> {calc.calculator.formula}
-                        <strong>Переменные:</strong>
+                        <strong>Введенные данные:</strong>
                         {calc.input_values && typeof calc.input_values === "object" ? (
                           <ul>
-                            {Object.entries(calc.input_values).map(([key, value]) => (
-                              <li key={key}>
-                                {key}: {value}
-                              </li>
-                            ))}
+                            {Object.entries(calc.input_values).map(([key, value]) => {
+                              const variable = calc.calculator.variables.find((v) => v.name === key);
+                              return (
+                                <li key={key}>
+                                  {key}: {value} -- {variable?.description}
+                                </li>
+                              );
+                            })}
                           </ul>
                         ) : (
                           <p>Нет данных о переменных</p>

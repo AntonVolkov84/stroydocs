@@ -7,7 +7,7 @@ import ConstructorCalculator from "../components/ConstructorCalculator";
 import ManageCalculator from "../components/ManageCalculator";
 import ManageUsers from "../components/ManageUsers";
 import CreatingNews from "../components/CreatingNews";
-import SavedCalculators from "./SavedCalculators";
+import SavedCalculators from "../components/SavedCalculators";
 import { useAppContext } from "../services/AppContext";
 
 interface User {
