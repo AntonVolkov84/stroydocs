@@ -1,12 +1,21 @@
 import axios from "axios";
 
-import { PayloadForCommercialOffer } from "../type";
+import { PayloadForCommercialOffer, PayloadUpdateCommercialOffer } from "../type";
 
 const apiUrl: string = import.meta.env.VITE_API_URL;
 
 export const saveCommercialOffer = async (payload: PayloadForCommercialOffer) => {
   try {
     await axios.post(`${apiUrl}/stroydocs/savecomerc`, payload, {
+      withCredentials: true,
+    });
+  } catch (error) {
+    console.log("saveCommercialOffer", error);
+  }
+};
+export const updateCommercialOffer = async (payload: PayloadUpdateCommercialOffer) => {
+  try {
+    await axios.put(`${apiUrl}/stroydocs/updatesavedcomerc`, payload, {
       withCredentials: true,
     });
   } catch (error) {
@@ -24,10 +33,10 @@ export const getCommercialOffers = async (id: string | number) => {
     console.log("getCommercialOffers", error);
   }
 };
-export const deletegetCommercialOffers = async (id: number | string) => {
+export const deleteCommercialOffers = async (id: number | string) => {
   try {
     await axios.delete(`${apiUrl}/stroydocs/delsavedcomerc`, {
-      params: { savedCalcId: id },
+      params: { savedComercId: id },
       withCredentials: true,
     });
   } catch (error) {

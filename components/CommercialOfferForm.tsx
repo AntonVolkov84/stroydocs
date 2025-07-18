@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 import "./CommercialOfferForm.css";
 import Button from "./Button";
 import { Mode } from "../type";
 import { Trash2 } from "lucide-react";
 import { useAppContext } from "../services/AppContext";
+import { SavedOfferData } from "../type";
 import * as commercialOfferService from "../services/commercialOfferService";
 
 interface RowData {
@@ -15,22 +16,33 @@ interface RowData {
 }
 
 interface CommercialOfferFormProps {
-  setMode: React.Dispatch<React.SetStateAction<Mode>>;
+  setMode?: React.Dispatch<React.SetStateAction<Mode>>;
+  initialRows?: RowData[];
+  initialTaxRate?: number;
+  initialTitle?: string;
+  showBackButton?: boolean;
+  initialOfferId?: number | string;
+  onUpdateSuccess?: () => void;
+  setSelectedOffer?: Dispatch<SetStateAction<SavedOfferData | null>>;
 }
 
-const CommercialOfferForm = ({ setMode }: CommercialOfferFormProps) => {
-  const [rows, setRows] = useState<RowData[]>([
-    {
-      name: "",
-      unit: "",
-      type: "работы",
-      quantity: 0,
-      price: 0,
-    },
-  ]);
+const CommercialOfferForm = ({
+  setMode,
+  initialRows,
+  initialTaxRate,
+  showBackButton = true,
+  initialTitle,
+  initialOfferId,
+  onUpdateSuccess,
+  setSelectedOffer,
+}: CommercialOfferFormProps) => {
+  console.log("showBackButton:", initialOfferId);
+  const [rows, setRows] = useState<RowData[]>(
+    initialRows || [{ name: "", unit: "", type: "работы", quantity: 0, price: 0 }]
+  );
   const { user } = useAppContext();
 
-  const [taxRate, setTaxRate] = useState(20);
+  const [taxRate, setTaxRate] = useState(initialTaxRate || 20);
 
   const addRow = (type: RowData["type"]) => {
     setRows((prev) => [...prev, { name: "", unit: "", type, quantity: 0, price: 0 }]);
@@ -81,21 +93,61 @@ const CommercialOfferForm = ({ setMode }: CommercialOfferFormProps) => {
       alert("Произошла ошибка при сохранении.");
     }
   };
+  const handleUpdate = async () => {
+    const title = prompt("Изменения вступают в силу, название оставляем?", initialTitle || "");
+    if (!title || !user || !initialOfferId) return;
+    const payload = {
+      offerId: initialOfferId,
+      userId: user.id,
+      title,
+      rows: rows,
+      taxRate,
+    };
+
+    try {
+      await commercialOfferService.updateCommercialOffer(payload);
+      alert("Коммерческое предложение успешно обновлено!");
+      setSelectedOffer?.(null);
+      if (onUpdateSuccess) onUpdateSuccess();
+    } catch (error) {
+      console.error("Ошибка при сохранении КП:", error);
+      alert("Произошла ошибка при сохранении.");
+    }
+  };
   return (
     <div className="commercial-wrapper">
       <div className="commercial__controlUnit">
-        <Button styled={{ marginBottom: 20 }} onClick={() => setMode((prev) => ({ form: false, calculators: false }))}>
-          ← Назад
-        </Button>
+        {showBackButton && (
+          <Button
+            styled={{ marginBottom: 20 }}
+            onClick={() => {
+              if (setMode) {
+                setMode({ form: false, calculators: false });
+              } else {
+                console.warn("setMode не передан, ничего не делаем");
+              }
+            }}
+          >
+            ← Назад
+          </Button>
+        )}
         {!user && (
           <h3 style={{ color: "red", alignSelf: "center", marginBottom: 20 }}>
             Для возможности сохранения рассчетов нужно авторизироваться!
           </h3>
         )}
         {user ? (
-          <Button onClick={() => handleSave()} styled={{ marginBottom: 20 }}>
-            Сохранить
-          </Button>
+          <>
+            {showBackButton ? (
+              <Button onClick={() => handleSave()} styled={{ marginBottom: 20 }}>
+                Сохранить
+              </Button>
+            ) : (
+              <Button onClick={() => handleUpdate()} styled={{ marginBottom: 20 }}>
+                Изменить
+              </Button>
+            )}
+          </>
         ) : null}
         {user ? (
           <Button styled={{ marginBottom: 20 }} onClick={() => window.print()}>

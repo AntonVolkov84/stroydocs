@@ -8,6 +8,7 @@ import ManageCalculator from "../components/ManageCalculator";
 import ManageUsers from "../components/ManageUsers";
 import CreatingNews from "../components/CreatingNews";
 import SavedCalculators from "../components/SavedCalculators";
+import Commercial from "../components/Commercial";
 import { useAppContext } from "../services/AppContext";
 
 interface User {
@@ -19,9 +20,7 @@ interface User {
   name: string;
   surname: string;
 }
-interface AdminUser extends User {
-  admin?: boolean;
-}
+
 export interface Calculator {
   id: number;
   title: string;
@@ -42,6 +41,7 @@ export default function PersonalPage() {
   const [creatingNews, setCreatingNews] = useState<boolean>(false);
   const [selectedCalculator, setSelectedCalculator] = useState<Calculator | null>(null);
   const [savedCalculator, setSavedCalculator] = useState<boolean>(false);
+  const [savedCommercialOffer, setSavedCommercialOffer] = useState<boolean>(false);
   const navigate = useNavigate();
   const { user, setUser } = useAppContext();
   const currentUserEmail = user.email;
@@ -52,6 +52,7 @@ export default function PersonalPage() {
     setManagerUser(false);
     setCreatingNews(false);
     setSavedCalculator(false);
+    setSavedCommercialOffer(false);
   };
 
   useEffect(() => {
@@ -85,6 +86,14 @@ export default function PersonalPage() {
             }}
           >
             Сохраненные данные по калькуляторам
+          </li>
+          <li
+            onClick={() => {
+              clearState();
+              setSavedCommercialOffer(true);
+            }}
+          >
+            Сохраненные данные по коммерческим предложениям
           </li>
           {isSuperAdmin && (
             <li
@@ -162,12 +171,18 @@ export default function PersonalPage() {
             )}
           </>
         )}
+        {savedCommercialOffer && <Commercial />}
         {savedCalculator && <SavedCalculators />}
-        {!managerCalculator && !constructorCalculator && !managerUser && !creatingNews && !savedCalculator && (
-          <div className="personalpage__content">
-            <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
-          </div>
-        )}
+        {!managerCalculator &&
+          !constructorCalculator &&
+          !managerUser &&
+          !creatingNews &&
+          !savedCalculator &&
+          !savedCommercialOffer && (
+            <div className="personalpage__content">
+              <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
+            </div>
+          )}
       </main>
     </div>
   );

@@ -60,7 +60,7 @@ export interface RowCommercialOffer {
   name: string;
   price: number;
   quantity: number;
-  type: string;
+  type: "работы" | "материалы" | "механизмы" | "оборудование";
   unit: string;
 }
 export interface PayloadForCommercialOffer {
@@ -68,4 +68,11 @@ export interface PayloadForCommercialOffer {
   userId: number | string;
   taxRate: number;
   rows: RowCommercialOffer[];
+}
+export interface PayloadUpdateCommercialOffer extends PayloadForCommercialOffer {
+  offerId: number | string;
+}
+export interface SavedOfferData extends PayloadForCommercialOffer {
+  id: number | string;
+  created_at: string;
 }

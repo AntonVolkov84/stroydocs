@@ -1,0 +1,31 @@
+.commercial__container {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 20px 0;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  width: 95%;
+  margin: 50px auto;
+}
+.commercial__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.commercial__table th,
+.commercial__table td {
+  border: 1px solid #ccc;
+  padding: 12px;
+  text-align: left;
+}
+
+.commercial__table th {
+  background-color: #f4f4f4;
+}
+
+.commercial__actions {
+  display: flex;
+  gap: 10px; /* Отступ между кнопками */
+}
