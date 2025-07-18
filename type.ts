@@ -56,3 +56,16 @@ export interface SavedCalculatorData {
   input_values: InputValues;
   result: string | number | null;
 }
+export interface RowCommercialOffer {
+  name: string;
+  price: number;
+  quantity: number;
+  type: string;
+  unit: string;
+}
+export interface PayloadForCommercialOffer {
+  title: string;
+  userId: number | string;
+  taxRate: number;
+  rows: RowCommercialOffer[];
+}

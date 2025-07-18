@@ -123,7 +123,11 @@
 .dashboard-submenu a:hover {
   color: #387bb6;
 }
-
+@media print {
+  .dashboard-header {
+    display: none !important;
+  }
+}
 @media (max-width: 1210px) {
   .dashboard-submenu-inner {
     justify-content: space-around;

@@ -4,6 +4,7 @@ import Button from "./Button";
 import { Mode } from "../type";
 import { Trash2 } from "lucide-react";
 import { useAppContext } from "../services/AppContext";
+import * as commercialOfferService from "../services/commercialOfferService";
 
 interface RowData {
   name: string;
@@ -38,10 +39,13 @@ const CommercialOfferForm = ({ setMode }: CommercialOfferFormProps) => {
   const deleteRow = (index: number) => {
     setRows((prev) => prev.filter((_, i) => i !== index));
   };
-
+  const sanitizeInput = (value: string) => {
+    return value.replace(/<\/?[^>]+(>|$)/g, "");
+  };
   const handleChange = (index: number, field: keyof RowData, value: string) => {
     const newRows = [...rows];
-    const parsed = field === "name" || field === "unit" || field === "type" ? value : parseFloat(value) || 0;
+    const parsed =
+      field === "name" || field === "unit" || field === "type" ? sanitizeInput(value) : parseFloat(value) || 0;
     newRows[index] = { ...newRows[index], [field]: parsed };
     setRows(newRows);
   };
@@ -60,16 +64,44 @@ const CommercialOfferForm = ({ setMode }: CommercialOfferFormProps) => {
     2
   );
   const withVAT = +(total + tax).toFixed(2);
-
+  const handleSave = async () => {
+    const title = prompt("Введите название коммерческого предложения:");
+    if (!title || !user) return;
+    const payload = {
+      userId: user.id,
+      title,
+      rows: rows,
+      taxRate,
+    };
+    try {
+      await commercialOfferService.saveCommercialOffer(payload);
+      alert("Коммерческое предложение успешно сохранено!");
+    } catch (error) {
+      console.error("Ошибка при сохранении КП:", error);
+      alert("Произошла ошибка при сохранении.");
+    }
+  };
   return (
     <div className="commercial-wrapper">
       <div className="commercial__controlUnit">
         <Button styled={{ marginBottom: 20 }} onClick={() => setMode((prev) => ({ form: false, calculators: false }))}>
           ← Назад
         </Button>
-
-        {user ? <Button styled={{ marginBottom: 20 }}>Сохранить</Button> : null}
-        {user ? <Button styled={{ marginBottom: 20 }}>Распечатать</Button> : null}
+        {!user && (
+          <h3 style={{ color: "red", alignSelf: "center", marginBottom: 20 }}>
+            Для возможности сохранения рассчетов нужно авторизироваться!
+          </h3>
+        )}
+        {user ? (
+          <Button onClick={() => handleSave()} styled={{ marginBottom: 20 }}>
+            Сохранить
+          </Button>
+        ) : null}
+        {user ? (
+          <Button styled={{ marginBottom: 20 }} onClick={() => window.print()}>
+            Распечатать
+          </Button>
+        ) : null}
       </div>
 
       <div className="add-buttons" style={{ display: "flex", gap: 10, marginBottom: 30 }}>
@@ -79,7 +111,19 @@ const CommercialOfferForm = ({ setMode }: CommercialOfferFormProps) => {
           </Button>
         ))}
       </div>
-
+      <div
+        style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", marginBottom: 20, marginRight: 80 }}
+      >
+        <div>
+          <strong>Приложение №2</strong>
+        </div>
+        <div>
+          к Договору подряда на выполнение работ №{" "}
+          <span style={{ borderBottom: "1px solid black", padding: "0 50px" }}></span>
+          &nbsp; от <span style={{ borderBottom: "1px solid black", padding: "0 50px" }}></span>
+          &nbsp; 202___ г.
+        </div>
+      </div>
       <h2 className="title">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</h2>
 
       <table className="offer-table">
@@ -131,6 +175,7 @@ const CommercialOfferForm = ({ setMode }: CommercialOfferFormProps) => {
                   step="0.000001"
                   className="cell-input smaller"
                   value={row.quantity}
+                  min="0"
                   onChange={(e) => handleChange(i, "quantity", e.target.value)}
                 />
               </td>
@@ -139,6 +184,8 @@ const CommercialOfferForm = ({ setMode }: CommercialOfferFormProps) => {
                   type="number"
                   className="cell-input smaller"
                   value={row.price}
+                  step="0.01"
+                  min="0"
                   onChange={(e) => handleChange(i, "price", e.target.value)}
                 />
               </td>
