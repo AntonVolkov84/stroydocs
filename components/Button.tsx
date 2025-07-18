@@ -1,7 +1,8 @@
 import "./Button.css";
+import React from "react";
 
 interface PersonalPageProps {
-  children: string;
+  children: React.ReactNode;
   onClick?: () => void;
   typeBtn?: "reset" | "button" | "submit";
   styled?: {};
