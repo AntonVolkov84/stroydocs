@@ -2,7 +2,7 @@ import { useState, Dispatch, SetStateAction } from "react";
 import "./CommercialOfferForm.css";
 import Button from "./Button";
 import { Mode } from "../type";
-import { Trash2 } from "lucide-react";
+import { Trash2, Copy } from "lucide-react";
 import { useAppContext } from "../services/AppContext";
 import { SavedOfferData } from "../type";
 import * as commercialOfferService from "../services/commercialOfferService";
@@ -36,7 +36,6 @@ const CommercialOfferForm = ({
   onUpdateSuccess,
   setSelectedOffer,
 }: CommercialOfferFormProps) => {
-  console.log("showBackButton:", initialOfferId);
   const [rows, setRows] = useState<RowData[]>(
     initialRows || [{ name: "", unit: "", type: "работы", quantity: 0, price: 0 }]
   );
@@ -47,7 +46,11 @@ const CommercialOfferForm = ({
   const addRow = (type: RowData["type"]) => {
     setRows((prev) => [...prev, { name: "", unit: "", type, quantity: 0, price: 0 }]);
   };
-
+  const duplicateRow = (index: number) => {
+    const newRows = [...rows];
+    newRows.splice(index + 1, 0, { ...rows[index] });
+    setRows(newRows);
+  };
   const deleteRow = (index: number) => {
     setRows((prev) => prev.filter((_, i) => i !== index));
   };
@@ -56,9 +59,23 @@ const CommercialOfferForm = ({
   };
   const handleChange = (index: number, field: keyof RowData, value: string) => {
     const newRows = [...rows];
-    const parsed =
-      field === "name" || field === "unit" || field === "type" ? sanitizeInput(value) : parseFloat(value) || 0;
-    newRows[index] = { ...newRows[index], [field]: parsed };
+
+    if (field === "type") {
+      const newType = value as RowData["type"];
+      const { name, unit, price } = rows[index];
+      for (let i = 0; i < newRows.length; i++) {
+        if (
+          newRows[i].name.trim() === name.trim() &&
+          newRows[i].unit.trim() === unit.trim() &&
+          newRows[i].price === price
+        ) {
+          newRows[i] = { ...newRows[i], type: newType };
+        }
+      }
+    } else {
+      const parsed = field === "name" || field === "unit" ? sanitizeInput(value) : parseFloat(value) || 0;
+      newRows[index] = { ...newRows[index], [field]: parsed };
+    }
     setRows(newRows);
   };
 
@@ -155,14 +172,6 @@ const CommercialOfferForm = ({
           </Button>
         ) : null}
       </div>
-
-      <div className="add-buttons" style={{ display: "flex", gap: 10, marginBottom: 30 }}>
-        {["работы", "материалы", "механизмы", "оборудование"].map((type) => (
-          <Button key={type} onClick={() => addRow(type as RowData["type"])}>
-            Добавить: {type}
-          </Button>
-        ))}
-      </div>
       <div
         style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", marginBottom: 20, marginRight: 80 }}
       >
@@ -184,10 +193,10 @@ const CommercialOfferForm = ({
             <th>№ п/п</th>
             <th>Наименование работ и затрат</th>
             <th>Ед. изм.</th>
-            <th>Тип</th>
             <th>Количество</th>
             <th>Цена, руб.</th>
             <th>Стоимость, руб</th>
+            <th className="col-type">Тип</th>
             <th></th>
           </tr>
         </thead>
@@ -208,18 +217,6 @@ const CommercialOfferForm = ({
                   value={row.unit}
                   onChange={(e) => handleChange(i, "unit", e.target.value)}
                 />
-              </td>
-              <td>
-                <select
-                  className="cell-input small"
-                  value={row.type}
-                  onChange={(e) => handleChange(i, "type", e.target.value)}
-                >
-                  <option value="работы">работы</option>
-                  <option value="материалы">материалы</option>
-                  <option value="механизмы">механизмы</option>
-                  <option value="оборудование">оборудование</option>
-                </select>
               </td>
               <td>
                 <input
@@ -244,63 +241,95 @@ const CommercialOfferForm = ({
               <td>
                 <input type="text" readOnly className="cell-input" value={computedTotals[i].toFixed(2)} />
               </td>
+              <td className="col-type">
+                <select
+                  className="cell-input small"
+                  value={row.type}
+                  onChange={(e) => handleChange(i, "type", e.target.value)}
+                >
+                  <option value="работы">работы</option>
+                  <option value="материалы">материалы</option>
+                  <option value="механизмы">механизмы</option>
+                  <option value="оборудование">оборудование</option>
+                </select>
+              </td>
               <td>
-                <button className="icon-button" onClick={() => deleteRow(i)}>
-                  <Trash2 size={18} />
-                </button>
+                <div className="icon-button-box">
+                  <button className="icon-button icon-button-copy" onClick={() => duplicateRow(i)}>
+                    <Copy size={18} />
+                  </button>
+                  <button className="icon-button icon-button-del" onClick={() => deleteRow(i)}>
+                    <Trash2 size={18} />
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
-
           <tr>
-            <td colSpan={6}>ИТОГ без НДС</td>
+            <td colSpan={8} style={{ padding: "10px", textAlign: "center" }}>
+              <div style={{ display: "inline-flex", gap: "10px" }}>
+                {["работы", "материалы", "механизмы", "оборудование"].map((type) => (
+                  <Button key={type} onClick={() => addRow(type as RowData["type"])}>
+                    Добавить: {type}
+                  </Button>
+                ))}
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td colSpan={5}>ИТОГ без НДС</td>
             <td>
               <input className="cell-input" readOnly value={total.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={6}>- Заработная плата</td>
+            <td colSpan={5}>- Оплата труда</td>
             <td>
               <input className="cell-input" readOnly value={summary.salary.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={6}>- Материал</td>
+            <td colSpan={5}>- Материал</td>
             <td>
               <input className="cell-input" readOnly value={summary.materials.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={6}>- Эксплуатация машин</td>
+            <td colSpan={5}>- Эксплуатация машин</td>
             <td>
               <input className="cell-input" readOnly value={summary.machines.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={6}>- Оборудование</td>
+            <td colSpan={5}>- Оборудование</td>
             <td>
               <input className="cell-input" readOnly value={summary.equipment.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={5}>- Налоги </td>
-            <td>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                className="cell-input smaller"
-                value={taxRate}
-                onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
-              />
-              %
+            <td colSpan={5}>
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <span>- Налоги</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    className="cell-input smaller"
+                    value={taxRate}
+                    onChange={(e) => setTaxRate(parseFloat(e.target.value) || 0)}
+                    style={{ width: "60px" }}
+                  />
+                  <span>%</span>
+                </div>
+              </div>
             </td>
             <td>
               <input className="cell-input" readOnly value={tax.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={6}>Всего с НДС</td>
+            <td colSpan={5}>Всего с НДС</td>
             <td>
               <input className="cell-input bold" readOnly value={withVAT.toFixed(2)} />
             </td>

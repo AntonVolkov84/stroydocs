@@ -25,7 +25,10 @@
 .inline-input.short {
   width: 100px;
 }
-
+.icon-button-box {
+  display: flex;
+  justify-content: space-around;
+}
 .title {
   text-align: center;
   margin-bottom: 20px;
@@ -77,10 +80,25 @@
   margin-top: 40px;
   font-size: 14px;
 }
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  transition: background-color 0.2s ease;
+  border-radius: 4px;
+}
+.icon-button-del:hover {
+  background-color: #ff6f61;
+}
+.icon-button-copy:hover {
+  background-color: #387bb6;
+}
 @media print {
   .commercial__controlUnit,
   .add-buttons,
   .icon-button,
+  .col-type,
   .offer-table th:last-child,
   .offer-table td:last-child {
     display: none !important;
