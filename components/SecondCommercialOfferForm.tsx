@@ -2,14 +2,15 @@ import React, { useState } from "react";
 import "./SecondCommercialOfferForm.css";
 import { Mode } from "../type";
 import Button from "./Button";
+import { useAppContext } from "../services/AppContext";
 
 const defaultRow = {
   name: "",
   unit: "",
   quantity: "",
-  salary: "",
-  material: "",
-  machine: "",
+  salary: "0",
+  material: "0",
+  machine: "0",
 };
 type RowData = {
   name: string;
@@ -26,6 +27,8 @@ interface SecondCommercialOfferFormProps {
 
 export default function SecondCommercialOfferForm({ setMode }: SecondCommercialOfferFormProps) {
   const [rows, setRows] = useState<RowData[]>([defaultRow]);
+  const [taxPercent, setTaxPercent] = useState("20");
+  const { user } = useAppContext();
 
   const handleChange = (index: number, field: keyof RowData, value: string) => {
     const newRows = [...rows];
@@ -70,16 +73,54 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
     const quantity = parseFloat(row.quantity) || 0;
     return quantity * (salary + material + machine);
   };
+  const totalSalaryCost = rows.reduce((acc, row) => acc + parseFloat(row.salary) * (parseFloat(row.quantity) || 0), 0);
+  const totalMaterialCost = rows.reduce(
+    (acc, row) => acc + parseFloat(row.material) * (parseFloat(row.quantity) || 0),
+    0
+  );
+  const totalMachineCost = rows.reduce(
+    (acc, row) => acc + parseFloat(row.machine) * (parseFloat(row.quantity) || 0),
+    0
+  );
+  const totalCost = totalSalaryCost + totalMaterialCost + totalMachineCost;
+  const taxValue = parseFloat(taxPercent) || 0;
+  const taxAmount = totalCost * (taxValue / 100);
+  const totalByTable = totalCost + taxAmount;
   return (
     <div className="commercial-wrapper">
-      <div className="commercial__controlUnit">
-        <Button onClick={() => setMode?.((prev) => ({ ...prev, form2: false }))}>← Назад</Button>
-        <Button onClick={handleSave}>💾 Сохранить</Button>
-        <Button onClick={() => window.print()}>🖨️ Печать</Button>
-        <Button onClick={handleAddRow}>➕ Добавить строку</Button>
-      </div>
-
-      <table className="offer-table">
+      {!user && (
+        <h3 style={{ color: "red", alignSelf: "center", marginBottom: 20 }}>
+          Для возможности сохранения рассчетов нужно авторизироваться!
+        </h3>
+      )}
+      {user && (
+        <div className="commercial__controlUnit">
+          <Button onClick={() => setMode?.((prev) => ({ ...prev, form2: false }))}>← Назад</Button>
+          <Button onClick={handleSave}>💾 Сохранить</Button>
+          <Button onClick={() => window.print()}>🖨️ Печать</Button>
+          <Button onClick={handleAddRow}>➕ Добавить строку</Button>
+        </div>
+      )}
+      <h2 className="title">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</h2>
+      <h4 className="title-line">___________________________________________________</h4>
+      <h6 className="title-placeholder">(наименование работ и затрат, наименование объекта)</h6>
+      <table className="offer-table" style={{ tableLayout: "fixed", width: "100%" }}>
+        <colgroup>
+          <col style={{ width: "40px" }} /> {/* № п/п */}
+          <col style={{ width: "250px" }} /> {/* Наименование работ — увеличили ширину в 3 раза */}
+          <col style={{ width: "70px" }} /> {/* Ед. изм. */}
+          <col style={{ width: "70px" }} /> {/* Кол-во */}
+          <col style={{ width: "120px" }} /> {/* Цена за единицу */}
+          <col style={{ width: "100px" }} /> {/* Заработная плата */}
+          <col style={{ width: "100px" }} /> {/* Материал */}
+          <col style={{ width: "120px" }} /> {/* Эксплуатация машин */}
+          <col style={{ width: "100px" }} /> {/* ВСЕГО */}
+          <col style={{ width: "100px" }} /> {/* Осн. зарплата */}
+          <col style={{ width: "100px" }} /> {/* Материалы */}
+          <col style={{ width: "100px" }} /> {/* Экспл. машин */}
+          <col style={{ width: "40px" }} /> {/* Действия 1 */}
+          <col style={{ width: "40px" }} /> {/* Действия 2 */}
+        </colgroup>
         <thead>
           <tr>
             <th rowSpan={3}>№ п/п</th>
@@ -112,11 +153,13 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
             return (
               <tr key={i}>
                 <td>{i + 1}</td>
-                <td>
-                  <input
+                <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
+                  <textarea
+                    style={{ resize: "vertical", width: "100%", whiteSpace: "normal", wordBreak: "break-word" }}
                     value={row.name}
                     onChange={(e) => handleChange(i, "name", e.target.value)}
                     className="cell-input"
+                    rows={2}
                   />
                 </td>
                 <td>
@@ -128,7 +171,6 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
                 </td>
                 <td>
                   <input
-                    placeholder="Кол-во"
                     value={row.quantity}
                     onChange={(e) => {
                       console.log("Quantity changed:", e.target.value);
@@ -176,6 +218,64 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
               </tr>
             );
           })}
+          <tr className="total-row">
+            <td></td> {/* № п/п */}
+            <td>ИТОГ без НДС</td> {/* Наименование работ */}
+            <td>руб.</td> {/* Ед. изм. */}
+            <td></td> {/* Кол-во пусто */}
+            <td></td> {/* Цена за единицу, пусто */}
+            <td></td> {/* Заработная плата (единичная цена), пусто */}
+            <td></td> {/* Материал (единичная цена), пусто */}
+            <td></td> {/* Машины (единичная цена), пусто */}
+            <td>{totalCost.toFixed(2)}</td> {/* ВСЕГО (стоимость сумма) */}
+            <td>{totalSalaryCost.toFixed(2)}</td> {/* Осн. зарплата */}
+            <td>{totalMaterialCost.toFixed(2)}</td> {/* Материалы */}
+            <td>{totalMachineCost.toFixed(2)}</td> {/* Экспл. машин */}
+            <td></td> {/* Действия пусто */}
+            <td></td> {/* Действия пусто */}
+          </tr>
+          <tr className="tax-row">
+            <td></td>
+            <td>Налоги, %</td>
+            <td>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value={taxPercent}
+                onChange={(e) => setTaxPercent(e.target.value)}
+                className="cell-input smaller"
+              />
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{taxAmount.toFixed(2)}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr className="tax-row">
+            <td></td>
+            <td>Всего с НДС</td>
+            <td>руб.</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{totalByTable.toFixed(2)}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
         </tbody>
       </table>
     </div>

@@ -21,7 +21,13 @@
   padding: 4px 8px;
   text-align: center;
 }
-
+.title-placeholder,
+.title-line {
+  text-align: center;
+}
+.title-placeholder {
+  margin-bottom: 25px;
+}
 .cell-input {
   width: 100%;
   box-sizing: border-box;
@@ -47,4 +53,9 @@
 .icon-button:hover {
   background-color: #f2f2f2;
   border-radius: 4px;
+}
+td {
+  white-space: normal; /* Позволяет переносить текст */
+  word-break: break-word; /* Переносит слова при необходимости */
+  vertical-align: top; /* Чтобы текст выравнивался по верхнему краю */
 }
