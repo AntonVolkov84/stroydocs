@@ -10,6 +10,7 @@ import * as calculatorService from "../services/calculatorService";
 import CalculatorComponent from "../components/Calculator";
 import { CalculatorInterface, ModalState, Mode } from "../type";
 import CommercialOfferForm from "../components/CommercialOfferForm";
+import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 interface NewsData {
   author_email: string;
   created_at: string;
@@ -24,7 +25,7 @@ interface NewsData {
 export default function Dashboard() {
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
-  const [mode, setMode] = useState<Mode>({ calculators: false, form: false });
+  const [mode, setMode] = useState<Mode>({ calculators: false, form: false, form1: false });
 
   const getNewsData = async () => {
     try {
@@ -98,7 +99,7 @@ export default function Dashboard() {
                         <button
                           key={calc.id}
                           onClick={() => {
-                            setMode((prev) => ({ form: false, calculators: calc }));
+                            setMode((prev) => ({ form: false, form1: false, calculators: calc }));
                           }}
                           className="dashboard-submenu-href"
                         >
@@ -114,11 +115,19 @@ export default function Dashboard() {
                   <div className="dashboard-submenu-inner">
                     <button
                       onClick={() => {
-                        setMode((prev) => ({ calculators: false, form: true }));
+                        setMode((prev) => ({ calculators: false, form: true, form1: false }));
                       }}
                       className="dashboard-submenu-href"
                     >
                       Коммерческое предложение форма 0
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMode((prev) => ({ calculators: false, form: false, form1: true }));
+                      }}
+                      className="dashboard-submenu-href"
+                    >
+                      Коммерческое предложение форма 1
                     </button>
                   </div>
                 </div>
@@ -137,11 +146,12 @@ export default function Dashboard() {
       </header>
       <main>
         {mode.form && <CommercialOfferForm setMode={setMode} />}
+        {mode.form1 && <SecondCommercialOfferForm setMode={setMode} />}
         {mode.calculators ? (
           <CalculatorComponent mode={mode} setMode={setMode} />
         ) : (
           <>
-            {!mode.calculators && !mode.form ? (
+            {!mode.calculators && !mode.form && !mode.form1 ? (
               <>
                 {Array.isArray(newsData) && <New item={newsData[0]} />}
                 {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}

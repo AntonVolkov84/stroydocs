@@ -74,8 +74,8 @@
   font-weight: bold;
 }
 
-.footer {
-  display: flex;
+.cell-footer {
+  display: none;
   justify-content: space-between;
   margin-top: 40px;
   font-size: 14px;
@@ -124,5 +124,8 @@
   .commercial-wrapper {
     padding: 0;
     margin: 0;
+  }
+  .cell-footer {
+    display: flex;
   }
 }

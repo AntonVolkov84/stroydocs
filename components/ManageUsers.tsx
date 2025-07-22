@@ -72,16 +72,18 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
                 <td>{user.isadmin ? "✅" : "❌"}</td>
                 <td className="Users-actions">
                   <div className="actions-buttons">
-                    {user.email !== currentUserEmail && (
-                      <>
-                        <Button onClick={() => toggleAdmin(user.id, user.isadmin ?? false)} className="edit-btn">
-                          {user.isadmin ? "Убрать права" : "Сделать админом"}
-                        </Button>
-                        <Button onClick={() => deleteUser(user.id)} className="button_btn--red-hover">
-                          Удалить
-                        </Button>
-                      </>
-                    )}
+                    {user.email !== currentUserEmail &&
+                      user.email !== "antvolkov84@gmail.com" &&
+                      user.email !== "aleks_e@inbox.ru" && (
+                        <>
+                          <Button onClick={() => toggleAdmin(user.id, user.isadmin ?? false)} className="edit-btn">
+                            {user.isadmin ? "Убрать права" : "Сделать админом"}
+                          </Button>
+                          <Button onClick={() => deleteUser(user.id)} className="button_btn--red-hover">
+                            Удалить
+                          </Button>
+                        </>
+                      )}
                   </div>
                 </td>
               </tr>

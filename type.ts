@@ -20,6 +20,7 @@ export interface CalculatorInterface {
 export interface Mode {
   calculators: ModalState<CalculatorInterface>;
   form: boolean;
+  form1: boolean;
 }
 export interface User {
   id: string;

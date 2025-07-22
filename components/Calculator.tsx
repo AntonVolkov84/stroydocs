@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useEffect } from "react";
 import { useAppContext } from "../services/AppContext";
 import "./Calculator.css";
 import Button from "./Button";
@@ -12,6 +12,11 @@ function Calculator({ mode, setMode }: CalculatorProps) {
   const [variableValues, setVariableValues] = useState<Record<string, number>>({});
   const [calcResult, setCalcResult] = useState<number | string | null>(null);
   const { user } = useAppContext();
+  console.log(calcResult);
+
+  useEffect(() => {
+    setCalcResult(null);
+  }, [mode]);
 
   const calculateFormula = (formula: string, variables: Record<string, number>): number | string => {
     try {

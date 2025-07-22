@@ -47,8 +47,7 @@ const CommercialOfferForm = ({
     setRows((prev) => [...prev, { name: "", unit: "", type, quantity: 0, price: 0 }]);
   };
   const duplicateRow = (index: number) => {
-    const newRows = [...rows];
-    newRows.splice(index + 1, 0, { ...rows[index] });
+    const newRows = [...rows, { ...rows[index] }];
     setRows(newRows);
   };
   const deleteRow = (index: number) => {
@@ -277,38 +276,48 @@ const CommercialOfferForm = ({
             </td>
           </tr>
           <tr>
-            <td colSpan={5}>ИТОГ без НДС</td>
+            <td style={{ textAlign: "end" }} colSpan={5}>
+              ИТОГ без налогов
+            </td>
             <td>
               <input className="cell-input" readOnly value={total.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={5}>- Оплата труда</td>
+            <td style={{ textAlign: "end" }} colSpan={5}>
+              - Оплата труда
+            </td>
             <td>
               <input className="cell-input" readOnly value={summary.salary.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={5}>- Материал</td>
+            <td style={{ textAlign: "end" }} colSpan={5}>
+              - Материал
+            </td>
             <td>
               <input className="cell-input" readOnly value={summary.materials.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={5}>- Эксплуатация машин</td>
+            <td style={{ textAlign: "end" }} colSpan={5}>
+              - Эксплуатация машин
+            </td>
             <td>
               <input className="cell-input" readOnly value={summary.machines.toFixed(2)} />
             </td>
           </tr>
           <tr>
-            <td colSpan={5}>- Оборудование</td>
+            <td style={{ textAlign: "end" }} colSpan={5}>
+              - Оборудование
+            </td>
             <td>
               <input className="cell-input" readOnly value={summary.equipment.toFixed(2)} />
             </td>
           </tr>
           <tr>
             <td colSpan={5}>
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
                 <span>- Налоги</span>
                 <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
                   <input
@@ -329,7 +338,9 @@ const CommercialOfferForm = ({
             </td>
           </tr>
           <tr>
-            <td colSpan={5}>Всего с НДС</td>
+            <td style={{ textAlign: "end" }} colSpan={5}>
+              ВСЕГО с налогами
+            </td>
             <td>
               <input className="cell-input bold" readOnly value={withVAT.toFixed(2)} />
             </td>
@@ -337,7 +348,7 @@ const CommercialOfferForm = ({
         </tbody>
       </table>
 
-      <div className="footer">
+      <div className="cell-footer">
         <div>
           Заказчик <br /> ___________________ /________________________/
         </div>
