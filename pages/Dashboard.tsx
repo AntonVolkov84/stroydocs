@@ -146,7 +146,7 @@ export default function Dashboard() {
       </header>
       <main>
         {mode.form && <CommercialOfferForm setMode={setMode} />}
-        {mode.form1 && <SecondCommercialOfferForm setMode={setMode} />}
+        {/* {mode.form1 && <SecondCommercialOfferForm setMode={setMode} />} */}
         {mode.calculators ? (
           <CalculatorComponent mode={mode} setMode={setMode} />
         ) : (

@@ -65,7 +65,7 @@ export default function ManageCalculator({
           </thead>
           <tbody>
             {calculators?.map((calc) => (
-              <tr>
+              <tr key={calc.id}>
                 <td>{calc.title}</td>
                 <td>{calc.formula}</td>
                 <td>{new Date(calc.updated_at).toLocaleDateString()}</td>
@@ -83,7 +83,13 @@ export default function ManageCalculator({
                       Изменить
                     </Button>
                     <Button
-                      onClick={() => removeCalculator(calc.id, calc.image_public_id)}
+                      onClick={() => {
+                        if (calc.image_public_id) {
+                          removeCalculator(calc.id, calc.image_public_id);
+                        } else {
+                          removeCalculator(calc.id, "");
+                        }
+                      }}
                       className="button_btn--red-hover"
                     >
                       Удалить
