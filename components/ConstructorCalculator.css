@@ -63,3 +63,8 @@
   font-size: 0.9rem;
   margin-top: 4px;
 }
+.image-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

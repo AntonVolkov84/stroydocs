@@ -12,7 +12,6 @@ function Calculator({ mode, setMode }: CalculatorProps) {
   const [variableValues, setVariableValues] = useState<Record<string, number>>({});
   const [calcResult, setCalcResult] = useState<number | string | null>(null);
   const { user } = useAppContext();
-  console.log(calcResult);
 
   useEffect(() => {
     setCalcResult(null);
@@ -40,6 +39,8 @@ function Calculator({ mode, setMode }: CalculatorProps) {
       variablesValues: variableValues,
       result: calcResult,
       title: documentName,
+      imageUri: mode.calculators.image_url,
+      imagePublicId: mode.calculators.image_public_id,
     };
     try {
       saveCalculatorResults(payload);
@@ -58,6 +59,22 @@ function Calculator({ mode, setMode }: CalculatorProps) {
             ← Назад
           </Button>
           <h2 className="calculator-title">{mode.calculators.title}</h2>
+          {mode.calculators.image_url && (
+            <div style={{ marginBottom: "20px" }}>
+              <img
+                src={mode.calculators.image_url}
+                alt="Иллюстрация к калькулятору"
+                style={{
+                  maxWidth: "100%",
+                  height: "auto",
+                  borderRadius: "8px",
+                  boxShadow: "0 0 8px rgba(0,0,0,0.1)",
+                  display: "block",
+                  margin: "0 auto",
+                }}
+              />
+            </div>
+          )}
           <p className="calculator-formula">
             Формула: <code>{mode.calculators.formula}</code>
           </p>

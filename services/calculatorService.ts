@@ -6,12 +6,16 @@ interface CalculatorForm {
   variables: { name: string; description: string }[];
   formula: string;
   resultUnit: string;
+  imageUri?: string;
+  imagePublicId?: string;
 }
 interface UpdateCalculatorInput {
   id: number;
   title: string;
   formula: string;
   result_unit: string;
+  imageUri?: string;
+  imagePublicId?: string;
   variables: { name: string; description: string }[];
 }
 

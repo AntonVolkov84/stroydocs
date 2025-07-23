@@ -15,6 +15,8 @@ export interface CalculatorInterface {
   result_unit: string;
   created_at: string;
   updated_at: string;
+  image_url?: string;
+  image_public_id?: string;
 }
 
 export interface Mode {
@@ -41,12 +43,16 @@ type Calculator = {
   formula: string;
   variables: Variable[];
   result_unit: string;
+  image_url?: string;
+  image_public_id?: string;
 };
 export type Payload = {
   userId: string;
   title: string;
   calculator: Calculator;
   variablesValues: InputValues;
+  imageUri?: string;
+  imagePublicId?: string;
   result: string | number | null;
 };
 export interface SavedCalculatorData {
@@ -76,4 +82,8 @@ export interface PayloadUpdateCommercialOffer extends PayloadForCommercialOffer 
 export interface SavedOfferData extends PayloadForCommercialOffer {
   id: number | string;
   created_at: string;
+}
+export interface ReturnOfCloudinaryUpload {
+  url: string;
+  publicId: string;
 }

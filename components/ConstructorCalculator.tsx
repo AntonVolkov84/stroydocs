@@ -5,12 +5,16 @@ import { useState, useEffect } from "react";
 import Input from "./Input";
 import * as calculatorService from "../services/calculatorService";
 import { Calculator } from "../components/ManageCalculator";
+import { uploadImageToCloudinary, delFromStorage } from "../services/cloudinaryService";
+import { ReturnOfCloudinaryUpload } from "../type";
 
 interface CalculatorForm {
   title: string;
   variables: { name: string; description: string }[];
   formula: string;
   resultUnit: string;
+  imageUri?: string;
+  imagePublicId?: string;
 }
 interface Props {
   selectedCalculator: Calculator | null;
@@ -33,17 +37,20 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
       formula: "",
     },
   });
-
+  const [imagePath, setImagePath] = useState<ReturnOfCloudinaryUpload | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOldImageDeleted, setIsOldImageDeleted] = useState(false);
   const { fields, append, remove } = useFieldArray({
     control,
     name: "variables",
   });
+
   useEffect(() => {
     if (selectedCalculator) {
       setIsEditing(true);
-
+      setIsOldImageDeleted(false);
       reset({
         title: selectedCalculator.title,
         formula: selectedCalculator.formula,
@@ -53,6 +60,38 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
     }
   }, [selectedCalculator, reset]);
   const variables = watch("variables");
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      setUploadError("Размер изображения не должен превышать 1 МБ");
+      return;
+    }
+    try {
+      setUploadError(null);
+      const uploadedPath = await uploadImageToCloudinary(file);
+      setImagePath(uploadedPath);
+    } catch (error) {
+      setUploadError("Ошибка при загрузке изображения");
+      console.error(error);
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    try {
+      if (imagePath) {
+        await delFromStorage(imagePath.publicId);
+        setImagePath(null);
+      } else if (selectedCalculator?.image_public_id) {
+        await delFromStorage(selectedCalculator.image_public_id);
+        setIsOldImageDeleted(true);
+      }
+    } catch (error) {
+      console.error("Ошибка при удалении изображения:", error);
+    }
+  };
 
   const onSubmit = async (data: CalculatorForm) => {
     const fieldsToCheck = [
@@ -76,6 +115,8 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
           formula: data.formula,
           result_unit: data.resultUnit,
           variables: data.variables,
+          imageUri: imagePath?.url || "",
+          imagePublicId: imagePath?.publicId || "",
         });
         alert(`${res.message}`);
         reset({
@@ -85,7 +126,11 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
           resultUnit: "",
         });
       } else {
-        await calculatorService.createCalculator(data);
+        await calculatorService.createCalculator({
+          ...data,
+          imageUri: imagePath?.url || "",
+          imagePublicId: imagePath?.publicId || "",
+        });
         alert("Калькулятор сохранён!");
       }
 
@@ -221,7 +266,24 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
           placeholder="Величина ответа, например: м², рулонов, штук"
         />
       </div>
+      <div className="form-group">
+        <label className="form-label">Изображение (до 1 МБ):</label>
+        <input type="file" accept="image/*" onChange={handleImageUpload} />
+        {uploadError && <p className="error-message">{uploadError}</p>}
 
+        {(imagePath || (selectedCalculator?.image_url && !isOldImageDeleted)) && (
+          <div className="image-preview">
+            <img
+              src={imagePath?.url || selectedCalculator?.image_url}
+              alt="Предпросмотр"
+              style={{ maxWidth: "200px", marginTop: "10px" }}
+            />
+            <Button typeBtn="button" className="button_btn--red-hover" onClick={handleRemoveImage}>
+              Удалить изображение
+            </Button>
+          </div>
+        )}
+      </div>
       <div className="form-actions">
         <Button disabled={isSubmitting} typeBtn="submit">
           {isSubmitting ? "Отправка..." : isEditing ? "Обновить калькулятор" : "Сохранить калькулятор"}

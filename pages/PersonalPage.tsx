@@ -30,6 +30,8 @@ export interface Calculator {
   result_unit: string;
   created_at: string;
   updated_at: string;
+  image_url?: string;
+  image_public_id?: string;
 }
 
 export default function PersonalPage() {
@@ -53,6 +55,7 @@ export default function PersonalPage() {
     setCreatingNews(false);
     setSavedCalculator(false);
     setSavedCommercialOffer(false);
+    setSelectedCalculator(null);
   };
 
   useEffect(() => {

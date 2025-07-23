@@ -2,6 +2,7 @@ import "./ManageCalculator.css";
 import Button from "./Button";
 import { useEffect, useState } from "react";
 import { Dispatch, SetStateAction } from "react";
+import { delFromStorage } from "../services/cloudinaryService";
 import * as calculatorService from "../services/calculatorService";
 export interface Calculator {
   id: number;
@@ -12,6 +13,8 @@ export interface Calculator {
   result_unit: string;
   created_at: string;
   updated_at: string;
+  image_url?: string;
+  image_public_id?: string;
 }
 interface ManageCalculatorProps {
   setSelectedCalculator: (calc: Calculator) => void;
@@ -35,8 +38,9 @@ export default function ManageCalculator({
   useEffect(() => {
     fetchCalculators();
   }, []);
-  const removeCalculator = async (id: number) => {
+  const removeCalculator = async (id: number, publicId: string) => {
     try {
+      await delFromStorage(publicId);
       const result = await calculatorService.deleteCalculator(id);
       fetchCalculators();
       alert(result.message);
@@ -78,7 +82,10 @@ export default function ManageCalculator({
                     >
                       Изменить
                     </Button>
-                    <Button onClick={() => removeCalculator(calc.id)} className="button_btn--red-hover">
+                    <Button
+                      onClick={() => removeCalculator(calc.id, calc.image_public_id)}
+                      className="button_btn--red-hover"
+                    >
                       Удалить
                     </Button>
                   </div>
