@@ -31,7 +31,10 @@ function Calculator({ mode, setMode }: CalculatorProps) {
   };
   const handleSave = async () => {
     if (!user || typeof mode.calculators !== "object") return;
-    const documentName = prompt("Введите название для сохранения расчета:");
+    if (!calcResult || !variableValues) {
+      return alert("Нет данных для сохранения!");
+    }
+    const documentName = "Введите название для сохранения расчета:";
     if (!documentName) return;
     const payload: Payload = {
       userId: user.id,

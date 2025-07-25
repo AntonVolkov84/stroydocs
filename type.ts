@@ -87,3 +87,23 @@ export interface ReturnOfCloudinaryUpload {
   url: string;
   publicId: string;
 }
+export interface ConfirmOptions {
+  title?: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+}
+export interface AppContextType {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  confirm: (options: ConfirmOptions) => Promise<boolean>;
+}
+export interface ConfirmModalProps {
+  open: boolean;
+  title?: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}

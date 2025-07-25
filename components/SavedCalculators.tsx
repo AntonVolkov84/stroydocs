@@ -8,7 +8,7 @@ import Button from "../components/Button";
 function SavedCalculators() {
   const [savedCalculatorData, setSavedCalculatorData] = useState<SavedCalculatorData[] | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const { user } = useAppContext();
+  const { user, confirm } = useAppContext();
 
   const getSavedCalculatorData = async () => {
     if (!user) return;
@@ -18,8 +18,14 @@ function SavedCalculators() {
   };
 
   const handleDelete = async (id: number | string) => {
-    const confirmed = window.confirm("Ты уверен, что хочешь удалить этот калькулятор? 🗑️");
-    if (!confirmed) return;
+    const confirmResult = await confirm({
+      title: "Ты уверен, что хочешь удалить этот рассчет? 🗑️",
+      message: "",
+      confirmText: "Да",
+      cancelText: "Нет",
+    });
+
+    if (!confirmResult) return;
     await deleteSavedCalculator(id);
     getSavedCalculatorData();
   };

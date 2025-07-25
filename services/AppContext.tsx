@@ -1,9 +1,12 @@
-import React, { createContext, useContext } from "react";
-import { User } from "../type";
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import { User, ConfirmModalProps } from "../type";
+
+type ConfirmOptions = Omit<ConfirmModalProps, "open" | "onConfirm" | "onCancel">;
 
 interface AppContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  confirm: (options: ConfirmOptions) => Promise<boolean>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

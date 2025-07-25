@@ -10,6 +10,7 @@ import * as calculatorService from "../services/calculatorService";
 import CalculatorComponent from "../components/Calculator";
 import { CalculatorInterface, ModalState, Mode } from "../type";
 import CommercialOfferForm from "../components/CommercialOfferForm";
+import Confirmation from "../components/Confirmation";
 import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 interface NewsData {
   author_email: string;
@@ -24,6 +25,7 @@ interface NewsData {
 
 export default function Dashboard() {
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
   const [mode, setMode] = useState<Mode>({ calculators: false, form: false, form1: false });
 
@@ -151,6 +153,15 @@ export default function Dashboard() {
           <CalculatorComponent mode={mode} setMode={setMode} />
         ) : (
           <>
+            <Confirmation
+              open={isOpen}
+              title="Удалить элемент?"
+              message="Вы уверены, что хотите удалить этот элемент?"
+              confirmText="Да"
+              cancelText="Нет"
+              onConfirm={() => console.log("confirm")}
+              onCancel={() => setIsOpen(false)}
+            />
             {!mode.calculators && !mode.form && !mode.form1 ? (
               <>
                 {Array.isArray(newsData) && <New item={newsData[0]} />}

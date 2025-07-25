@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Button from "./Button";
 import * as userService from "../services/userService";
 import "./ManageUsers.css";
+import { useAppContext } from "../services/AppContext";
 
 interface User {
   id: number;
@@ -16,6 +17,7 @@ interface ManageUserProps {
 
 export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
   const [users, setUsers] = useState<User[]>([]);
+  const { confirm } = useAppContext();
   const fetchUsers = async () => {
     try {
       const data = await userService.getAllUsers();
@@ -36,12 +38,21 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
   };
 
   const deleteUser = async (id: number) => {
-    if (!window.confirm("Удалить пользователя?")) return;
-    try {
-      await userService.deleteUser(id);
-      fetchUsers();
-    } catch (error) {
-      console.error("Ошибка при удалении пользователя", error);
+    const confirmResult = await confirm({
+      title: "Удалить пользователя?",
+      message: "",
+      confirmText: "Да",
+      cancelText: "Нет",
+    });
+    if (!confirmResult) {
+      return;
+    } else {
+      try {
+        await userService.deleteUser(id);
+        fetchUsers();
+      } catch (error) {
+        console.error("Ошибка при удалении пользователя", error);
+      }
     }
   };
 

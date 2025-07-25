@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Button from "./Button";
 import * as cloudinaryServise from "../services/cloudinaryService";
 import * as newsServise from "../services/newsServise";
+import { useAppContext } from "../services/AppContext";
 interface NewData {
   title: string;
   text: string;
@@ -28,6 +29,7 @@ function CreatingNews() {
   const [articleChange, setArticleChange] = useState<NewsData | null>(null);
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const { confirm } = useAppContext();
   const [form, setForm] = useState({
     title: "",
     text: "",
@@ -109,9 +111,15 @@ function CreatingNews() {
     if (publicId) {
       await cloudinaryServise.delFromStorage(publicId);
     }
-    const isConfirmed = window.confirm("Вы уверены, что хотите удалить новость?");
-    if (!isConfirmed) return;
-    await newsServise.deleteNew(id);
+    const confirmResult = await confirm({
+      title: "Удаление",
+      message: "Вы уверены, что нужно удалить новость?",
+      confirmText: "Да",
+      cancelText: "Нет",
+    });
+    if (confirmResult) {
+      await newsServise.deleteNew(id);
+    }
     setForm({ title: "", text: "", image: null });
     if (fileInputRef.current) {
       fileInputRef.current.value = "";

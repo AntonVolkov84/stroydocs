@@ -7,7 +7,7 @@ import Button from "../components/Button";
 import CommercialOfferForm from "../components/CommercialOfferForm";
 
 function Commercial() {
-  const { user } = useAppContext();
+  const { user, confirm } = useAppContext();
   const [selectedOffer, setSelectedOffer] = useState<SavedOfferData | null>(null);
   const [savedOfferData, setSavedOfferData] = useState<SavedOfferData[] | null>(null);
   const getSavedOfferData = async () => {
@@ -18,9 +18,17 @@ function Commercial() {
   };
 
   const handleDelete = async (id: number | string) => {
-    if (!window.confirm("Удалить коммерческое предложение?")) return;
-    await commercialOfferService.deleteCommercialOffers(id);
-    await getSavedOfferData();
+    const confirmResult = await confirm({
+      title: "Удалить сохраненное коммерческое предложение",
+      message: "Вы уверены, оно будет стерто из Ваших сохранений?",
+      confirmText: "Да",
+      cancelText: "Нет",
+    });
+    if (!confirmResult) return;
+    if (confirmResult) {
+      await commercialOfferService.deleteCommercialOffers(id);
+      await getSavedOfferData();
+    }
   };
 
   const formatDate = (dateString: string) => {
