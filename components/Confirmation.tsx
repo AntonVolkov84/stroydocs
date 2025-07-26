@@ -19,9 +19,13 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       <div className="confirm-modal">
         {title && <h2>{title}</h2>}
         <p>{message}</p>
-        <div className="confirm-buttons">
-          <Button onClick={onCancel}>{cancelText}</Button>
-          <Button onClick={onConfirm}>{confirmText}</Button>
+        <div className="confirm-buttons-conf">
+          <Button styled={{ minWidth: "70px" }} onClick={onCancel}>
+            {cancelText}
+          </Button>
+          <Button styled={{ minWidth: "70px" }} className="button_btn--red-hover" onClick={onConfirm}>
+            {confirmText}
+          </Button>
         </div>
       </div>
     </div>

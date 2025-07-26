@@ -79,6 +79,27 @@ export interface PayloadForCommercialOffer {
 export interface PayloadUpdateCommercialOffer extends PayloadForCommercialOffer {
   offerId: number | string;
 }
+export interface RowCommercialOfferSecondForm {
+  machine: string;
+  material: string;
+  name: string;
+  quantity: string | number;
+  salary: string;
+  unit: string;
+}
+export interface PayloadForCommercialOfferSecondForm {
+  title: string;
+  userId: number | string;
+  taxRate: number | string;
+  rows: RowCommercialOfferSecondForm[];
+}
+export interface PayloadUpdateCommercialOfferSecondForm extends PayloadForCommercialOffer {
+  offerId: number | string;
+}
+export interface SavedOfferDataSecondForm extends PayloadForCommercialOfferSecondForm {
+  id: number | string;
+  created_at: string;
+}
 export interface SavedOfferData extends PayloadForCommercialOffer {
   id: number | string;
   created_at: string;
@@ -107,3 +128,21 @@ export interface ConfirmModalProps {
   onConfirm: () => void;
   onCancel: () => void;
 }
+export interface PromptModalProps {
+  open: boolean;
+  title?: string;
+  message?: string;
+  placeholder?: string;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm: (value: string) => void;
+  onCancel: () => void;
+}
+export interface AlertModalProps {
+  open: boolean;
+  message: string;
+  title?: string;
+  confirmText?: string;
+  onConfirm: () => void;
+}
+export type PromptOptions = Omit<PromptModalProps, "open" | "onConfirm" | "onCancel">;

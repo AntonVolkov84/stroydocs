@@ -56,6 +56,15 @@
   font-size: 13px;
   text-align: center;
 }
+.cell-input.textarea {
+  resize: vertical;
+  overflow: hidden;
+  min-height: 32px;
+  line-height: 1.2;
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 14px;
+}
 
 .cell-input:focus {
   outline: none;

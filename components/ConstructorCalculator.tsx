@@ -7,6 +7,7 @@ import * as calculatorService from "../services/calculatorService";
 import { Calculator } from "../components/ManageCalculator";
 import { uploadImageToCloudinary, delFromStorage } from "../services/cloudinaryService";
 import { ReturnOfCloudinaryUpload } from "../type";
+import { useAppContext } from "../services/AppContext";
 
 interface CalculatorForm {
   title: string;
@@ -41,12 +42,13 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoadingSomeData, setIsLoadingSomeData] = useState(false);
   const [isOldImageDeleted, setIsOldImageDeleted] = useState(false);
   const { fields, append, remove } = useFieldArray({
     control,
     name: "variables",
   });
-
+  const { alert } = useAppContext();
   useEffect(() => {
     if (selectedCalculator) {
       setIsEditing(true);
@@ -70,18 +72,22 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
       return;
     }
     try {
+      setIsLoadingSomeData(true);
       setUploadError(null);
       const uploadedPath = await uploadImageToCloudinary(file);
       setImagePath(uploadedPath);
     } catch (error) {
       setUploadError("Ошибка при загрузке изображения");
       console.error(error);
+    } finally {
+      setIsLoadingSomeData(false);
     }
   };
 
   const handleRemoveImage = async () => {
     try {
       if (imagePath) {
+        setIsLoadingSomeData(true);
         await delFromStorage(imagePath.publicId);
         setImagePath(null);
       } else if (selectedCalculator?.image_public_id) {
@@ -90,6 +96,8 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
       }
     } catch (error) {
       console.error("Ошибка при удалении изображения:", error);
+    } finally {
+      setIsLoadingSomeData(false);
     }
   };
 
@@ -103,7 +111,10 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
     ];
     const hasHTML = fieldsToCheck.some(containsHTML);
     if (hasHTML) {
-      alert("Ввод HTML или потенциально опасного кода запрещён.");
+      await alert({
+        title: "Ввод HTML или потенциально опасного кода запрещён.",
+        message: "",
+      });
       return;
     }
     setIsSubmitting(true);
@@ -118,7 +129,10 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
           imageUri: imagePath?.url || "",
           imagePublicId: imagePath?.publicId || "",
         });
-        alert(`${res.message}`);
+        await alert({
+          title: `${res.message}`,
+          message: "",
+        });
         reset({
           title: "",
           variables: [{ name: "", description: "" }],
@@ -131,7 +145,10 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
           imageUri: imagePath?.url || "",
           imagePublicId: imagePath?.publicId || "",
         });
-        alert("Калькулятор сохранён!");
+        await alert({
+          title: "Калькулятор сохранён!",
+          message: "",
+        });
       }
 
       setIsEditing(false);
@@ -139,7 +156,10 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
       onUpdated?.();
     } catch (error: any) {
       console.error("Ошибка:", error.message);
-      alert(`Ошибка: ${error.message}`);
+      await alert({
+        title: `Ошибка: ${error.message}`,
+        message: "",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -285,7 +305,7 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
         )}
       </div>
       <div className="form-actions">
-        <Button disabled={isSubmitting} typeBtn="submit">
+        <Button disabled={isSubmitting || isLoadingSomeData} typeBtn="submit">
           {isSubmitting ? "Отправка..." : isEditing ? "Обновить калькулятор" : "Сохранить калькулятор"}
         </Button>
       </div>

@@ -1,6 +1,11 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
-import { PayloadForCommercialOffer, PayloadUpdateCommercialOffer } from "../type";
+import {
+  PayloadForCommercialOffer,
+  PayloadUpdateCommercialOffer,
+  PayloadForCommercialOfferSecondForm,
+  PayloadUpdateCommercialOfferSecondForm,
+} from "../type";
 
 const apiUrl: string = import.meta.env.VITE_API_URL;
 
@@ -41,5 +46,52 @@ export const deleteCommercialOffers = async (id: number | string) => {
     });
   } catch (error) {
     console.log("deletegetCommercialOffers", error);
+  }
+};
+export const saveCommercialOfferSecondForm = async (
+  payload: PayloadForCommercialOfferSecondForm
+): Promise<{ message: string }> => {
+  try {
+    const res: AxiosResponse<{ message: string }> = await axios.post(
+      `${apiUrl}/stroydocs/savecomercsecondform`,
+      payload,
+      {
+        withCredentials: true,
+      }
+    );
+    return res.data;
+  } catch (error) {
+    console.log("saveCommercialOfferSecondForm", error);
+    throw error;
+  }
+};
+export const updateCommercialOfferSecondForm = async (payload: PayloadUpdateCommercialOfferSecondForm) => {
+  try {
+    await axios.put(`${apiUrl}/stroydocs/updatesavedcomercsecondform`, payload, {
+      withCredentials: true,
+    });
+  } catch (error) {
+    console.log("saveCommercialOfferSecondForm", error);
+  }
+};
+export const getCommercialOffersSecondForm = async (id: string | number) => {
+  try {
+    const response = await axios.get(`${apiUrl}/stroydocs/getsavecomercsecondform`, {
+      params: { userId: id },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("getCommercialOffersSecondForm", error);
+  }
+};
+export const deleteCommercialOffersSecondForm = async (id: number | string) => {
+  try {
+    await axios.delete(`${apiUrl}/stroydocs/delsavedcomercsecondform`, {
+      params: { savedComercId: id },
+      withCredentials: true,
+    });
+  } catch (error) {
+    console.log("deletegetCommercialOffersSecondForm", error);
   }
 };

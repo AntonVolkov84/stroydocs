@@ -2,15 +2,9 @@ import { useForm } from "react-hook-form";
 import "./RegisterPage.css";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../services/AppContext";
 import * as authServices from "../services/authServices";
-interface User {
-  id: string;
-  email: string;
-  username: string;
-  emailConfirmed: boolean;
-  name: string;
-  surname: string;
-}
+
 interface DataRegister {
   username: string;
   email: string;
@@ -19,9 +13,7 @@ interface DataRegister {
   name: string;
   surname: string;
 }
-interface RegisterPageProps {
-  setUser: (user: User | null) => void;
-}
+
 declare global {
   interface Window {
     grecaptcha: any;
@@ -29,7 +21,7 @@ declare global {
 }
 const RECAPTCHA_SITE_KEY = "6Lc8nXErAAAAAHPZDnc6DEPkLQ6iHX_8xv-kN5BA";
 
-export default function RegistrationPage({ setUser }: RegisterPageProps) {
+export default function RegistrationPage() {
   const {
     register,
     handleSubmit,
@@ -39,6 +31,7 @@ export default function RegistrationPage({ setUser }: RegisterPageProps) {
   } = useForm<DataRegister>();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { setUser, alert } = useAppContext();
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -49,12 +42,18 @@ export default function RegistrationPage({ setUser }: RegisterPageProps) {
 
   const onSubmit = async (data: DataRegister) => {
     if (data.password !== data.confirmPassword) {
-      alert("Пароли не совпадают");
+      await alert({
+        title: "Пароли не совпадают",
+        message: "",
+      });
       return;
     }
     setLoading(true);
     if (!window.grecaptcha) {
-      alert("Ошибка: reCAPTCHA не загружена");
+      await alert({
+        title: "Ошибка: reCAPTCHA не загружена",
+        message: "",
+      });
       setLoading(false);
       return;
     }
@@ -69,11 +68,17 @@ export default function RegistrationPage({ setUser }: RegisterPageProps) {
         surname: data.surname,
       });
       if (success) {
-        alert("На почту отправлено письмо! Пожалуйста, подтвердите почту для входа");
+        await alert({
+          title: "На почту отправлено письмо! Пожалуйста, подтвердите почту для входа",
+          message: "",
+        });
         reset();
         navigate("/login");
       } else {
-        alert("Ошибка регистрации");
+        await alert({
+          title: "Ошибка регистрации",
+          message: "",
+        });
       }
     } catch (error) {
       console.error("Ошибка при регистрации:", error);

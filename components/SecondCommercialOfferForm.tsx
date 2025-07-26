@@ -3,6 +3,7 @@ import "./SecondCommercialOfferForm.css";
 import { Mode } from "../type";
 import Button from "./Button";
 import { useAppContext } from "../services/AppContext";
+import * as commercialOfferService from "../services/commercialOfferService";
 
 const defaultRow = {
   name: "",
@@ -28,7 +29,7 @@ interface SecondCommercialOfferFormProps {
 export default function SecondCommercialOfferForm({ setMode }: SecondCommercialOfferFormProps) {
   const [rows, setRows] = useState<RowData[]>([defaultRow]);
   const [taxPercent, setTaxPercent] = useState("20");
-  const { user } = useAppContext();
+  const { user, prompt, alert } = useAppContext();
 
   const handleChange = (index: number, field: keyof RowData, value: string) => {
     const newRows = [...rows];
@@ -50,8 +51,26 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
     setRows(newRows);
   };
 
-  const handleSave = () => {
-    console.log("Saved data:", { userId: user.id, taxPercent, ...rows });
+  const handleSave = async () => {
+    const promptResult = await prompt({
+      title: "Придумайте название сохраняемой форме",
+      message: "",
+      placeholder: "Название",
+    });
+    if (promptResult && user) {
+      const payload = {
+        title: promptResult,
+        userId: user.id,
+        taxRate: taxPercent,
+        rows: [...rows],
+      };
+      const res = await commercialOfferService.saveCommercialOfferSecondForm(payload);
+      if (res.message)
+        await alert({
+          title: res.message,
+          message: "",
+        });
+    }
   };
 
   const computeUnitPrice = (row: RowData) => {
@@ -95,7 +114,7 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
       )}
       {user && (
         <div className="commercial__controlUnit">
-          <Button onClick={() => setMode?.((prev) => ({ ...prev, form2: false }))}>← Назад</Button>
+          <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>
           <Button onClick={handleSave}>💾 Сохранить</Button>
           <Button onClick={() => window.print()}>🖨️ Печать</Button>
           <Button onClick={handleAddRow}>➕ Добавить строку</Button>
@@ -159,7 +178,13 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
                     value={row.name}
                     onChange={(e) => handleChange(i, "name", e.target.value)}
                     className="cell-input"
-                    rows={2}
+                    rows={1}
+                    ref={(el) => {
+                      if (el) {
+                        el.style.height = "auto";
+                        el.style.height = el.scrollHeight + "px";
+                      }
+                    }}
                   />
                 </td>
                 <td>

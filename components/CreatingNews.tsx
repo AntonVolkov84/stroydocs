@@ -29,7 +29,7 @@ function CreatingNews() {
   const [articleChange, setArticleChange] = useState<NewsData | null>(null);
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
-  const { confirm } = useAppContext();
+  const { confirm, alert } = useAppContext();
   const [form, setForm] = useState({
     title: "",
     text: "",
@@ -51,11 +51,15 @@ function CreatingNews() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 1048576) {
-      alert("Размер файла не должен превышать 1 МБ");
+      await alert({
+        title: "Размер файла не должен превышать 1 МБ",
+        message: "",
+      });
+
       return;
     }
     if (e.target.files && e.target.files[0]) {
@@ -71,7 +75,10 @@ function CreatingNews() {
       if (form.image) {
         const uploadResult = await cloudinaryServise.uploadImageToCloudinary(form.image);
         if (!uploadResult) {
-          alert("Ошибка при загрузке изображения");
+          await alert({
+            title: "Ошибка при загрузке изображения",
+            message: "",
+          });
           return;
         }
         imageUrl = uploadResult.url;
@@ -85,7 +92,10 @@ function CreatingNews() {
       };
       const response = await newsServise.createNew(newData);
       if (response.ok) {
-        alert(`${response.message}`);
+        await alert({
+          title: `${response.message}`,
+          message: "",
+        });
         getData();
         setForm({ title: "", text: "", image: null });
         if (fileInputRef.current) {
@@ -95,14 +105,23 @@ function CreatingNews() {
       } else {
         const res = await cloudinaryServise.delFromStorage(imagePublicId);
         if (res.success) {
-          alert("Файл удален из хранилища");
+          await alert({
+            title: "Файл удален из хранилища",
+            message: "",
+          });
         } else {
-          alert("Не удалось удалить загруженный файл");
+          await alert({
+            title: "Не удалось удалить загруженный файл",
+            message: "",
+          });
         }
       }
     } catch (error) {
       console.error("Ошибка при сабмите:", error);
-      alert("Произошла ошибка при создании новости");
+      await alert({
+        title: "Произошла ошибка при создании новости",
+        message: "",
+      });
     } finally {
       setIsUpdating(false);
     }
@@ -136,7 +155,10 @@ function CreatingNews() {
       if (form.image && latestPublicId) {
         const uploaded = await cloudinaryServise.uploadImageToCloudinary(form.image);
         if (!uploaded) {
-          alert("Ошибка при загрузке изображения");
+          await alert({
+            title: "Ошибка при загрузке изображения",
+            message: "",
+          });
           return;
         }
         imageUrl = uploaded.url;
@@ -151,7 +173,10 @@ function CreatingNews() {
       };
       const response = await newsServise.updateNew(articleChange.id, updatedNews);
       if (response.message === "Новость успешно обновлена") {
-        alert("Новость успешно обновлена");
+        await alert({
+          title: "Новость успешно обновлена",
+          message: "",
+        });
         setArticleChange(null);
         setForm({ title: "", text: "", image: null });
         if (fileInputRef.current) {
@@ -160,11 +185,17 @@ function CreatingNews() {
         setArticleChange(null);
         getData();
       } else {
-        alert("Ошибка при обновлении");
+        await alert({
+          title: "Ошибка при обновлении",
+          message: "",
+        });
       }
     } catch (error) {
       console.error("Ошибка при обновлении новости:", error);
-      alert("Ошибка при обновлении новости");
+      await alert({
+        title: "Ошибка при обновлении новости",
+        message: "",
+      });
     } finally {
       setIsUpdating(false);
     }

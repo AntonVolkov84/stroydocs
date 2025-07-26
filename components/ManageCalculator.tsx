@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Dispatch, SetStateAction } from "react";
 import { delFromStorage } from "../services/cloudinaryService";
 import * as calculatorService from "../services/calculatorService";
+import { useAppContext } from "../services/AppContext";
 export interface Calculator {
   id: number;
   title: string;
@@ -27,6 +28,7 @@ export default function ManageCalculator({
   setManagerCalculator,
 }: ManageCalculatorProps) {
   const [calculators, setCalculators] = useState<Calculator[] | null>(null);
+  const { alert } = useAppContext();
   const fetchCalculators = async (): Promise<void> => {
     try {
       const data = await calculatorService.getAllCalculators();
@@ -43,10 +45,16 @@ export default function ManageCalculator({
       await delFromStorage(publicId);
       const result = await calculatorService.deleteCalculator(id);
       fetchCalculators();
-      alert(result.message);
+      await alert({
+        title: result.message,
+        message: "",
+      });
     } catch (error) {
       console.error("Ошибка при удалении калькулятора:", error);
-      alert("Ошибка при удалении калькулятора");
+      await alert({
+        title: "Ошибка при удалении калькулятора",
+        message: "",
+      });
     }
   };
   return (

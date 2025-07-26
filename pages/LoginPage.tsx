@@ -2,18 +2,8 @@ import { useForm } from "react-hook-form";
 import "./LoginPage.css";
 import { useNavigate, Link } from "react-router-dom";
 import * as authServices from "../services/authServices";
-interface User {
-  id: string;
-  email: string;
-  username: string;
-  emailConfirmed: boolean;
-  isAdmin?: boolean;
-  name: string;
-  surname: string;
-}
-interface LoginPageProps {
-  setUser: (user: User | null) => void;
-}
+import { useAppContext } from "../services/AppContext";
+
 interface DataLogin {
   username: string;
   password: string;
@@ -22,29 +12,39 @@ interface DataLogin {
   name: string;
   surname: string;
 }
-export default function LoginPage({ setUser }: LoginPageProps) {
+export default function LoginPage() {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<DataLogin>();
+  const { setUser, alert } = useAppContext();
   const navigate = useNavigate();
   const onSubmit = async (data: DataLogin): Promise<void> => {
     const loggedIn = await authServices.login(data);
     if (!loggedIn) {
-      alert("Неверные данные");
+      await alert({
+        title: "Неверные данные",
+        message: "",
+      });
       return;
     }
     const user = await authServices.getMe();
     if (user) {
       setUser(user);
       if (!user.emailConfirmed) {
-        alert("Подтвердите Вашу почту");
+        await alert({
+          title: "Подтвердите Вашу почту",
+          message: "",
+        });
       } else {
         navigate("/personalpage");
       }
     } else {
-      alert("Не удалось получить данные пользователя");
+      await alert({
+        title: "Не удалось получить данные пользователя",
+        message: "",
+      });
     }
   };
   return (

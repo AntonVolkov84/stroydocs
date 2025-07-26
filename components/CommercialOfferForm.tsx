@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import "./CommercialOfferForm.css";
 import Button from "./Button";
 import { Mode } from "../type";
@@ -39,7 +39,7 @@ const CommercialOfferForm = ({
   const [rows, setRows] = useState<RowData[]>(
     initialRows || [{ name: "", unit: "", type: "работы", quantity: 0, price: 0 }]
   );
-  const { user } = useAppContext();
+  const { user, prompt, alert } = useAppContext();
 
   const [taxRate, setTaxRate] = useState(initialTaxRate || 20);
 
@@ -93,7 +93,11 @@ const CommercialOfferForm = ({
   );
   const withVAT = +(total + tax).toFixed(2);
   const handleSave = async () => {
-    const title = prompt("Введите название коммерческого предложения:");
+    const title = await prompt({
+      title: "Придумайте название сохраняемой форме",
+      message: "",
+      placeholder: "Название",
+    });
     if (!title || !user) return;
     const payload = {
       userId: user.id,
@@ -103,14 +107,25 @@ const CommercialOfferForm = ({
     };
     try {
       await commercialOfferService.saveCommercialOffer(payload);
-      alert("Коммерческое предложение успешно сохранено!");
+      await alert({
+        title: "Коммерческое предложение успешно сохранено!",
+        message: "",
+      });
     } catch (error) {
       console.error("Ошибка при сохранении КП:", error);
-      alert("Произошла ошибка при сохранении.");
+      await alert({
+        title: "Произошла ошибка при сохранении.",
+        message: "",
+      });
     }
   };
   const handleUpdate = async () => {
-    const title = prompt("Изменения вступают в силу, название оставляем?", initialTitle || "");
+    const title = await prompt({
+      title: "Изменения вступают в силу, название оставляем?",
+      message: initialTitle,
+      placeholder: "Название",
+    });
+
     if (!title || !user || !initialOfferId) return;
     const payload = {
       offerId: initialOfferId,
@@ -122,12 +137,18 @@ const CommercialOfferForm = ({
 
     try {
       await commercialOfferService.updateCommercialOffer(payload);
-      alert("Коммерческое предложение успешно обновлено!");
+      await alert({
+        title: "Коммерческое предложение успешно обновлено!",
+        message: "",
+      });
       setSelectedOffer?.(null);
       if (onUpdateSuccess) onUpdateSuccess();
     } catch (error) {
       console.error("Ошибка при сохранении КП:", error);
-      alert("Произошла ошибка при сохранении.");
+      await alert({
+        title: "Произошла ошибка при сохранении.",
+        message: "",
+      });
     }
   };
   return (
@@ -138,7 +159,7 @@ const CommercialOfferForm = ({
             styled={{ marginBottom: 20 }}
             onClick={() => {
               if (setMode) {
-                setMode({ form: false, calculators: false });
+                setMode({ form: false, calculators: false, form1: false });
               } else {
                 console.warn("setMode не передан, ничего не делаем");
               }
@@ -204,10 +225,17 @@ const CommercialOfferForm = ({
             <tr key={i}>
               <td>{i + 1}</td>
               <td>
-                <input
-                  className="cell-input"
+                <textarea
+                  className="cell-input textarea"
                   value={row.name}
                   onChange={(e) => handleChange(i, "name", e.target.value)}
+                  rows={1}
+                  ref={(el) => {
+                    if (el) {
+                      el.style.height = "auto";
+                      el.style.height = el.scrollHeight + "px";
+                    }
+                  }}
                 />
               </td>
               <td>

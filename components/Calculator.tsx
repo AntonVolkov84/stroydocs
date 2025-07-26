@@ -11,7 +11,8 @@ interface CalculatorProps {
 function Calculator({ mode, setMode }: CalculatorProps) {
   const [variableValues, setVariableValues] = useState<Record<string, number>>({});
   const [calcResult, setCalcResult] = useState<number | string | null>(null);
-  const { user } = useAppContext();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const { user, prompt, alert } = useAppContext();
 
   useEffect(() => {
     setCalcResult(null);
@@ -32,25 +33,39 @@ function Calculator({ mode, setMode }: CalculatorProps) {
   const handleSave = async () => {
     if (!user || typeof mode.calculators !== "object") return;
     if (!calcResult || !variableValues) {
-      return alert("Нет данных для сохранения!");
+      return await alert({
+        title: "Внимание",
+        message: "Нет данных для сохранения!",
+      });
     }
-    const documentName = "Введите название для сохранения расчета:";
-    if (!documentName) return;
+    const title = await prompt({
+      title: "Придумайте название сохраняемому калькулятору",
+      message: "",
+      placeholder: "Название",
+    });
+
+    if (!title) return;
     const payload: Payload = {
       userId: user.id,
       calculator: mode.calculators,
       variablesValues: variableValues,
       result: calcResult,
-      title: documentName,
+      title: title,
       imageUri: mode.calculators.image_url,
       imagePublicId: mode.calculators.image_public_id,
     };
     try {
       saveCalculatorResults(payload);
-      alert("Расчёт успешно сохранён!");
+      await alert({
+        title: "Расчёт успешно сохранён!",
+        message: "",
+      });
     } catch (err) {
       console.error("Ошибка при сохранении расчета:", err);
-      alert("Ошибка при сохранении.");
+      await alert({
+        title: "Ошибка при сохранении.",
+        message: "",
+      });
     }
   };
   return (
@@ -122,7 +137,7 @@ function Calculator({ mode, setMode }: CalculatorProps) {
             </div>
           )}
           {user && (
-            <Button onClick={() => handleSave()} styled={{ width: 100, marginTop: 40 }}>
+            <Button disabled={isSaving} onClick={() => handleSave()} styled={{ width: 100, marginTop: 40 }}>
               Сохранить
             </Button>
           )}
