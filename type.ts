@@ -83,7 +83,7 @@ export interface RowCommercialOfferSecondForm {
   machine: string;
   material: string;
   name: string;
-  quantity: string | number;
+  quantity: string;
   salary: string;
   unit: string;
 }
@@ -93,12 +93,16 @@ export interface PayloadForCommercialOfferSecondForm {
   taxRate: number | string;
   rows: RowCommercialOfferSecondForm[];
 }
-export interface PayloadUpdateCommercialOfferSecondForm extends PayloadForCommercialOffer {
+export interface PayloadUpdateCommercialOfferSecondForm extends PayloadForCommercialOfferSecondForm {
   offerId: number | string;
 }
-export interface SavedOfferDataSecondForm extends PayloadForCommercialOfferSecondForm {
+export interface SavedOfferDataSecondForm {
   id: number | string;
   created_at: string;
+  title: string;
+  userId: number | string;
+  taxrate: number | string;
+  rows: RowCommercialOfferSecondForm[];
 }
 export interface SavedOfferData extends PayloadForCommercialOffer {
   id: number | string;

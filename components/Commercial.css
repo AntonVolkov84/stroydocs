@@ -24,7 +24,11 @@
 .commercial__table th {
   background-color: #f4f4f4;
 }
-
+.commercial-form1,
+.commercial-form0 {
+  width: 1200px;
+  margin-left: 0;
+}
 .commercial__actions {
   display: flex;
   gap: 10px; /* Отступ между кнопками */

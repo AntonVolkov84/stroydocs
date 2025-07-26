@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction } from "react";
 import "./CommercialOfferForm.css";
 import Button from "./Button";
 import { Mode } from "../type";
@@ -188,7 +188,7 @@ const CommercialOfferForm = ({
         ) : null}
         {user ? (
           <Button styled={{ marginBottom: 20 }} onClick={() => window.print()}>
-            Распечатать
+            🖨️ Печать
           </Button>
         ) : null}
       </div>
@@ -217,7 +217,7 @@ const CommercialOfferForm = ({
             <th>Цена, руб.</th>
             <th>Стоимость, руб</th>
             <th className="col-type">Тип</th>
-            <th></th>
+            <th className="test-col"></th>
           </tr>
         </thead>
         <tbody>

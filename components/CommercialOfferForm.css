@@ -108,8 +108,10 @@
   .add-buttons,
   .icon-button,
   .col-type,
-  .offer-table th:last-child,
-  .offer-table td:last-child {
+  .test-col,
+  .offer-table th[colspan="2"],
+  .offer-table td:nth-last-child(2),
+  .offer-table td:nth-last-child(1) {
     display: none !important;
   }
 

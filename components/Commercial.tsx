@@ -102,15 +102,17 @@ function Commercial() {
             </tbody>
           </table>
           {selectedOffer && (
-            <CommercialOfferForm
-              showBackButton={!selectedOffer}
-              initialRows={selectedOffer.rows}
-              initialTaxRate={selectedOffer.taxRate}
-              initialTitle={selectedOffer.title}
-              initialOfferId={selectedOffer.id}
-              onUpdateSuccess={getSavedOfferData}
-              setSelectedOffer={setSelectedOffer}
-            />
+            <div className="commercial-form0">
+              <CommercialOfferForm
+                showBackButton={!selectedOffer}
+                initialRows={selectedOffer.rows}
+                initialTaxRate={selectedOffer.taxRate}
+                initialTitle={selectedOffer.title}
+                initialOfferId={selectedOffer.id}
+                onUpdateSuccess={getSavedOfferData}
+                setSelectedOffer={setSelectedOffer}
+              />
+            </div>
           )}
         </>
       )}
@@ -148,15 +150,17 @@ function Commercial() {
             </tbody>
           </table>
           {selectedOfferSecondForm && (
-            <SecondCommercialOfferForm
-              showBackButton={!selectedOffer}
-              initialRows={selectedOffer.rows}
-              initialTaxRate={selectedOffer.taxRate}
-              initialTitle={selectedOffer.title}
-              initialOfferId={selectedOffer.id}
-              onUpdateSuccess={getSavedOfferData}
-              setSelectedOffer={setSelectedOffer}
-            />
+            <div className="commercial-form1">
+              <SecondCommercialOfferForm
+                showBackButton={!setSelectedOfferSecondForm}
+                initialRows={selectedOfferSecondForm.rows}
+                initialTaxRate={selectedOfferSecondForm.taxrate}
+                initialTitle={selectedOfferSecondForm.title}
+                initialOfferId={selectedOfferSecondForm.id}
+                onUpdateSuccess={getSavedOfferSecondFormData}
+                setSelectedOffer={setSelectedOfferSecondForm}
+              />
+            </div>
           )}
         </>
       )}

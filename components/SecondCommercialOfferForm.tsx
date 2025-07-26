@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, Dispatch, SetStateAction } from "react";
 import "./SecondCommercialOfferForm.css";
-import { Mode } from "../type";
+import { Mode, SavedOfferDataSecondForm } from "../type";
 import Button from "./Button";
 import { useAppContext } from "../services/AppContext";
 import * as commercialOfferService from "../services/commercialOfferService";
@@ -24,11 +24,27 @@ type RowData = {
 
 interface SecondCommercialOfferFormProps {
   setMode?: React.Dispatch<React.SetStateAction<Mode>>;
+  initialRows?: RowData[];
+  initialTaxRate?: string;
+  initialTitle?: string;
+  showBackButton?: boolean;
+  initialOfferId?: number | string;
+  onUpdateSuccess?: () => void;
+  setSelectedOffer?: Dispatch<SetStateAction<SavedOfferDataSecondForm | null>>;
 }
 
-export default function SecondCommercialOfferForm({ setMode }: SecondCommercialOfferFormProps) {
-  const [rows, setRows] = useState<RowData[]>([defaultRow]);
-  const [taxPercent, setTaxPercent] = useState("20");
+export default function SecondCommercialOfferForm({
+  setMode,
+  initialRows,
+  initialTaxRate,
+  showBackButton = true,
+  initialTitle,
+  initialOfferId,
+  onUpdateSuccess,
+  setSelectedOffer,
+}: SecondCommercialOfferFormProps) {
+  const [rows, setRows] = useState<RowData[]>(initialRows || [defaultRow]);
+  const [taxPercent, setTaxPercent] = useState(initialTaxRate || "20");
   const { user, prompt, alert } = useAppContext();
 
   const handleChange = (index: number, field: keyof RowData, value: string) => {
@@ -105,6 +121,28 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
   const taxValue = parseFloat(taxPercent) || 0;
   const taxAmount = totalCost * (taxValue / 100);
   const totalByTable = totalCost + taxAmount;
+  const handleUpdate = async () => {
+    const promptResult = await prompt({
+      title: "Измените название",
+      message: "",
+      placeholder: initialTitle,
+      confirmText: "Изменить",
+    });
+    if (promptResult) {
+      if (!initialOfferId || !user) return;
+      const payload = {
+        offerId: initialOfferId,
+        rows: rows,
+        taxRate: taxPercent,
+        userId: user?.id,
+        title: promptResult,
+      };
+      await commercialOfferService.updateCommercialOfferSecondForm(payload);
+      if (onUpdateSuccess) onUpdateSuccess();
+      if (setSelectedOffer) setSelectedOffer(null);
+    }
+  };
+
   return (
     <div className="commercial-wrapper">
       {!user && (
@@ -114,8 +152,12 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
       )}
       {user && (
         <div className="commercial__controlUnit">
-          <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>
-          <Button onClick={handleSave}>💾 Сохранить</Button>
+          {showBackButton && <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>}
+          {showBackButton ? (
+            <Button onClick={handleSave}>💾 Сохранить</Button>
+          ) : (
+            <Button onClick={handleUpdate}>💾 Изменить</Button>
+          )}
           <Button onClick={() => window.print()}>🖨️ Печать</Button>
           <Button onClick={handleAddRow}>➕ Добавить строку</Button>
         </div>
@@ -204,7 +246,7 @@ export default function SecondCommercialOfferForm({ setMode }: SecondCommercialO
                   />
                 </td>
                 <td style={{ textAlign: "right", paddingRight: 8, fontWeight: "bold" }}>{unitPrice.toFixed(2)}</td>
-                <td>
+                <td className="cell-blockinput">
                   <input
                     value={row.salary}
                     onChange={(e) => handleChange(i, "salary", e.target.value)}
