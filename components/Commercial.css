@@ -8,6 +8,9 @@
   width: 95%;
   margin: 50px auto;
 }
+.commercial__table-title {
+  margin-top: 15px;
+}
 .commercial__table {
   width: 100%;
   border-collapse: collapse;

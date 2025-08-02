@@ -123,6 +123,11 @@
 .dashboard-submenu a:hover {
   color: #387bb6;
 }
+.block__slider {
+  background-color: #eef2fa;
+  display: flex;
+  justify-content: center;
+}
 @media print {
   .dashboard-header {
     display: none !important;

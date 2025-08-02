@@ -117,7 +117,7 @@ function Commercial() {
         </>
       )}
       {!savedOfferData || (savedOfferData.length === 0 && <p>Нет сохранённых предложений формы 0.</p>)}
-      <h2>Сохранённые коммерческие предложения формы 1</h2>
+      <h2 className="commercial__table-title">Сохранённые коммерческие предложения формы 1</h2>
       {savedOfferDataSecondForm && savedOfferDataSecondForm.length > 0 && (
         <>
           <table className="commercial__table">

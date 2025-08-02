@@ -8,9 +8,10 @@ import facebook from "../src/icons/facebook.svg";
 import { getAllNews } from "../services/newsServise";
 import * as calculatorService from "../services/calculatorService";
 import CalculatorComponent from "../components/Calculator";
-import { CalculatorInterface, ModalState, Mode } from "../type";
+import { CalculatorInterface, Mode } from "../type";
 import CommercialOfferForm from "../components/CommercialOfferForm";
 import Confirmation from "../components/Confirmation";
+import Slider from "../components/Slider";
 import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 interface NewsData {
   author_email: string;
@@ -165,6 +166,11 @@ export default function Dashboard() {
             {!mode.calculators && !mode.form && !mode.form1 ? (
               <>
                 {Array.isArray(newsData) && <New item={newsData[0]} />}
+                {calculators && (
+                  <div className="block__slider">
+                    <Slider calculators={calculators} />
+                  </div>
+                )}
                 {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
                 {Array.isArray(newsData) && newsData[2] && <New item={newsData[2]} />}
                 {Array.isArray(newsData) && newsData[3] && <New reversed item={newsData[3]} />}
