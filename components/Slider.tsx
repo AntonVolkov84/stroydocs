@@ -1,6 +1,6 @@
 import "./Slider.css";
 import { CalculatorInterface } from "../type";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 interface SliderProps {
   calculators: CalculatorInterface[] | null;
@@ -8,6 +8,7 @@ interface SliderProps {
 
 function Slider({ calculators }: SliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const startXRef = useRef<number | null>(null);
 
   if (!calculators || calculators.length === 0) return null;
   const currentCalculator = calculators[currentIndex];
@@ -18,6 +19,36 @@ function Slider({ calculators }: SliderProps) {
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + calculators.length) % calculators.length);
   };
+  const handleMouseDown = (e: React.MouseEvent) => {
+    startXRef.current = e.clientX;
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (startXRef.current === null) return;
+
+    const delta = e.clientX - startXRef.current;
+    if (delta > 50) {
+      prevSlide();
+    } else if (delta < -50) {
+      nextSlide();
+    }
+    startXRef.current = null;
+  };
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (startXRef.current === null) return;
+
+    const delta = e.changedTouches[0].clientX - startXRef.current;
+    if (delta > 50) {
+      prevSlide();
+    } else if (delta < -50) {
+      nextSlide();
+    }
+    startXRef.current = null;
+  };
   const backgroundStyle = currentCalculator.image_url
     ? {
         backgroundImage: `url(${currentCalculator.image_url})`,
@@ -27,7 +58,13 @@ function Slider({ calculators }: SliderProps) {
       }
     : { backgroundColor: "#4289c7" };
   return (
-    <div className="slider__container">
+    <div
+      className="slider__container"
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <button className="slider__button slider__button--left" onClick={prevSlide}>
         ◀
       </button>

@@ -8,7 +8,8 @@
   overflow: hidden;
   border-radius: 8px;
   justify-content: space-between;
-  background-color: #3d424d;
+  background-color: #4289c7;
+  user-select: none;
 }
 .slider__image-wrapper {
   display: flex;
@@ -16,7 +17,6 @@
   height: 100%;
   flex-direction: column;
   align-items: center;
-  /* justify-content: space-around; */
   gap: 30px;
 }
 .slider__button {
