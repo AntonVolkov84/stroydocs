@@ -12,6 +12,9 @@ import { CalculatorInterface, Mode } from "../type";
 import CommercialOfferForm from "../components/CommercialOfferForm";
 import Confirmation from "../components/Confirmation";
 import Slider from "../components/Slider";
+import CO0 from "../src/CO0.png";
+import CO1 from "../src/CO1.png";
+import Logo from "../src/StroydoksLogo2.png";
 import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 interface NewsData {
   author_email: string;
@@ -60,13 +63,13 @@ export default function Dashboard() {
     {
       title: "Форма 0",
       formula: "Форма ноль включает в себя краткое предложение с указанием общей стоимости",
-      image_url: "../src/CO0.png",
+      image_url: CO0,
     },
     {
       title: "Форма 1",
       formula:
         "Форма 1 включает в себя разбивку цены на составляющие. В обоих формах есть возможность выбора налоговой ставки",
-      image_url: "../src/CO1.png",
+      image_url: CO1,
     },
   ];
 
@@ -96,6 +99,9 @@ export default function Dashboard() {
         <div className="dashboard-menu-bar">
           <div className="dashboard-container">
             <ul className="dashboard-main-menu">
+              <li className="dashboard-menu-logo">
+                <img src={Logo} alt="Stroydoks Logo" className="dashboard-logo-img" />
+              </li>
               <li className="dashboard-menu-item">
                 <span>О компании ▾</span>
                 <div className="dashboard-submenu">
