@@ -1,23 +1,24 @@
 import "./Slider.css";
-import { CalculatorInterface } from "../type";
+import { Slide } from "../type";
 import { useState, useRef } from "react";
 
 interface SliderProps {
-  calculators: CalculatorInterface[] | null;
+  slides: Slide[] | null;
+  title: string;
 }
 
-function Slider({ calculators }: SliderProps) {
+function Slider({ slides, title }: SliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const startXRef = useRef<number | null>(null);
 
-  if (!calculators || calculators.length === 0) return null;
-  const currentCalculator = calculators[currentIndex];
+  if (!slides || slides.length === 0) return null;
+  const currentCalculator = slides[currentIndex];
   const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % calculators.length);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + calculators.length) % calculators.length);
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + slides.length) % slides.length);
   };
   const handleMouseDown = (e: React.MouseEvent) => {
     startXRef.current = e.clientX;
@@ -49,14 +50,7 @@ function Slider({ calculators }: SliderProps) {
     }
     startXRef.current = null;
   };
-  const backgroundStyle = currentCalculator.image_url
-    ? {
-        backgroundImage: `url(${currentCalculator.image_url})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-      }
-    : { backgroundColor: "#4289c7" };
+
   return (
     <div
       className="slider__container"
@@ -65,26 +59,24 @@ function Slider({ calculators }: SliderProps) {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <button className="slider__button slider__button--left" onClick={prevSlide}>
-        ◀
-      </button>
-      <div className="slider__image-wrapper">
-        <h2 className="slider__image-wrapper-title">Калькуляторы</h2>
-        {calculators && <h3>{calculators[currentIndex].title}</h3>}{" "}
-        {calculators && <h4>{calculators[currentIndex].formula}</h4>}
-      </div>
-      {calculators?.[currentIndex].image_url && (
-        <div className="slider__image-block">
-          <img
-            src={calculators[currentIndex].image_url}
-            alt={calculators[currentIndex].title}
-            className="slider__image"
-          />
+      <h2 className="slider__title">{title}</h2>
+      <div className="slider__content">
+        <button className="slider__button slider__button--left" onClick={prevSlide}>
+          ◀
+        </button>
+        <div className="slider__image-wrapper">
+          {slides && <h3>{slides[currentIndex].title}</h3>}
+          {slides && <h4>{slides[currentIndex].formula}</h4>}
         </div>
-      )}
-      <button className="slider__button slider__button--right" onClick={nextSlide}>
-        ▶
-      </button>
+        {slides?.[currentIndex].image_url && (
+          <div className="slider__image-block">
+            <img src={slides[currentIndex].image_url} alt={slides[currentIndex].title} className="slider__image" />
+          </div>
+        )}
+        <button className="slider__button slider__button--right" onClick={nextSlide}>
+          ▶
+        </button>
+      </div>
     </div>
   );
 }

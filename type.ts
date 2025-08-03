@@ -149,4 +149,10 @@ export interface AlertModalProps {
   confirmText?: string;
   onConfirm: () => void;
 }
+export interface Slide {
+  title: string;
+  formula: string;
+  image_url?: string;
+}
+
 export type PromptOptions = Omit<PromptModalProps, "open" | "onConfirm" | "onCancel">;

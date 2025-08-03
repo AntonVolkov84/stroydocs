@@ -56,6 +56,19 @@ export default function Dashboard() {
   useEffect(() => {
     getNewsData();
   }, []);
+  const customSlides = [
+    {
+      title: "Форма 0",
+      formula: "Форма ноль включает в себя краткое предложение с указанием общей стоимости",
+      image_url: "../src/CO0.png",
+    },
+    {
+      title: "Форма 1",
+      formula:
+        "Форма 1 включает в себя разбивку цены на составляющие. В обоих формах есть возможность выбора налоговой ставки",
+      image_url: "../src/CO1.png",
+    },
+  ];
 
   return (
     <>
@@ -166,13 +179,17 @@ export default function Dashboard() {
             {!mode.calculators && !mode.form && !mode.form1 ? (
               <>
                 {Array.isArray(newsData) && <New item={newsData[0]} />}
+
+                {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
+                <div className="block__slider">
+                  <Slider title="Коммерческие предложения разных форм" slides={customSlides} />
+                </div>
+                {Array.isArray(newsData) && newsData[2] && <New item={newsData[2]} />}
                 {calculators && (
                   <div className="block__slider">
-                    <Slider calculators={calculators} />
+                    <Slider title="Калькуляторы" slides={calculators} />
                   </div>
                 )}
-                {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
-                {Array.isArray(newsData) && newsData[2] && <New item={newsData[2]} />}
                 {Array.isArray(newsData) && newsData[3] && <New reversed item={newsData[3]} />}
               </>
             ) : null}
