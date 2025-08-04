@@ -90,7 +90,12 @@ function Commercial() {
                   <td>{offer.title}</td>
                   <td>{formatDate(offer.created_at)}</td>
                   <td className="commercial__actions">
-                    <Button onClick={() => setSelectedOffer(selectedOffer?.id === offer.id ? null : offer)}>
+                    <Button
+                      onClick={() => {
+                        setSelectedOfferSecondForm(null);
+                        setSelectedOffer((prev) => (prev?.id === offer.id ? null : offer));
+                      }}
+                    >
                       {selectedOffer?.id === offer.id ? "Скрыть" : "Просмотреть"}
                     </Button>
                     <Button className="button_btn--red-hover" onClick={() => handleDelete(offer.id)}>
@@ -104,6 +109,7 @@ function Commercial() {
           {selectedOffer && (
             <div className="commercial-form0">
               <CommercialOfferForm
+                key={selectedOffer?.id}
                 showBackButton={!selectedOffer}
                 initialRows={selectedOffer.rows}
                 initialTaxRate={selectedOffer.taxRate}
@@ -135,9 +141,10 @@ function Commercial() {
                   <td>{formatDate(offer.created_at)}</td>
                   <td className="commercial__actions">
                     <Button
-                      onClick={() =>
-                        setSelectedOfferSecondForm(selectedOfferSecondForm?.id === offer.id ? null : offer)
-                      }
+                      onClick={() => {
+                        setSelectedOffer(null);
+                        setSelectedOfferSecondForm((prev) => (prev?.id === offer.id ? null : offer));
+                      }}
                     >
                       {selectedOfferSecondForm?.id === offer.id ? "Скрыть" : "Просмотреть"}
                     </Button>
@@ -152,6 +159,7 @@ function Commercial() {
           {selectedOfferSecondForm && (
             <div className="commercial-form1">
               <SecondCommercialOfferForm
+                key={selectedOfferSecondForm?.id}
                 showBackButton={!setSelectedOfferSecondForm}
                 initialRows={selectedOfferSecondForm.rows}
                 initialTaxRate={selectedOfferSecondForm.taxrate}

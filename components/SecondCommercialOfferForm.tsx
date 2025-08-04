@@ -27,6 +27,7 @@ interface SecondCommercialOfferFormProps {
   initialRows?: RowData[];
   initialTaxRate?: string;
   initialTitle?: string;
+  key: string | number;
   showBackButton?: boolean;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
@@ -37,6 +38,7 @@ export default function SecondCommercialOfferForm({
   setMode,
   initialRows,
   initialTaxRate,
+  key,
   showBackButton = true,
   initialTitle,
   initialOfferId,
@@ -216,7 +218,7 @@ export default function SecondCommercialOfferForm({
                 <td>{i + 1}</td>
                 <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
                   <textarea
-                    style={{ resize: "vertical", width: "100%", whiteSpace: "normal", wordBreak: "break-word" }}
+                    style={{ resize: "none", width: "100%", whiteSpace: "normal", wordBreak: "break-word" }}
                     value={row.name}
                     onChange={(e) => handleChange(i, "name", e.target.value)}
                     className="cell-input"
@@ -271,12 +273,12 @@ export default function SecondCommercialOfferForm({
                 <td>{(parseFloat(row.salary) * parseFloat(row.quantity) || 0).toFixed(2)}</td>
                 <td>{(parseFloat(row.material) * parseFloat(row.quantity) || 0).toFixed(2)}</td>
                 <td>{(parseFloat(row.machine) * parseFloat(row.quantity) || 0).toFixed(2)}</td>
-                <td>
+                <td className="hide-in-print">
                   <button onClick={() => handleCopyRow(i)} className="icon-button icon-button-copy">
                     📄
                   </button>
                 </td>
-                <td>
+                <td className="hide-in-print">
                   <button onClick={() => handleDeleteRow(i)} className="icon-button icon-button-del">
                     🗑️
                   </button>
@@ -298,8 +300,8 @@ export default function SecondCommercialOfferForm({
               <td>{totalSalaryCost.toFixed(2)}</td>
               <td>{totalMaterialCost.toFixed(2)}</td>
               <td>{totalMachineCost.toFixed(2)}</td>
-              <td></td>
-              <td></td>
+              <td className="hide-in-print"></td>
+              <td className="hide-in-print"></td>
             </tr>
           </>
           <>
@@ -326,8 +328,8 @@ export default function SecondCommercialOfferForm({
               <td></td>
               <td></td>
               <td></td>
-              <td></td>
-              <td></td>
+              <td className="hide-in-print"></td>
+              <td className="hide-in-print"></td>
             </tr>
           </>
           <>
@@ -344,8 +346,8 @@ export default function SecondCommercialOfferForm({
               <td></td>
               <td></td>
               <td></td>
-              <td></td>
-              <td></td>
+              <td className="hide-in-print"></td>
+              <td className="hide-in-print"></td>
             </tr>
           </>
         </tbody>

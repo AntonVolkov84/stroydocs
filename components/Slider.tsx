@@ -12,7 +12,6 @@ function Slider({ slides, title }: SliderProps) {
   const startXRef = useRef<number | null>(null);
 
   if (!slides || slides.length === 0) return null;
-  const currentCalculator = slides[currentIndex];
   const nextSlide = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % slides.length);
   };

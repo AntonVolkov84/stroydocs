@@ -57,7 +57,7 @@
   text-align: center;
 }
 .cell-input.textarea {
-  resize: vertical;
+  resize: none;
   overflow: hidden;
   min-height: 32px;
   line-height: 1.2;
@@ -110,11 +110,13 @@
   .col-type,
   .test-col,
   .offer-table th[colspan="2"],
-  .offer-table td:nth-last-child(2),
-  .offer-table td:nth-last-child(1) {
+  .hide-in-print,
+  .offer-table td:nth-last-child(1):not(.result-row-print) {
     display: none !important;
   }
-
+  .result-row {
+    display: table-row !important;
+  }
   .offer-table input {
     border: none;
     background: none;

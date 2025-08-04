@@ -32,9 +32,11 @@
   width: 100%;
   box-sizing: border-box;
   padding: 2px 4px;
+  resize: none;
+  resize: none;
 }
 .cell-input.textarea {
-  resize: vertical;
+  resize: none;
   overflow: hidden;
   min-height: 32px;
   line-height: 1.2;

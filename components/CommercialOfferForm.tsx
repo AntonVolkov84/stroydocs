@@ -21,6 +21,7 @@ interface CommercialOfferFormProps {
   initialTaxRate?: number;
   initialTitle?: string;
   showBackButton?: boolean;
+  key: string | number;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferData | null>>;
@@ -33,6 +34,7 @@ const CommercialOfferForm = ({
   showBackButton = true,
   initialTitle,
   initialOfferId,
+  key,
   onUpdateSuccess,
   setSelectedOffer,
 }: CommercialOfferFormProps) => {
@@ -303,47 +305,47 @@ const CommercialOfferForm = ({
               </div>
             </td>
           </tr>
-          <tr>
+          <tr className="result-row total-without-tax">
             <td style={{ textAlign: "end" }} colSpan={5}>
               ИТОГ без налогов
             </td>
-            <td>
+            <td className="result-row-print">
               <input className="cell-input" readOnly value={total.toFixed(2)} />
             </td>
           </tr>
-          <tr>
+          <tr className="result-row salary">
             <td style={{ textAlign: "end" }} colSpan={5}>
               - Оплата труда
             </td>
-            <td>
+            <td className="result-row-print">
               <input className="cell-input" readOnly value={summary.salary.toFixed(2)} />
             </td>
           </tr>
-          <tr>
+          <tr className="result-row materials">
             <td style={{ textAlign: "end" }} colSpan={5}>
               - Материал
             </td>
-            <td>
+            <td className="result-row-print">
               <input className="cell-input" readOnly value={summary.materials.toFixed(2)} />
             </td>
           </tr>
-          <tr>
+          <tr className="result-row machines">
             <td style={{ textAlign: "end" }} colSpan={5}>
               - Эксплуатация машин
             </td>
-            <td>
+            <td className="result-row-print">
               <input className="cell-input" readOnly value={summary.machines.toFixed(2)} />
             </td>
           </tr>
-          <tr>
+          <tr className="result-row equipment">
             <td style={{ textAlign: "end" }} colSpan={5}>
               - Оборудование
             </td>
-            <td>
+            <td className="result-row-print">
               <input className="cell-input" readOnly value={summary.equipment.toFixed(2)} />
             </td>
           </tr>
-          <tr>
+          <tr className="result-row tax">
             <td colSpan={5}>
               <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
                 <span>- Налоги</span>
@@ -361,15 +363,15 @@ const CommercialOfferForm = ({
                 </div>
               </div>
             </td>
-            <td>
+            <td className="result-row-print">
               <input className="cell-input" readOnly value={tax.toFixed(2)} />
             </td>
           </tr>
-          <tr>
+          <tr className="result-row total-with-vat">
             <td style={{ textAlign: "end" }} colSpan={5}>
               ВСЕГО с налогами
             </td>
-            <td>
+            <td className="result-row-print">
               <input className="cell-input bold" readOnly value={withVAT.toFixed(2)} />
             </td>
           </tr>
