@@ -23,7 +23,9 @@
 }
 .title-placeholder,
 .title-line {
+  color: gray;
   text-align: center;
+  text-shadow: none;
 }
 .title-placeholder {
   margin-bottom: 25px;
@@ -66,7 +68,7 @@
   border-radius: 4px;
 }
 td {
-  white-space: normal; /* Позволяет переносить текст */
-  word-break: break-word; /* Переносит слова при необходимости */
-  vertical-align: top; /* Чтобы текст выравнивался по верхнему краю */
+  white-space: normal;
+  word-break: break-word;
+  vertical-align: top;
 }

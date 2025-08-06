@@ -27,7 +27,7 @@ interface SecondCommercialOfferFormProps {
   initialRows?: RowData[];
   initialTaxRate?: string;
   initialTitle?: string;
-  key: string | number;
+  key?: string | number;
   showBackButton?: boolean;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;

@@ -15,6 +15,8 @@ import Slider from "../components/Slider";
 import CO0 from "../src/CO0.png";
 import CO1 from "../src/CO1.png";
 import Logo from "../src/StroydoksLogo2.png";
+import Feedback from "../components/Feedback";
+import BannerFeedback from "../components/BannerFeedback";
 import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 interface NewsData {
   author_email: string;
@@ -30,6 +32,7 @@ interface NewsData {
 export default function Dashboard() {
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<boolean>(false);
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
   const [mode, setMode] = useState<Mode>({ calculators: false, form: false, form1: false });
 
@@ -185,11 +188,16 @@ export default function Dashboard() {
             {!mode.calculators && !mode.form && !mode.form1 ? (
               <>
                 {Array.isArray(newsData) && <New item={newsData[0]} />}
-
-                {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
                 <div className="block__slider">
                   <Slider title="Коммерческие предложения разных форм" slides={customSlides} />
                 </div>
+                {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
+                {feedbackModal ? (
+                  <Feedback setFeedbackModal={setFeedbackModal} />
+                ) : (
+                  <BannerFeedback setFeedbackModal={setFeedbackModal} />
+                )}
+
                 {Array.isArray(newsData) && newsData[2] && <New item={newsData[2]} />}
                 {calculators && (
                   <div className="block__slider">

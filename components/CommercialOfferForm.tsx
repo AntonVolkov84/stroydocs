@@ -21,7 +21,7 @@ interface CommercialOfferFormProps {
   initialTaxRate?: number;
   initialTitle?: string;
   showBackButton?: boolean;
-  key: string | number;
+  key?: string | number;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferData | null>>;
@@ -60,7 +60,6 @@ const CommercialOfferForm = ({
   };
   const handleChange = (index: number, field: keyof RowData, value: string) => {
     const newRows = [...rows];
-
     if (field === "type") {
       const newType = value as RowData["type"];
       const { name, unit, price } = rows[index];
@@ -76,6 +75,13 @@ const CommercialOfferForm = ({
     } else {
       const parsed = field === "name" || field === "unit" ? sanitizeInput(value) : parseFloat(value) || 0;
       newRows[index] = { ...newRows[index], [field]: parsed };
+      const { name, unit, price } = newRows[index];
+      const matchingRow = newRows.find(
+        (r, i) => i !== index && r.name.trim() === name.trim() && r.unit.trim() === unit.trim() && r.price === price
+      );
+      if (matchingRow) {
+        newRows[index].type = matchingRow.type;
+      }
     }
     setRows(newRows);
   };

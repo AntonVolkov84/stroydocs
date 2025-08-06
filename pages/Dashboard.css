@@ -127,6 +127,8 @@
   background-color: #eef2fa;
   display: flex;
   justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
 }
 .dashboard-menu-logo {
   display: flex;
