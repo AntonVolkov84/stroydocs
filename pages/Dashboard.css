@@ -49,7 +49,8 @@
   filter: invert(1);
 }
 .dashboard-menu-bar {
-  background-color: #eef2fa;
+  background-color: #e4ecfd;
+  position: relative;
 }
 .dashboard-main-menu {
   display: flex;
@@ -58,7 +59,6 @@
   list-style: none;
   margin: 0;
   padding: 0;
-  position: relative;
   z-index: 2;
   height: 107px;
 }
@@ -76,11 +76,11 @@
 }
 .dashboard-submenu {
   display: none;
-  position: fixed;
-  top: 145px;
+  position: absolute;
+  top: 107px;
   left: 0;
   width: 100vw;
-  background-color: #eef2fa;
+  background-color: #e4ecfd;
   padding: 0;
   border-top: 1px solid #ccc;
   z-index: 1000;

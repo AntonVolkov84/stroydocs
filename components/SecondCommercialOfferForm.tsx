@@ -152,7 +152,7 @@ export default function SecondCommercialOfferForm({
           Для возможности сохранения рассчетов нужно авторизироваться!
         </h3>
       )}
-      {user && (
+      {user ? (
         <div className="commercial__controlUnit">
           {showBackButton && <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>}
           {showBackButton ? (
@@ -162,6 +162,10 @@ export default function SecondCommercialOfferForm({
           )}
           <Button onClick={() => window.print()}>🖨️ Печать</Button>
           <Button onClick={handleAddRow}>➕ Добавить строку</Button>
+        </div>
+      ) : (
+        <div className="commercial__controlUnit">
+          {showBackButton && <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>}
         </div>
       )}
       <h2 className="title">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</h2>
