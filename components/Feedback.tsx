@@ -8,9 +8,10 @@ interface FeedbackProps {
 function Feedback({ setFeedbackModal }: FeedbackProps) {
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
+  const [sendingMail, setSendingMail] = useState(false);
   const [email, setEmail] = useState<string | undefined>("");
   const [status, setStatus] = useState<string | null>(null);
-  const { user } = useAppContext();
+  const { user, alert } = useAppContext();
   const currentUserEmail = user?.email;
 
   useEffect(() => {
@@ -19,6 +20,16 @@ function Feedback({ setFeedbackModal }: FeedbackProps) {
 
   const handleSend = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSendingMail(true);
+    const hasDangerousTags = /<\s*script|on\w+=|<\s*iframe/i.test(message);
+    if (hasDangerousTags) {
+      alert({
+        title: "Ошибка",
+        message: "В сообщении обнаружен запрещённый HTML. Пожалуйста, удалите его.",
+      });
+      setSendingMail(false);
+      return;
+    }
     const serviceId = "service_d11exx1";
     const templateId = "template_12aagmr";
     const publicKey = "NhQ2J0fY_65vJzShl";
@@ -30,15 +41,26 @@ function Feedback({ setFeedbackModal }: FeedbackProps) {
       message: message,
     };
     emailjs.send(serviceId, templateId, templateParams, publicKey).then(
-      (response) => {
-        console.log("SUCCESS!", response.status, response.text);
-        setStatus("Сообщение отправлено успешно!");
+      async (response) => {
+        const statusText = "Сообщение отправлено успешно!";
+        setStatus(statusText);
+        await alert({
+          title: "Внимание",
+          message: statusText,
+        });
+        if (setFeedbackModal) setFeedbackModal(false);
         setSubject("");
         setMessage("");
+        setSendingMail(false);
       },
-      (err) => {
-        console.error("FAILED...", err);
-        setStatus("Ошибка при отправке. Попробуйте ещё раз.");
+      async (err) => {
+        const statusText = "Ошибка при отправке. Попробуйте ещё раз.";
+        setStatus(statusText);
+        await alert({
+          title: "Внимание",
+          message: statusText,
+        });
+        setSendingMail(false);
       }
     );
   };
@@ -85,7 +107,7 @@ function Feedback({ setFeedbackModal }: FeedbackProps) {
               required
             ></textarea>
           </div>
-          <button type="submit" className="feedback__submit-button">
+          <button disabled={sendingMail} type="submit" className="feedback__submit-button">
             Отправить
           </button>
           <button
