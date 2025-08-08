@@ -2,28 +2,38 @@ import "./Commercial.css";
 import { useState, useEffect } from "react";
 import * as commercialOfferService from "../services/commercialOfferService";
 import { useAppContext } from "../services/AppContext";
-import { SavedOfferData, SavedOfferDataSecondForm } from "../type";
+import {
+  SavedOfferData,
+  SavedOfferDataSecondForm,
+  PayloadForCommercialOffer,
+  PayloadForCommercialOfferSecondForm,
+} from "../type";
 import Button from "../components/Button";
 import CommercialOfferForm from "../components/CommercialOfferForm";
 import SecondCommercialOfferForm from "./SecondCommercialOfferForm";
+import * as userService from "../services/userService";
 
 function Commercial() {
-  const { user, confirm } = useAppContext();
+  const { user, confirm, prompt, alert } = useAppContext();
   const [selectedOffer, setSelectedOffer] = useState<SavedOfferData | null>(null);
   const [selectedOfferSecondForm, setSelectedOfferSecondForm] = useState<SavedOfferDataSecondForm | null>(null);
+  const [sendingOfferForm, setSendingOfferForm] = useState<boolean>(false);
   const [savedOfferData, setSavedOfferData] = useState<SavedOfferData[] | null>(null);
   const [savedOfferDataSecondForm, setSavedOfferDataSecondForm] = useState<SavedOfferDataSecondForm[] | null>(null);
+
   const getSavedOfferData = async () => {
     if (!user) return;
     const id = user.id;
     const data = await commercialOfferService.getCommercialOffers(id);
     setSavedOfferData(data);
+    console.log(data);
   };
   const getSavedOfferSecondFormData = async () => {
     if (!user) return;
     const id = user.id;
     const data = await commercialOfferService.getCommercialOffersSecondForm(id);
     setSavedOfferDataSecondForm(data);
+    console.log(data);
   };
 
   const handleDelete = async (id: number | string) => {
@@ -66,6 +76,81 @@ function Commercial() {
       .replace(",", " в");
   };
 
+  const sendForm = async (offer: SavedOfferData | SavedOfferDataSecondForm) => {
+    let recieverEmail = await prompt({
+      title: "Укажите эл почту получателя формы",
+      message: "",
+      placeholder: "Эл почта получателя",
+    });
+    setSendingOfferForm(true);
+    if (recieverEmail === null) return;
+    if (!recieverEmail) {
+      await alert({
+        title: "Вы не ввели почту получателя",
+        message: "",
+      });
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(recieverEmail)) {
+      return await alert({
+        title: "Введите корректный адрес электронной почты!",
+        message: "",
+      });
+    }
+    const currentUserEmail = user?.email;
+    if (currentUserEmail === recieverEmail) {
+      await alert({
+        title: "Нет смысла отправлять себе!",
+        message: "У тебя уже есть эта форма",
+      });
+      return;
+    }
+    if ("type" in offer.rows[0]) {
+      const res = await userService.getUserId(recieverEmail);
+      if (!res) {
+        await alert({
+          title: "Получатель не найден",
+          message: "Проверьте почту",
+        });
+        return setSendingOfferForm(false);
+      }
+      const payload = {
+        title: offer.title,
+        userId: res,
+        taxRate: offer.taxrate,
+        rows: offer.rows,
+      };
+      commercialOfferService.saveCommercialOffer(payload as PayloadForCommercialOffer);
+      await alert({
+        title: "Форма 0 отправлена",
+        message: "",
+      });
+      setSendingOfferForm(false);
+    } else {
+      const res = await userService.getUserId(recieverEmail);
+      if (!res) {
+        await alert({
+          title: "Получатель не найден",
+          message: "Проверьте почту",
+        });
+        return setSendingOfferForm(false);
+      }
+      const payload = {
+        title: offer.title,
+        userId: res,
+        taxRate: offer.taxrate,
+        rows: offer.rows,
+      };
+      commercialOfferService.saveCommercialOfferSecondForm(payload as PayloadForCommercialOfferSecondForm);
+      await alert({
+        title: "Форма 1 отправлена",
+        message: "",
+      });
+      setSendingOfferForm(false);
+    }
+  };
+
   useEffect(() => {
     getSavedOfferData();
     getSavedOfferSecondFormData();
@@ -98,6 +183,14 @@ function Commercial() {
                     >
                       {selectedOffer?.id === offer.id ? "Скрыть" : "Просмотреть"}
                     </Button>
+                    <Button
+                      disabled={sendingOfferForm}
+                      onClick={() => {
+                        sendForm(offer);
+                      }}
+                    >
+                      Отправить форму
+                    </Button>
                     <Button className="button_btn--red-hover" onClick={() => handleDelete(offer.id)}>
                       Удалить
                     </Button>
@@ -112,7 +205,7 @@ function Commercial() {
                 key={selectedOffer?.id}
                 showBackButton={!selectedOffer}
                 initialRows={selectedOffer.rows}
-                initialTaxRate={selectedOffer.taxRate}
+                initialTaxRate={selectedOffer.taxrate}
                 initialTitle={selectedOffer.title}
                 initialOfferId={selectedOffer.id}
                 onUpdateSuccess={getSavedOfferData}
@@ -147,6 +240,14 @@ function Commercial() {
                       }}
                     >
                       {selectedOfferSecondForm?.id === offer.id ? "Скрыть" : "Просмотреть"}
+                    </Button>
+                    <Button
+                      disabled={sendingOfferForm}
+                      onClick={async () => {
+                        sendForm(offer);
+                      }}
+                    >
+                      Отправить форму
                     </Button>
                     <Button className="button_btn--red-hover" onClick={() => handleDeleteSecondForm(offer.id)}>
                       Удалить

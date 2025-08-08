@@ -25,13 +25,15 @@ export interface Mode {
   form1: boolean;
 }
 export interface User {
-  id: string;
+  id: string | number;
   email: string;
   username: string;
-  emailConfirmed: boolean;
-  isAdmin?: boolean;
+  emailconfirmed: boolean;
+  isadmin?: boolean;
   name: string;
   surname: string;
+  subscribe: boolean;
+  unlimited: boolean;
 }
 export type InputValues = {
   [key: string]: number;
@@ -73,7 +75,7 @@ export interface RowCommercialOffer {
 export interface PayloadForCommercialOffer {
   title: string;
   userId: number | string;
-  taxRate: number;
+  taxRate: number | string;
   rows: RowCommercialOffer[];
 }
 export interface PayloadUpdateCommercialOffer extends PayloadForCommercialOffer {
@@ -100,13 +102,17 @@ export interface SavedOfferDataSecondForm {
   id: number | string;
   created_at: string;
   title: string;
-  userId: number | string;
+  userid: number | string;
   taxrate: number | string;
   rows: RowCommercialOfferSecondForm[];
 }
-export interface SavedOfferData extends PayloadForCommercialOffer {
+export interface SavedOfferData {
   id: number | string;
   created_at: string;
+  title: string;
+  userid: number | string;
+  taxrate: number | string;
+  rows: RowCommercialOffer[];
 }
 export interface ReturnOfCloudinaryUpload {
   url: string;

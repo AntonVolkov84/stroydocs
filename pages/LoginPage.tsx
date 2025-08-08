@@ -32,7 +32,7 @@ export default function LoginPage() {
     const user = await authServices.getMe();
     if (user) {
       setUser(user);
-      if (!user.emailConfirmed) {
+      if (!user.emailconfirmed) {
         await alert({
           title: "Подтвердите Вашу почту",
           message: "",

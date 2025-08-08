@@ -18,7 +18,7 @@ interface RowData {
 interface CommercialOfferFormProps {
   setMode?: React.Dispatch<React.SetStateAction<Mode>>;
   initialRows?: RowData[];
-  initialTaxRate?: number;
+  initialTaxRate?: number | string;
   initialTitle?: string;
   showBackButton?: boolean;
   key?: string | number;
@@ -96,7 +96,7 @@ const CommercialOfferForm = ({
     equipment: rows.filter((r) => r.type === "оборудование").reduce((sum, r) => sum + r.quantity * r.price, 0),
   };
 
-  const tax = +((summary.salary + summary.materials + summary.machines + summary.equipment) * (taxRate / 100)).toFixed(
+  const tax = +((summary.salary + summary.materials + summary.machines + summary.equipment) * (+taxRate / 100)).toFixed(
     2
   );
   const withVAT = +(total + tax).toFixed(2);
@@ -159,6 +159,7 @@ const CommercialOfferForm = ({
       });
     }
   };
+
   return (
     <div className="commercial-wrapper">
       <div className="commercial__controlUnit">
@@ -194,11 +195,11 @@ const CommercialOfferForm = ({
             )}
           </>
         ) : null}
-        {user ? (
+        {(user?.subscribe || user?.unlimited) && (
           <Button styled={{ marginBottom: 20 }} onClick={() => window.print()}>
             🖨️ Печать
           </Button>
-        ) : null}
+        )}
       </div>
       <div
         style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", marginBottom: 20, marginRight: 80 }}

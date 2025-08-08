@@ -25,7 +25,7 @@ type RowData = {
 interface SecondCommercialOfferFormProps {
   setMode?: React.Dispatch<React.SetStateAction<Mode>>;
   initialRows?: RowData[];
-  initialTaxRate?: string;
+  initialTaxRate?: string | number;
   initialTitle?: string;
   key?: string | number;
   showBackButton?: boolean;
@@ -46,7 +46,7 @@ export default function SecondCommercialOfferForm({
   setSelectedOffer,
 }: SecondCommercialOfferFormProps) {
   const [rows, setRows] = useState<RowData[]>(initialRows || [defaultRow]);
-  const [taxPercent, setTaxPercent] = useState(initialTaxRate || "20");
+  const [taxPercent, setTaxPercent] = useState<string | number>(initialTaxRate || "20");
   const { user, prompt, alert } = useAppContext();
 
   const handleChange = (index: number, field: keyof RowData, value: string) => {
@@ -120,7 +120,7 @@ export default function SecondCommercialOfferForm({
     0
   );
   const totalCost = totalSalaryCost + totalMaterialCost + totalMachineCost;
-  const taxValue = parseFloat(taxPercent) || 0;
+  const taxValue = parseFloat(typeof taxPercent === "number" ? taxPercent.toString() : taxPercent) || 0;
   const taxAmount = totalCost * (taxValue / 100);
   const totalByTable = totalCost + taxAmount;
   const handleUpdate = async () => {
@@ -160,7 +160,7 @@ export default function SecondCommercialOfferForm({
           ) : (
             <Button onClick={handleUpdate}>💾 Изменить</Button>
           )}
-          <Button onClick={() => window.print()}>🖨️ Печать</Button>
+          {(user.subscribe || user.unlimited) && <Button onClick={() => window.print()}>🖨️ Печать</Button>}
           <Button onClick={handleAddRow}>➕ Добавить строку</Button>
         </div>
       ) : (

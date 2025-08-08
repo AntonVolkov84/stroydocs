@@ -1,19 +1,11 @@
 import axios from "axios";
+import { User } from "../type";
 
 interface LoginData {
   username: string;
   password: string;
   email: string;
   recaptchaToken?: string;
-  name: string;
-  surname: string;
-}
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  emailConfirmed: boolean;
   name: string;
   surname: string;
 }

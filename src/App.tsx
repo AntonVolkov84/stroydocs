@@ -24,7 +24,7 @@ function AppRoutes() {
       <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
       <Route path="/changepassword" element={<ChangePasswordPage user={user} />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/personalpage" element={user && user.emailConfirmed ? <PersonalPage /> : <Navigate to="/login" />} />
+      <Route path="/personalpage" element={user && user.emailconfirmed ? <PersonalPage /> : <Navigate to="/login" />} />
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="*" element={<NoPage />} />
     </Routes>

@@ -10,16 +10,7 @@ import CreatingNews from "../components/CreatingNews";
 import SavedCalculators from "../components/SavedCalculators";
 import Commercial from "../components/Commercial";
 import { useAppContext } from "../services/AppContext";
-
-interface User {
-  id: string;
-  email: string;
-  username: string;
-  emailConfirmed: boolean;
-  isAdmin?: boolean;
-  name: string;
-  surname: string;
-}
+import { User } from "../type";
 
 export interface Calculator {
   id: number;
@@ -46,7 +37,7 @@ export default function PersonalPage() {
   const [savedCommercialOffer, setSavedCommercialOffer] = useState<boolean>(false);
   const navigate = useNavigate();
   const { user, setUser } = useAppContext();
-  const currentUserEmail = user.email;
+  const currentUserEmail = user?.email;
 
   const clearState = () => {
     setManagerCalculator(false);
@@ -63,8 +54,8 @@ export default function PersonalPage() {
     if (user.email === "antvolkov84@gmail.com" || user.email === "aleks_e@inbox.ru") {
       setIsSuperAdmin(true);
     }
-    if (user && typeof user.isAdmin === "boolean") {
-      setIsAdmin(user.isAdmin);
+    if (user && typeof user.isadmin === "boolean") {
+      setIsAdmin(user.isadmin);
     } else {
       setIsAdmin(false);
     }
@@ -144,7 +135,7 @@ export default function PersonalPage() {
       </aside>
       <main className="personalpage__main">
         <h1>
-          Добро пожаловать, {user.name} {user.surname}
+          Добро пожаловать, {user?.name} {user?.surname}
         </h1>
         {creatingNews && <CreatingNews />}
         {constructorCalculator ? (

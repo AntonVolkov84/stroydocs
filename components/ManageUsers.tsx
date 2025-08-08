@@ -3,14 +3,8 @@ import Button from "./Button";
 import * as userService from "../services/userService";
 import "./ManageUsers.css";
 import { useAppContext } from "../services/AppContext";
+import { User } from "../type";
 
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  emailconfirmed: boolean;
-  isadmin: boolean;
-}
 interface ManageUserProps {
   currentUserEmail: string;
 }
@@ -18,6 +12,7 @@ interface ManageUserProps {
 export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
   const [users, setUsers] = useState<User[]>([]);
   const { confirm } = useAppContext();
+
   const fetchUsers = async () => {
     try {
       const data = await userService.getAllUsers();
@@ -27,8 +22,7 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
     }
   };
 
-  const toggleAdmin = async (id: number, value: boolean) => {
-    console.log(value);
+  const toggleAdmin = async (id: number | string, value: boolean) => {
     try {
       await userService.setAdminStatus(id, !value);
       fetchUsers();
@@ -36,8 +30,16 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
       console.error("Ошибка при обновлении прав администратора", error);
     }
   };
+  const toggleUnlim = async (id: number | string, value: boolean) => {
+    try {
+      await userService.setUnlimStatus(id, !value);
+      fetchUsers();
+    } catch (error) {
+      console.error("Ошибка при обновлении прав администратора", error);
+    }
+  };
 
-  const deleteUser = async (id: number) => {
+  const deleteUser = async (id: number | string) => {
     const confirmResult = await confirm({
       title: "Удалить пользователя?",
       message: "",
@@ -69,8 +71,10 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
             <tr>
               <th>Имя пользователя</th>
               <th>Email</th>
-              <th>Подтверждён</th>
+              <th>Подтвержден</th>
               <th>Админ</th>
+              <th>Подписка</th>
+              <th>Безлимит</th>
               <th className="actions-header">Действия</th>
             </tr>
           </thead>
@@ -81,12 +85,23 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
                 <td>{user.email}</td>
                 <td>{user.emailconfirmed ? "✅" : "❌"}</td>
                 <td>{user.isadmin ? "✅" : "❌"}</td>
+                <td>{user.subscribe ? "✅" : "❌"}</td>
+                <td>
+                  {user.email === "antvolkov84@gmail.com" || user.email === "aleks_e@inbox.ru"
+                    ? "✅ Суперадмин"
+                    : user.unlimited
+                    ? "✅"
+                    : "❌"}{" "}
+                </td>
                 <td className="Users-actions">
                   <div className="actions-buttons">
                     {user.email !== currentUserEmail &&
                       user.email !== "antvolkov84@gmail.com" &&
                       user.email !== "aleks_e@inbox.ru" && (
                         <>
+                          <Button onClick={() => toggleUnlim(user.id, user.unlimited ?? false)} className="edit-btn">
+                            {user.unlimited ? "Убрать безлим" : "Включить безлим"}
+                          </Button>
                           <Button onClick={() => toggleAdmin(user.id, user.isadmin ?? false)} className="edit-btn">
                             {user.isadmin ? "Убрать права" : "Сделать админом"}
                           </Button>
