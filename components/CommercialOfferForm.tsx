@@ -6,6 +6,9 @@ import { Trash2, Copy } from "lucide-react";
 import { useAppContext } from "../services/AppContext";
 import { SavedOfferData } from "../type";
 import * as commercialOfferService from "../services/commercialOfferService";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import ExcelJS from "exceljs";
 
 interface RowData {
   name: string;
@@ -159,6 +162,126 @@ const CommercialOfferForm = ({
       });
     }
   };
+  const exportToExcel = async (offer: { rows: RowData[]; total: number }) => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Коммерческое предложение");
+    worksheet.mergeCells("A1", "G1");
+    const app2Cell1 = worksheet.getCell("E1");
+    app2Cell1.value = "Приложение №2";
+    app2Cell1.font = { bold: true };
+    app2Cell1.alignment = { horizontal: "right" };
+    worksheet.addRow([]);
+    worksheet.mergeCells("A3", "G3");
+    const app2Cell2 = worksheet.getCell("C3");
+    app2Cell2.value = `к Договору подряда на выполнение работ № ________   от ____________   202___ г.`;
+    app2Cell2.alignment = { horizontal: "right" };
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    worksheet.mergeCells("A6", "G6");
+    const titleCell = worksheet.getCell("A6");
+    titleCell.value = "КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ";
+    titleCell.font = { bold: true, size: 16 };
+    titleCell.alignment = { horizontal: "center", vertical: "middle" };
+
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    const headerRow = worksheet.addRow([
+      "№",
+      "Наименование работ и затрат",
+      "Ед. изм.",
+      "Количество",
+      "Цена, руб.",
+      "Стоимость, руб.",
+      "Тип",
+    ]);
+    headerRow.font = { bold: true };
+    headerRow.alignment = { horizontal: "center" };
+    headerRow.eachCell((cell) => {
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
+    offer.rows.forEach((row, index) => {
+      const cost = +(row.quantity * row.price).toFixed(2);
+      const rowData = [index + 1, row.name, row.unit, row.quantity, row.price, cost, row.type];
+      const newRow = worksheet.addRow(rowData);
+      newRow.getCell(2).alignment = { wrapText: true };
+      newRow.height = 30;
+      newRow.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+        if (typeof cell.value === "number") {
+          cell.alignment = { horizontal: "right" };
+        }
+      });
+    });
+    worksheet.addRow([]);
+    const summarySalary = rows.filter((r) => r.type === "работы").reduce((sum, r) => sum + r.quantity * r.price, 0);
+    const summaryMaterials = rows
+      .filter((r) => r.type === "материалы")
+      .reduce((sum, r) => sum + r.quantity * r.price, 0);
+    const summaryMachines = rows
+      .filter((r) => r.type === "механизмы")
+      .reduce((sum, r) => sum + r.quantity * r.price, 0);
+    const summaryEquipment = rows
+      .filter((r) => r.type === "оборудование")
+      .reduce((sum, r) => sum + r.quantity * r.price, 0);
+    const taxAmount = +(
+      (summarySalary + summaryMaterials + summaryMachines + summaryEquipment) *
+      (+taxRate / 100)
+    ).toFixed(2);
+    const totalWithTax = +(offer.total + taxAmount).toFixed(2);
+    const summaryData = [
+      ["", "ИТОГ без налогов", "", "", "", offer.total, ""],
+      ["", "- Оплата труда", "", "", "", summarySalary.toFixed(2), ""],
+      ["", "- Материал", "", "", "", summaryMaterials.toFixed(2), ""],
+      ["", "- Эксплуатация машин", "", "", "", summaryMachines.toFixed(2), ""],
+      ["", "- Оборудование", "", "", "", summaryEquipment.toFixed(2), ""],
+      ["", "- Налоги", "", "", `${taxRate}%`, taxAmount.toFixed(2), ""],
+      ["", "ВСЕГО с налогами", "", "", "", totalWithTax.toFixed(2), ""],
+    ];
+    summaryData.forEach((data) => {
+      const row = worksheet.addRow(data);
+      row.font = { bold: data[1].toString().includes("ИТОГ") || data[1].toString().includes("ВСЕГО") };
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+        if (cell.col === 6) {
+          cell.alignment = { horizontal: "right" };
+        }
+      });
+    });
+    worksheet.addRow([]);
+    worksheet.addRow([]);
+    const customerRow = worksheet.addRow(["Заказчик", "", "", "___________________ /_____________________/"]);
+    const contractorRow = worksheet.addRow(["Подрядчик", "", "", "___________________ /_____________________/"]);
+    [customerRow, contractorRow].forEach((r) => {
+      r.getCell(1).alignment = { horizontal: "left" };
+      r.getCell(7).alignment = { horizontal: "left" };
+    });
+    worksheet.columns = [
+      { width: 5 },
+      { width: 40 },
+      { width: 8 },
+      { width: 15 },
+      { width: 12 },
+      { width: 20 },
+      { width: 12 },
+    ];
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), "Коммерческое_предложение.xlsx");
+  };
 
   return (
     <div className="commercial-wrapper">
@@ -198,6 +321,11 @@ const CommercialOfferForm = ({
         {(user?.subscribe || user?.unlimited) && (
           <Button styled={{ marginBottom: 20 }} onClick={() => window.print()}>
             🖨️ Печать
+          </Button>
+        )}
+        {(user?.subscribe || user?.unlimited) && (
+          <Button styled={{ marginBottom: 20 }} onClick={() => exportToExcel({ rows, total })}>
+            📊 Выгрузить в Excel
           </Button>
         )}
       </div>
