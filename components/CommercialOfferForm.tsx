@@ -208,8 +208,9 @@ const CommercialOfferForm = ({
       const cost = +(row.quantity * row.price).toFixed(2);
       const rowData = [index + 1, row.name, row.unit, row.quantity, row.price, cost, row.type];
       const newRow = worksheet.addRow(rowData);
-      newRow.getCell(2).alignment = { wrapText: true };
-      newRow.height = 30;
+      newRow.getCell(2).alignment = { wrapText: true, horizontal: "left", vertical: "middle" };
+      const approxLines = Math.ceil(row.name.length / 40);
+      newRow.height = approxLines * 17;
       newRow.eachCell((cell) => {
         cell.border = {
           top: { style: "thin" },
@@ -250,13 +251,19 @@ const CommercialOfferForm = ({
     summaryData.forEach((data) => {
       const row = worksheet.addRow(data);
       row.font = { bold: data[1].toString().includes("ИТОГ") || data[1].toString().includes("ВСЕГО") };
-      row.eachCell((cell) => {
-        cell.border = {
-          top: { style: "thin" },
-          left: { style: "thin" },
-          bottom: { style: "thin" },
-          right: { style: "thin" },
-        };
+      row.eachCell((cell, colNumber) => {
+        if (colNumber === 7) {
+          cell.border = {
+            left: { style: "thin" },
+          };
+        } else {
+          cell.border = {
+            top: { style: "thin" },
+            left: { style: "thin" },
+            bottom: { style: "thin" },
+            right: { style: "thin" },
+          };
+        }
         if (cell.col === 6) {
           cell.alignment = { horizontal: "right" };
         }
@@ -265,6 +272,7 @@ const CommercialOfferForm = ({
     worksheet.addRow([]);
     worksheet.addRow([]);
     const customerRow = worksheet.addRow(["Заказчик", "", "", "___________________ /_____________________/"]);
+    worksheet.addRow([]);
     const contractorRow = worksheet.addRow(["Подрядчик", "", "", "___________________ /_____________________/"]);
     [customerRow, contractorRow].forEach((r) => {
       r.getCell(1).alignment = { horizontal: "left" };
@@ -273,14 +281,14 @@ const CommercialOfferForm = ({
     worksheet.columns = [
       { width: 5 },
       { width: 40 },
-      { width: 8 },
+      { width: 10 },
       { width: 15 },
-      { width: 12 },
+      { width: 15 },
       { width: 20 },
-      { width: 12 },
+      { width: 15 },
     ];
     const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), "Коммерческое_предложение.xlsx");
+    saveAs(new Blob([buffer]), "Коммерческое_предложение форма 0.xlsx");
   };
 
   return (
@@ -386,7 +394,7 @@ const CommercialOfferForm = ({
                 <input
                   type="number"
                   step="0.000001"
-                  className="cell-input smaller"
+                  className="cell-input smallest no-spinner"
                   value={row.quantity}
                   min="0"
                   onChange={(e) => handleChange(i, "quantity", e.target.value)}
@@ -395,7 +403,7 @@ const CommercialOfferForm = ({
               <td>
                 <input
                   type="number"
-                  className="cell-input smaller"
+                  className="cell-input smallest no-spinner"
                   value={row.price}
                   step="0.01"
                   min="0"

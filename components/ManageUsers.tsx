@@ -86,13 +86,7 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
                 <td>{user.emailconfirmed ? "✅" : "❌"}</td>
                 <td>{user.isadmin ? "✅" : "❌"}</td>
                 <td>{user.subscribe ? "✅" : "❌"}</td>
-                <td>
-                  {user.email === "antvolkov84@gmail.com" || user.email === "aleks_e@inbox.ru"
-                    ? "✅ Суперадмин"
-                    : user.unlimited
-                    ? "✅"
-                    : "❌"}{" "}
-                </td>
+                <td>{user.unlimited ? "✅" : "❌"} </td>
                 <td className="Users-actions">
                   <div className="actions-buttons">
                     {user.email !== currentUserEmail &&

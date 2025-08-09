@@ -73,12 +73,23 @@
 
 .cell-input.small {
   width: 95%;
+  max-width: 80px;
 }
 
-.cell-input.smaller {
-  width: 60px;
+.cell-input.smallest {
+  max-width: 80px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 4px 6px;
 }
-
+input[type="number"].no-spinner::-webkit-inner-spin-button,
+input[type="number"].no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"].no-spinner {
+  -moz-appearance: textfield;
+}
 .cell-input.bold {
   font-weight: bold;
 }

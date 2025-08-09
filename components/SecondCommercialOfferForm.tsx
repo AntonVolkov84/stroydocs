@@ -4,6 +4,8 @@ import { Mode, SavedOfferDataSecondForm } from "../type";
 import Button from "./Button";
 import { useAppContext } from "../services/AppContext";
 import * as commercialOfferService from "../services/commercialOfferService";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 
 const defaultRow = {
   name: "",
@@ -45,7 +47,7 @@ export default function SecondCommercialOfferForm({
   onUpdateSuccess,
   setSelectedOffer,
 }: SecondCommercialOfferFormProps) {
-  const [rows, setRows] = useState<RowData[]>(initialRows || [defaultRow]);
+  const [rows, setRows] = useState<RowData[]>(initialRows || [{ ...defaultRow }]);
   const [taxPercent, setTaxPercent] = useState<string | number>(initialTaxRate || "20");
   const { user, prompt, alert } = useAppContext();
 
@@ -56,7 +58,7 @@ export default function SecondCommercialOfferForm({
   };
 
   const handleAddRow = () => {
-    setRows([...rows, defaultRow]);
+    setRows([...rows, { ...defaultRow }]);
   };
 
   const handleDeleteRow = (index: number) => {
@@ -144,6 +146,146 @@ export default function SecondCommercialOfferForm({
       if (setSelectedOffer) setSelectedOffer(null);
     }
   };
+  const exportToExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Коммерческое предложение");
+    worksheet.mergeCells("A1", "M1");
+    const titleCell = worksheet.getCell("A1");
+    titleCell.value = "КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ";
+    titleCell.font = { bold: true, size: 16 };
+    titleCell.alignment = { horizontal: "center", vertical: "middle" };
+    worksheet.addRow([]);
+    worksheet.mergeCells("A2", "M2");
+    const lineCell = worksheet.getCell("A2");
+    lineCell.value = "_________________________________________________________________________________";
+    lineCell.alignment = { horizontal: "center" };
+    worksheet.mergeCells("A3", "M3");
+    const placeholderCell = worksheet.getCell("A3");
+    placeholderCell.value = "(наименование работ и затрат, наименование объекта)";
+    placeholderCell.alignment = { horizontal: "center" };
+    placeholderCell.font = { italic: true };
+    worksheet.addRow([]);
+    const headerRow = worksheet.addRow([
+      "№ п/п",
+      "Наименование работ",
+      "Ед. изм.",
+      "Кол-во",
+      "Цена за единицу, руб. без НДС",
+      "Заработная плата",
+      "Материал",
+      "Эксплуатация машин",
+      "ВСЕГО",
+      "Осн. зарплата",
+      "Материалы",
+      "Экспл. машин",
+    ]);
+    headerRow.height = 30;
+    headerRow.eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+      cell.border = {
+        top: { style: "thin" },
+        left: { style: "thin" },
+        bottom: { style: "thin" },
+        right: { style: "thin" },
+      };
+    });
+    rows.forEach((row, index) => {
+      const unitPrice = computeUnitPrice(row);
+      const totalSum = computeTotalSum(row);
+      const rowValues = [
+        index + 1,
+        row.name,
+        row.unit,
+        row.quantity,
+        unitPrice.toFixed(2),
+        row.salary,
+        row.material,
+        row.machine,
+        totalSum.toFixed(2),
+        (parseFloat(row.salary) * (parseFloat(row.quantity) || 0)).toFixed(2),
+        (parseFloat(row.material) * (parseFloat(row.quantity) || 0)).toFixed(2),
+        (parseFloat(row.machine) * (parseFloat(row.quantity) || 0)).toFixed(2),
+      ];
+      const newRow = worksheet.addRow(rowValues);
+      newRow.getCell(2).alignment = { wrapText: true, horizontal: "left", vertical: "middle" };
+      const approxLines = Math.ceil(row.name.length / 40);
+      newRow.height = approxLines * 17;
+      newRow.eachCell((cell, colNumber) => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+        if (typeof cell.value === "number" || !isNaN(parseFloat(cell.value as string))) {
+          cell.alignment = { horizontal: "right" };
+        }
+        if (colNumber === 2) {
+          cell.alignment = { wrapText: true, horizontal: "left", vertical: "middle" };
+        } else if (typeof cell.value === "number" || !isNaN(parseFloat(cell.value as string))) {
+          cell.alignment = { horizontal: "right", vertical: "middle", wrapText: true };
+        } else {
+          cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+        }
+      });
+    });
+    worksheet.addRow([]);
+    const summaryRows = [
+      [
+        "",
+        "ИТОГ без НДС",
+        "руб.",
+        "",
+        "",
+        "",
+        "",
+        "",
+        totalCost.toFixed(2),
+        totalSalaryCost.toFixed(2),
+        totalMaterialCost.toFixed(2),
+        totalMachineCost.toFixed(2),
+      ],
+      ["", "Налоги, %", taxPercent.toString(), "", "", "", "", "", taxAmount.toFixed(2), "", "", ""],
+      ["", "Всего с НДС", "руб.", "", "", "", "", "", totalByTable.toFixed(2), "", "", ""],
+    ];
+
+    summaryRows.forEach((data) => {
+      const row = worksheet.addRow(data);
+      row.eachCell((cell, colNumber) => {
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+
+        if (colNumber === 9) {
+          cell.alignment = { horizontal: "right" };
+        }
+      });
+    });
+    worksheet.addRow([]);
+    const customerRow = worksheet.addRow(["", "Заказчик", "", "___________________ /_____________________/"]);
+    worksheet.addRow([]);
+    const contractorRow = worksheet.addRow(["", "Подрядчик", "", "___________________ /_____________________/"]);
+    worksheet.columns = [
+      { width: 6 },
+      { width: 40 },
+      { width: 10 },
+      { width: 10 },
+      { width: 20 },
+      { width: 15 },
+      { width: 15 },
+      { width: 15 },
+      { width: 18 },
+      { width: 18 },
+      { width: 18 },
+      { width: 18 },
+    ];
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), "Коммерческое_предложение форма1.xlsx");
+  };
 
   return (
     <div className="commercial-wrapper">
@@ -161,6 +303,7 @@ export default function SecondCommercialOfferForm({
             <Button onClick={handleUpdate}>💾 Изменить</Button>
           )}
           {(user.subscribe || user.unlimited) && <Button onClick={() => window.print()}>🖨️ Печать</Button>}
+          {(user.subscribe || user.unlimited) && <Button onClick={() => exportToExcel()}>📊 Выгрузить в Excel</Button>}
           <Button onClick={handleAddRow}>➕ Добавить строку</Button>
         </div>
       ) : (
