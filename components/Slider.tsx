@@ -1,6 +1,7 @@
 import "./Slider.css";
 import { Slide } from "../type";
 import { useState, useRef } from "react";
+import ImageCalculator from "../src/unsplash.jpg";
 
 interface SliderProps {
   slides: Slide[] | null;
@@ -49,7 +50,7 @@ function Slider({ slides, title }: SliderProps) {
     }
     startXRef.current = null;
   };
-
+  const imageSrc = slides?.[currentIndex]?.image_url ? slides[currentIndex].image_url : ImageCalculator;
   return (
     <div
       className="slider__container"
@@ -67,9 +68,9 @@ function Slider({ slides, title }: SliderProps) {
           {slides && <h3>{slides[currentIndex].title}</h3>}
           {slides && <h4>{slides[currentIndex].formula}</h4>}
         </div>
-        {slides?.[currentIndex].image_url && (
+        {slides && (
           <div className="slider__image-block">
-            <img src={slides[currentIndex].image_url} alt={slides[currentIndex].title} className="slider__image" />
+            <img src={imageSrc} alt={slides[currentIndex].title} className="slider__image" />
           </div>
         )}
         <button className="slider__button slider__button--right" onClick={nextSlide}>

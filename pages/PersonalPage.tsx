@@ -10,7 +10,7 @@ import CreatingNews from "../components/CreatingNews";
 import SavedCalculators from "../components/SavedCalculators";
 import Commercial from "../components/Commercial";
 import { useAppContext } from "../services/AppContext";
-import { User } from "../type";
+import ReferenceBooks from "../components/ReferenceBooks";
 
 export interface Calculator {
   id: number;
@@ -31,6 +31,7 @@ export default function PersonalPage() {
   const [constructorCalculator, setConstructorCalculator] = useState<boolean>(false);
   const [managerCalculator, setManagerCalculator] = useState<boolean>(false);
   const [managerUser, setManagerUser] = useState<boolean>(false);
+  const [manageReferenceBooks, setManageReferenceBooks] = useState(false);
   const [creatingNews, setCreatingNews] = useState<boolean>(false);
   const [selectedCalculator, setSelectedCalculator] = useState<Calculator | null>(null);
   const [savedCalculator, setSavedCalculator] = useState<boolean>(false);
@@ -47,6 +48,7 @@ export default function PersonalPage() {
     setSavedCalculator(false);
     setSavedCommercialOffer(false);
     setSelectedCalculator(null);
+    setManageReferenceBooks(false);
   };
 
   useEffect(() => {
@@ -127,6 +129,14 @@ export default function PersonalPage() {
               >
                 Управление калькуляторами
               </li>
+              <li
+                onClick={() => {
+                  clearState();
+                  setManageReferenceBooks(true);
+                }}
+              >
+                Управление справочниками
+              </li>
             </>
           )}
           <li onClick={() => navigate("/changepassword")}>Сменить пароль</li>
@@ -165,11 +175,13 @@ export default function PersonalPage() {
             )}
           </>
         )}
+        {manageReferenceBooks && (isAdmin || isSuperAdmin) && <ReferenceBooks />}
         {savedCommercialOffer && <Commercial />}
         {savedCalculator && <SavedCalculators />}
         {!managerCalculator &&
           !constructorCalculator &&
           !managerUser &&
+          !manageReferenceBooks &&
           !creatingNews &&
           !savedCalculator &&
           !savedCommercialOffer && (

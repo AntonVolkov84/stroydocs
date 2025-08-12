@@ -26,14 +26,12 @@ function Commercial() {
     const id = user.id;
     const data = await commercialOfferService.getCommercialOffers(id);
     setSavedOfferData(data);
-    console.log(data);
   };
   const getSavedOfferSecondFormData = async () => {
     if (!user) return;
     const id = user.id;
     const data = await commercialOfferService.getCommercialOffersSecondForm(id);
     setSavedOfferDataSecondForm(data);
-    console.log(data);
   };
 
   const handleDelete = async (id: number | string) => {
@@ -83,16 +81,17 @@ function Commercial() {
       placeholder: "Эл почта получателя",
     });
     setSendingOfferForm(true);
-    if (recieverEmail === null) return;
+    if (recieverEmail === null) return setSendingOfferForm(false);
     if (!recieverEmail) {
       await alert({
         title: "Вы не ввели почту получателя",
         message: "",
       });
-      return;
+      return setSendingOfferForm(false);
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(recieverEmail)) {
+      setSendingOfferForm(false);
       return await alert({
         title: "Введите корректный адрес электронной почты!",
         message: "",
@@ -104,7 +103,7 @@ function Commercial() {
         title: "Нет смысла отправлять себе!",
         message: "У тебя уже есть эта форма",
       });
-      return;
+      return setSendingOfferForm(false);
     }
     if ("type" in offer.rows[0]) {
       const res = await userService.getUserId(recieverEmail);

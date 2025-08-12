@@ -111,7 +111,6 @@ export default function Dashboard() {
                   <div className="dashboard-submenu-inner">
                     <button className="dashboard-submenu-href">Руководство</button>
                     <button className="dashboard-submenu-href">Департаменты</button>
-                    <button className="dashboard-submenu-href">Еще что-то там</button>
                   </div>
                 </div>
               </li>
@@ -158,7 +157,7 @@ export default function Dashboard() {
                 </div>
               </li>
               <li className="dashboard-menu-item">
-                <span>Отчеты ▾</span>
+                <span>Справочники ▾</span>
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
                     <button className="dashboard-submenu-href">Все отчеты</button>

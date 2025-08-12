@@ -263,6 +263,9 @@ export default function SecondCommercialOfferForm({
         if (colNumber === 9) {
           cell.alignment = { horizontal: "right" };
         }
+        if (colNumber > 9) {
+          cell.alignment = { horizontal: "right" };
+        }
       });
     });
     worksheet.addRow([]);
