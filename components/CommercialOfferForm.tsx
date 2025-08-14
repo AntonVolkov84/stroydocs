@@ -340,10 +340,10 @@ const CommercialOfferForm = ({
       <div
         style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", marginBottom: 20, marginRight: 80 }}
       >
-        <div>
+        <div className="print-only">
           <strong>Приложение №2</strong>
         </div>
-        <div>
+        <div className="print-only">
           к Договору подряда на выполнение работ №{" "}
           <span style={{ borderBottom: "1px solid black", padding: "0 50px" }}></span>
           &nbsp; от <span style={{ borderBottom: "1px solid black", padding: "0 50px" }}></span>

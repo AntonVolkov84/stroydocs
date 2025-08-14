@@ -307,7 +307,6 @@ export default function SecondCommercialOfferForm({
           )}
           {(user.subscribe || user.unlimited) && <Button onClick={() => window.print()}>🖨️ Печать</Button>}
           {(user.subscribe || user.unlimited) && <Button onClick={() => exportToExcel()}>📊 Выгрузить в Excel</Button>}
-          <Button onClick={handleAddRow}>➕ Добавить строку</Button>
         </div>
       ) : (
         <div className="commercial__controlUnit">
@@ -315,8 +314,8 @@ export default function SecondCommercialOfferForm({
         </div>
       )}
       <h2 className="title">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</h2>
-      <h4 className="title-line">___________________________________________________</h4>
-      <h6 className="title-placeholder">(наименование работ и затрат, наименование объекта)</h6>
+      <h4 className="title-line print-only">___________________________________________________</h4>
+      <h6 className="title-placeholder print-only">(наименование работ и затрат, наименование объекта)</h6>
       <table className="offer-table" style={{ tableLayout: "fixed", width: "100%" }}>
         <colgroup>
           <col style={{ width: "40px" }} />
@@ -436,6 +435,11 @@ export default function SecondCommercialOfferForm({
               </tr>
             );
           })}
+          <tr>
+            <td colSpan={14} style={{ textAlign: "center" }}>
+              <Button onClick={handleAddRow}>➕ Добавить строку</Button>
+            </td>
+          </tr>
           <>
             <tr className="total-row">
               <td></td>

@@ -128,6 +128,7 @@ input[type="number"].no-spinner {
   .result-row {
     display: table-row !important;
   }
+
   .offer-table input {
     border: none;
     background: none;

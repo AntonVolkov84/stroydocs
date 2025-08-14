@@ -50,7 +50,9 @@
 .smaller {
   max-width: 55px;
 }
-
+.print-only {
+  display: none;
+}
 .icon-button {
   border: none;
   background: none;
@@ -71,4 +73,9 @@ td {
   white-space: normal;
   word-break: break-word;
   vertical-align: top;
+}
+@media print {
+  .print-only {
+    display: block;
+  }
 }

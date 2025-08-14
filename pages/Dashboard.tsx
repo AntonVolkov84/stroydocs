@@ -109,8 +109,12 @@ export default function Dashboard() {
                 <span>О компании ▾</span>
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
-                    <button className="dashboard-submenu-href">Руководство</button>
-                    <button className="dashboard-submenu-href">Департаменты</button>
+                    <button style={{ padding: "10px" }} className="dashboard-submenu-href">
+                      Руководство
+                    </button>
+                    <button style={{ padding: "10px" }} className="dashboard-submenu-href">
+                      Департаменты
+                    </button>
                   </div>
                 </div>
               </li>
@@ -121,6 +125,7 @@ export default function Dashboard() {
                     {calculators &&
                       calculators.map((calc) => (
                         <button
+                          style={{ padding: "10px" }}
                           key={calc.id}
                           onClick={() => {
                             setMode((prev) => ({ form: false, form1: false, calculators: calc }));
@@ -138,6 +143,7 @@ export default function Dashboard() {
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
                     <button
+                      style={{ padding: "10px" }}
                       onClick={() => {
                         setMode((prev) => ({ calculators: false, form: true, form1: false }));
                       }}
@@ -146,6 +152,7 @@ export default function Dashboard() {
                       Коммерческое предложение форма 0
                     </button>
                     <button
+                      style={{ padding: "10px" }}
                       onClick={() => {
                         setMode((prev) => ({ calculators: false, form: false, form1: true }));
                       }}
@@ -160,7 +167,9 @@ export default function Dashboard() {
                 <span>Справочники ▾</span>
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
-                    <button className="dashboard-submenu-href">Все отчеты</button>
+                    <button style={{ padding: "10px" }} className="dashboard-submenu-href">
+                      Все справочники
+                    </button>
                   </div>
                 </div>
               </li>

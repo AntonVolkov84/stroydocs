@@ -89,7 +89,7 @@ export default function PersonalPage() {
               setSavedCommercialOffer(true);
             }}
           >
-            Сохраненные данные по коммерческим предложениям
+            Сохраненные документы
           </li>
           {isSuperAdmin && (
             <li
