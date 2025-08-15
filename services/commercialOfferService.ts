@@ -5,6 +5,7 @@ import {
   PayloadUpdateCommercialOffer,
   PayloadForCommercialOfferSecondForm,
   PayloadUpdateCommercialOfferSecondForm,
+  PayloadPendingDoc,
 } from "../type";
 
 const apiUrl: string = import.meta.env.VITE_API_URL;
@@ -93,5 +94,16 @@ export const deleteCommercialOffersSecondForm = async (id: number | string) => {
     });
   } catch (error) {
     console.log("deletegetCommercialOffersSecondForm", error);
+  }
+};
+export const savePendingDocument = async (payload: PayloadPendingDoc): Promise<{ message: string }> => {
+  try {
+    const res: AxiosResponse<{ message: string }> = await axios.post(`${apiUrl}/stroydocs/pendingcommercial`, payload, {
+      withCredentials: true,
+    });
+    return res.data;
+  } catch (error) {
+    console.log("saveCommercialOfferSecondForm", error);
+    throw error;
   }
 };

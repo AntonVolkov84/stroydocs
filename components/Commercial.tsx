@@ -108,9 +108,21 @@ function Commercial() {
     if ("type" in offer.rows[0]) {
       const res = await userService.getUserId(recieverEmail);
       if (!res) {
+        const payload = {
+          email: recieverEmail,
+          title: offer.title,
+          taxRate: offer.taxrate,
+          rows: offer.rows,
+          type: "form0",
+          receiver: recieverEmail,
+          sender: `${user?.name} ${user?.surname}`,
+        };
+        const response = await commercialOfferService.savePendingDocument(payload);
+        console.log(response);
         await alert({
-          title: "Получатель не найден",
-          message: "Проверьте почту",
+          title: "Такой получатель не зарегистрирован",
+          message:
+            "Возможно, Вы не верно ввели данные, либо получатель еще не зарегистрирован на сайте. В таком случае он получить сообщение на почту с информацией, что ему отправлены документы",
         });
         return setSendingOfferForm(false);
       }
@@ -129,9 +141,21 @@ function Commercial() {
     } else {
       const res = await userService.getUserId(recieverEmail);
       if (!res) {
+        const payload = {
+          email: recieverEmail,
+          title: offer.title,
+          taxRate: offer.taxrate,
+          rows: offer.rows,
+          type: "form1",
+          receiver: recieverEmail,
+          sender: `${user?.name} ${user?.surname}`,
+        };
+        const response = await commercialOfferService.savePendingDocument(payload);
+        console.log(response);
         await alert({
-          title: "Получатель не найден",
-          message: "Проверьте почту",
+          title: "Такой получатель не зарегистрирован",
+          message:
+            "Возможно, Вы не верно ввели данные, либо получатель еще не зарегистрирован на сайте. В таком случае он получить сообщение на почту с информацией, что ему отправлены документы",
         });
         return setSendingOfferForm(false);
       }

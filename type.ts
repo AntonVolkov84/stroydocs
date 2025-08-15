@@ -162,3 +162,12 @@ export interface Slide {
 }
 
 export type PromptOptions = Omit<PromptModalProps, "open" | "onConfirm" | "onCancel">;
+export interface PayloadPendingDoc {
+  email: string;
+  title: string;
+  rows: RowCommercialOfferSecondForm[] | RowCommercialOffer[];
+  taxRate: number | string;
+  type: string;
+  receiver: string;
+  sender: string;
+}
