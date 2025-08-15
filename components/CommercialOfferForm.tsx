@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState, Dispatch, SetStateAction, useRef } from "react";
 import "./CommercialOfferForm.css";
 import Button from "./Button";
 import { Mode } from "../type";
@@ -6,7 +6,6 @@ import { Trash2, Copy } from "lucide-react";
 import { useAppContext } from "../services/AppContext";
 import { SavedOfferData } from "../type";
 import * as commercialOfferService from "../services/commercialOfferService";
-import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
 
@@ -45,11 +44,27 @@ const CommercialOfferForm = ({
     initialRows || [{ name: "", unit: "", type: "работы", quantity: 0, price: 0 }]
   );
   const { user, prompt, alert } = useAppContext();
-
   const [taxRate, setTaxRate] = useState(initialTaxRate || 20);
+  const inputRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  const addRow = (type: RowData["type"], index?: number) => {
+    const newRow: RowData = { name: "", unit: "", type, quantity: 0, price: 0 };
 
-  const addRow = (type: RowData["type"]) => {
-    setRows((prev) => [...prev, { name: "", unit: "", type, quantity: 0, price: 0 }]);
+    setRows((prev) => {
+      let newRows;
+      if (index === undefined || index < 0 || index >= prev.length) {
+        newRows = [...prev, newRow];
+        setTimeout(() => {
+          inputRefs.current[newRows.length - 1]?.focus();
+        }, 0);
+      } else {
+        newRows = [...prev.slice(0, index + 1), newRow, ...prev.slice(index + 1)];
+        setTimeout(() => {
+          inputRefs.current[index + 1]?.focus();
+        }, 0);
+      }
+      return newRows;
+    });
   };
   const duplicateRow = (index: number) => {
     const newRows = [...rows, { ...rows[index] }];
@@ -367,7 +382,7 @@ const CommercialOfferForm = ({
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i}>
+            <tr key={i} onFocus={() => setSelectedRowIndex(i)}>
               <td>{i + 1}</td>
               <td>
                 <textarea
@@ -379,6 +394,7 @@ const CommercialOfferForm = ({
                     if (el) {
                       el.style.height = "auto";
                       el.style.height = el.scrollHeight + "px";
+                      inputRefs.current[i] = el;
                     }
                   }}
                 />
@@ -441,7 +457,12 @@ const CommercialOfferForm = ({
             <td colSpan={8} style={{ padding: "10px", textAlign: "center" }}>
               <div style={{ display: "inline-flex", gap: "10px" }}>
                 {["работы", "материалы", "механизмы", "оборудование"].map((type) => (
-                  <Button key={type} onClick={() => addRow(type as RowData["type"])}>
+                  <Button
+                    key={type}
+                    onClick={() => {
+                      if (selectedRowIndex !== null) addRow(type as RowData["type"], selectedRowIndex);
+                    }}
+                  >
                     Добавить: {type}
                   </Button>
                 ))}

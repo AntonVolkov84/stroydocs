@@ -1,4 +1,4 @@
-import React, { useState, Dispatch, SetStateAction } from "react";
+import React, { useState, Dispatch, SetStateAction, useRef } from "react";
 import "./SecondCommercialOfferForm.css";
 import { Mode, SavedOfferDataSecondForm } from "../type";
 import Button from "./Button";
@@ -50,6 +50,8 @@ export default function SecondCommercialOfferForm({
   const [rows, setRows] = useState<RowData[]>(initialRows || [{ ...defaultRow }]);
   const [taxPercent, setTaxPercent] = useState<string | number>(initialTaxRate || "20");
   const { user, prompt, alert } = useAppContext();
+  const inputRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
 
   const handleChange = (index: number, field: keyof RowData, value: string) => {
     const newRows = [...rows];
@@ -57,8 +59,23 @@ export default function SecondCommercialOfferForm({
     setRows(newRows);
   };
 
-  const handleAddRow = () => {
-    setRows([...rows, { ...defaultRow }]);
+  const handleAddRow = (index: number | null) => {
+    const newRow: RowData = { name: "", unit: "", quantity: "0", salary: "0", material: "0", machine: "0" };
+    setRows((prev) => {
+      let newRows;
+      if (index === undefined || index === null || index < 0 || index >= prev.length) {
+        newRows = [...prev, newRow];
+        setTimeout(() => {
+          inputRefs.current[newRows.length - 1]?.focus();
+        }, 0);
+      } else {
+        newRows = [...prev.slice(0, index + 1), newRow, ...prev.slice(index + 1)];
+        setTimeout(() => {
+          inputRefs.current[index + 1]?.focus();
+        }, 0);
+      }
+      return newRows;
+    });
   };
 
   const handleDeleteRow = (index: number) => {
@@ -363,7 +380,7 @@ export default function SecondCommercialOfferForm({
             const total = computeTotal(row);
 
             return (
-              <tr key={i}>
+              <tr key={i} onFocus={() => setSelectedRowIndex(i)}>
                 <td>{i + 1}</td>
                 <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
                   <textarea
@@ -376,6 +393,7 @@ export default function SecondCommercialOfferForm({
                       if (el) {
                         el.style.height = "auto";
                         el.style.height = el.scrollHeight + "px";
+                        inputRefs.current[i] = el;
                       }
                     }}
                   />
@@ -437,7 +455,7 @@ export default function SecondCommercialOfferForm({
           })}
           <tr>
             <td colSpan={14} style={{ textAlign: "center" }}>
-              <Button onClick={handleAddRow}>➕ Добавить строку</Button>
+              <Button onClick={() => handleAddRow(selectedRowIndex)}>➕ Добавить строку</Button>
             </td>
           </tr>
           <>
