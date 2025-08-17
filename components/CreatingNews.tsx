@@ -20,9 +20,6 @@ interface NewsData {
   updated_at: string;
   imagepublicid?: string;
 }
-interface ChangeArticle extends NewsData {
-  imagepublicid: string;
-}
 
 function CreatingNews() {
   const [showPreview, setShowPreview] = useState(false);
@@ -145,14 +142,19 @@ function CreatingNews() {
     }
     getData();
   };
+  console.log(form);
   const handleChangeArticle = async () => {
     if (!articleChange) return;
     setIsUpdating(true);
     const latestPublicId = articleChange.imagepublicid;
+    console.log(form.image, latestPublicId);
     let imageUrl;
     let imagePublicId;
     try {
-      if (form.image && latestPublicId) {
+      if (latestPublicId) {
+        await cloudinaryServise.delFromStorage(latestPublicId);
+      }
+      if (form.image) {
         const uploaded = await cloudinaryServise.uploadImageToCloudinary(form.image);
         if (!uploaded) {
           await alert({
@@ -163,7 +165,6 @@ function CreatingNews() {
         }
         imageUrl = uploaded.url;
         imagePublicId = uploaded.publicId;
-        await cloudinaryServise.delFromStorage(latestPublicId);
       }
       const updatedNews = {
         title: form.title,
