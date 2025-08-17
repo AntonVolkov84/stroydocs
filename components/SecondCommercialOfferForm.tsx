@@ -33,6 +33,7 @@ interface SecondCommercialOfferFormProps {
   showBackButton?: boolean;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
+  setExportedRows: Dispatch<SetStateAction<RowData[] | null>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferDataSecondForm | null>>;
 }
 
@@ -44,6 +45,7 @@ export default function SecondCommercialOfferForm({
   showBackButton = true,
   initialTitle,
   initialOfferId,
+  setExportedRows,
   onUpdateSuccess,
   setSelectedOffer,
 }: SecondCommercialOfferFormProps) {
@@ -306,6 +308,23 @@ export default function SecondCommercialOfferForm({
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), "Коммерческое_предложение форма1.xlsx");
   };
+  const exportInForm0 = async () => {
+    const convertedRows = rows.map((row) => {
+      const total = parseFloat(row.salary || "0") + parseFloat(row.material || "0") + parseFloat(row.machine || "0");
+      const quantity = parseFloat(row.quantity || "0") || 1;
+      const price = total / quantity;
+      return {
+        name: row.name,
+        unit: row.unit,
+        quantity,
+        price,
+      };
+    });
+    setExportedRows(convertedRows);
+    if (setMode) {
+      setMode({ form: true, form1: false, calculators: false });
+    }
+  };
 
   return (
     <div className="commercial-wrapper">
@@ -317,6 +336,7 @@ export default function SecondCommercialOfferForm({
       {user ? (
         <div className="commercial__controlUnit">
           {showBackButton && <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>}
+          {showBackButton && <Button onClick={() => exportInForm0()}>Экспорт в форму 0</Button>}
           {showBackButton ? (
             <Button onClick={handleSave}>💾 Сохранить</Button>
           ) : (

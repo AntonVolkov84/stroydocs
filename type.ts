@@ -171,3 +171,10 @@ export interface PayloadPendingDoc {
   receiver: string;
   sender: string;
 }
+export interface RowData {
+  name: string;
+  unit: string;
+  type: "работы" | "материалы" | "механизмы" | "оборудование";
+  quantity: number;
+  price: number;
+}

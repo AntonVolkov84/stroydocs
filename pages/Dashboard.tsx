@@ -8,7 +8,7 @@ import facebook from "../src/icons/facebook.svg";
 import { getAllNews } from "../services/newsServise";
 import * as calculatorService from "../services/calculatorService";
 import CalculatorComponent from "../components/Calculator";
-import { CalculatorInterface, Mode } from "../type";
+import { CalculatorInterface, Mode, RowData } from "../type";
 import CommercialOfferForm from "../components/CommercialOfferForm";
 import Confirmation from "../components/Confirmation";
 import Slider from "../components/Slider";
@@ -32,6 +32,7 @@ interface NewsData {
 export default function Dashboard() {
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [exportedRows, setExportedRows] = useState<RowData[] | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<boolean>(false);
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
   const [mode, setMode] = useState<Mode>({ calculators: false, form: false, form1: false });
@@ -178,8 +179,8 @@ export default function Dashboard() {
         </div>
       </header>
       <main>
-        {mode.form && <CommercialOfferForm setMode={setMode} />}
-        {mode.form1 && <SecondCommercialOfferForm setMode={setMode} />}
+        {mode.form && <CommercialOfferForm setMode={setMode} initialRows={exportedRows} />}
+        {mode.form1 && <SecondCommercialOfferForm setMode={setMode} setExportedRows={setExportedRows} />}
         {mode.calculators ? (
           <CalculatorComponent mode={mode} setMode={setMode} />
         ) : (

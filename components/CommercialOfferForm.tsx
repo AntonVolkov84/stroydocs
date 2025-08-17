@@ -4,18 +4,10 @@ import Button from "./Button";
 import { Mode } from "../type";
 import { Trash2, Copy } from "lucide-react";
 import { useAppContext } from "../services/AppContext";
-import { SavedOfferData } from "../type";
+import { SavedOfferData, RowData } from "../type";
 import * as commercialOfferService from "../services/commercialOfferService";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
-
-interface RowData {
-  name: string;
-  unit: string;
-  type: "работы" | "материалы" | "механизмы" | "оборудование";
-  quantity: number;
-  price: number;
-}
 
 interface CommercialOfferFormProps {
   setMode?: React.Dispatch<React.SetStateAction<Mode>>;
