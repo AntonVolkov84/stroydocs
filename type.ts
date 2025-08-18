@@ -194,7 +194,14 @@ export interface RefData {
   tableImages: UploadedImage[];
   updated_at: string;
 }
+export interface RefDataPayload {
+  title: string;
+  text: string;
+  textImages: UploadedImage[];
+  tableImages: UploadedImage[];
+}
 export interface UploadedImage {
   url: string;
   publicId: string;
 }
+export type ImageType = File | UploadedImage;

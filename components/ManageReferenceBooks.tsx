@@ -2,9 +2,9 @@ import "./ManageReferenceBooks.css";
 import React, { useState, useEffect, useRef } from "react";
 import Button from "./Button";
 import * as cloudinaryServise from "../services/cloudinaryService";
-import * as referenceService from "../services/referenceService";
+import * as referenceService from "../services/referenceBookService";
 import { useAppContext } from "../services/AppContext";
-import { RefData, RefDataInput, UploadedImage } from "../type";
+import { RefData, RefDataInput, UploadedImage, ImageType } from "../type";
 
 function ManageReferenceBooks() {
   const [showPreview, setShowPreview] = useState(false);
@@ -16,8 +16,8 @@ function ManageReferenceBooks() {
   const [form, setForm] = useState<RefDataInput>({
     title: "",
     text: "",
-    textImages: [],
-    tableImages: [],
+    textImages: [] as ImageType[],
+    tableImages: [] as ImageType[],
   });
 
   const textInputRef = useRef<HTMLInputElement | null>(null);
@@ -28,10 +28,26 @@ function ManageReferenceBooks() {
   }, []);
 
   const getData = async () => {
-    const res = await referenceService.getAll();
+    const res = await referenceService.getAllReferenceBooks();
     setRefData(res);
   };
-
+  const handleRemoveImage = async (field: "textImages" | "tableImages", index: number) => {
+    const image = form[field][index];
+    if (image instanceof File) {
+      setForm((prev) => ({
+        ...prev,
+        [field]: prev[field].filter((_, i) => i !== index),
+      }));
+    } else {
+      if (image.publicId) {
+        await cloudinaryServise.delFromStorage(image.publicId);
+      }
+      setForm((prev) => ({
+        ...prev,
+        [field]: prev[field].filter((_, i) => i !== index),
+      }));
+    }
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value } as any);
   };
@@ -39,10 +55,8 @@ function ManageReferenceBooks() {
   const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>, field: "textImages" | "tableImages") => {
     const files = e.target.files;
     if (!files) return;
-
     const arr = Array.from(files);
     const valid: File[] = [];
-
     for (const file of arr) {
       if (file.size > 1048576) {
         await alert({ title: "Файл больше 1 МБ", message: file.name });
@@ -50,17 +64,11 @@ function ManageReferenceBooks() {
       }
       valid.push(file);
     }
-
     setForm((prev) => ({
       ...prev,
-      [field]: [...prev[field], ...valid].slice(0, 3),
+      [field]: [...prev[field].filter((f) => !(f instanceof File)), ...valid].slice(0, 3),
     }));
-  };
-
-  const resetForm = () => {
-    setForm({ title: "", text: "", textImages: [], tableImages: [] });
-    if (textInputRef.current) textInputRef.current.value = "";
-    if (tableInputRef.current) tableInputRef.current.value = "";
+    e.target.value = "";
   };
 
   const handleSubmit = async () => {
@@ -68,18 +76,24 @@ function ManageReferenceBooks() {
     try {
       const textImages: UploadedImage[] = [];
       const tableImages: UploadedImage[] = [];
-
       for (const file of form.textImages) {
-        const uploaded = await cloudinaryServise.uploadImageToCloudinary(file);
-        if (uploaded) {
-          textImages.push({ url: uploaded.url, publicId: uploaded.publicId });
+        if (file instanceof File) {
+          const uploaded = await cloudinaryServise.uploadImageToCloudinary(file);
+          if (uploaded) {
+            textImages.push({ url: uploaded.url, publicId: uploaded.publicId });
+          }
+        } else {
+          textImages.push(file);
         }
       }
-
       for (const file of form.tableImages) {
-        const uploaded = await cloudinaryServise.uploadImageToCloudinary(file);
-        if (uploaded) {
-          tableImages.push({ url: uploaded.url, publicId: uploaded.publicId });
+        if (file instanceof File) {
+          const uploaded = await cloudinaryServise.uploadImageToCloudinary(file);
+          if (uploaded) {
+            tableImages.push({ url: uploaded.url, publicId: uploaded.publicId });
+          }
+        } else {
+          tableImages.push(file);
         }
       }
 
@@ -89,14 +103,13 @@ function ManageReferenceBooks() {
         textImages,
         tableImages,
       };
-      console.log("Ref", newRef);
       const response = refChange
-        ? await referenceService.update(refChange.id, newRef)
-        : await referenceService.create(newRef);
+        ? await referenceService.updateReferenceBook(refChange.id, newRef)
+        : await referenceService.createReferenceBook(newRef);
 
       if (response.ok) {
         await alert({ title: response.message, message: "" });
-        resetForm();
+        setForm({ title: "", text: "", textImages: [], tableImages: [] });
         setRefChange(null);
         getData();
         setShowPreview(false);
@@ -140,6 +153,22 @@ function ManageReferenceBooks() {
       });
     }
   };
+  const removeAllImages = async (field: "textImages" | "tableImages") => {
+    const imagesToDelete = form[field].filter((img) => !(img instanceof File));
+
+    try {
+      for (const img of imagesToDelete) {
+        if (img.publicId) await cloudinaryServise.delFromStorage(img.publicId);
+      }
+      setForm((prev) => ({
+        ...prev,
+        [field]: [],
+      }));
+    } catch (err) {
+      console.error("Ошибка при удалении изображений:", err);
+      await alert({ title: "Ошибка при удалении изображений", message: "" });
+    }
+  };
 
   return (
     <div className="managereferencebooks__container">
@@ -170,16 +199,13 @@ function ManageReferenceBooks() {
           onChange={(e) => handleFiles(e, "textImages")}
         />
         <div className="preview-row">
-          {form.textImages.map((file, idx) => (
-            <img key={idx} src={URL.createObjectURL(file)} alt="preview" />
-          ))}
+          {form.textImages.map((file, idx) => {
+            const src = file instanceof File ? URL.createObjectURL(file) : file.url;
+            return <img key={idx} src={src} alt="preview" />;
+          })}
         </div>
         {form.textImages.length > 0 && (
-          <Button
-            styled={{ maxWidth: "150px" }}
-            onClick={() => setForm((prev) => ({ ...prev, textImages: [] }))}
-            typeBtn="button"
-          >
+          <Button styled={{ maxWidth: "150px" }} onClick={() => removeAllImages("textImages")} typeBtn="button">
             Удалить все картинки
           </Button>
         )}
@@ -195,16 +221,13 @@ function ManageReferenceBooks() {
           onChange={(e) => handleFiles(e, "tableImages")}
         />
         <div className="preview-row">
-          {form.tableImages.map((file, idx) => (
-            <img key={idx} src={URL.createObjectURL(file)} alt="preview" />
-          ))}
+          {form.tableImages.map((file, idx) => {
+            const src = file instanceof File ? URL.createObjectURL(file) : file.url;
+            return <img key={idx} src={src} alt="preview" />;
+          })}
         </div>
         {form.textImages.length > 0 && (
-          <Button
-            styled={{ maxWidth: "150px" }}
-            onClick={() => setForm((prev) => ({ ...prev, tableImages: [] }))}
-            typeBtn="button"
-          >
+          <Button styled={{ maxWidth: "150px" }} onClick={() => removeAllImages("tableImages")} typeBtn="button">
             Удалить все таблицы
           </Button>
         )}
@@ -235,15 +258,17 @@ function ManageReferenceBooks() {
             <h3 className="preview-title">{form.title || "Без названия"}</h3>
             <div className="preview-container">
               <div className="text-images-row">
-                {form.textImages.map((file, idx) => (
-                  <img key={idx} src={URL.createObjectURL(file)} alt="preview" />
-                ))}
+                {form.textImages.map((file, idx) => {
+                  const src = file instanceof File ? URL.createObjectURL(file) : file.url;
+                  return <img key={idx} src={src} alt="preview" />;
+                })}
               </div>
               <p className="preview-text">{form.text || "Нет текста"}</p>
               <div className="table-images-column">
-                {form.tableImages.map((file, idx) => (
-                  <img key={idx} src={URL.createObjectURL(file)} alt="table" />
-                ))}
+                {form.tableImages.map((file, idx) => {
+                  const src = file instanceof File ? URL.createObjectURL(file) : file.url;
+                  return <img key={idx} src={src} alt="table" />;
+                })}
               </div>
             </div>
             <Button onClick={() => setShowPreview(false)} className="button_btn--red-hover">
@@ -284,8 +309,8 @@ function ManageReferenceBooks() {
                         setForm({
                           title: item.title,
                           text: item.text,
-                          textImages: [],
-                          tableImages: [],
+                          textImages: item.textImages,
+                          tableImages: item.tableImages,
                         });
                       }}
                       className="edit-btn"
