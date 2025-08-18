@@ -336,7 +336,7 @@ export default function SecondCommercialOfferForm({
       {user ? (
         <div className="commercial__controlUnit">
           {showBackButton && <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>}
-          {showBackButton && <Button onClick={() => exportInForm0()}>Экспорт в форму 0</Button>}
+          {showBackButton && <Button onClick={() => exportInForm0()}>🔀 Экспорт в форму 0</Button>}
           {showBackButton ? (
             <Button onClick={handleSave}>💾 Сохранить</Button>
           ) : (

@@ -10,7 +10,7 @@ import CreatingNews from "../components/CreatingNews";
 import SavedCalculators from "../components/SavedCalculators";
 import Commercial from "../components/Commercial";
 import { useAppContext } from "../services/AppContext";
-import ReferenceBooks from "../components/ReferenceBooks";
+import ManageReferenceBooks from "../components/ManageReferenceBooks";
 
 export interface Calculator {
   id: number;
@@ -175,7 +175,7 @@ export default function PersonalPage() {
             )}
           </>
         )}
-        {manageReferenceBooks && (isAdmin || isSuperAdmin) && <ReferenceBooks />}
+        {manageReferenceBooks && (isAdmin || isSuperAdmin) && <ManageReferenceBooks />}
         {savedCommercialOffer && <Commercial />}
         {savedCalculator && <SavedCalculators />}
         {!managerCalculator &&

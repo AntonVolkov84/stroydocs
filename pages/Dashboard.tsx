@@ -17,6 +17,7 @@ import CO1 from "../src/CO1.png";
 import Logo from "../src/StroydoksLogo2.png";
 import Feedback from "../components/Feedback";
 import BannerFeedback from "../components/BannerFeedback";
+import ReferenceBook from "../components/ReferenceBook";
 import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 interface NewsData {
   author_email: string;
@@ -35,7 +36,7 @@ export default function Dashboard() {
   const [exportedRows, setExportedRows] = useState<RowData[] | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<boolean>(false);
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
-  const [mode, setMode] = useState<Mode>({ calculators: false, form: false, form1: false });
+  const [mode, setMode] = useState<Mode>({ calculators: false, form: false, form1: false, referencebook: false });
 
   const getNewsData = async () => {
     try {
@@ -129,7 +130,7 @@ export default function Dashboard() {
                           style={{ padding: "10px" }}
                           key={calc.id}
                           onClick={() => {
-                            setMode((prev) => ({ form: false, form1: false, calculators: calc }));
+                            setMode((prev) => ({ referencebook: false, form: false, form1: false, calculators: calc }));
                           }}
                           className="dashboard-submenu-href"
                         >
@@ -146,7 +147,7 @@ export default function Dashboard() {
                     <button
                       style={{ padding: "10px" }}
                       onClick={() => {
-                        setMode((prev) => ({ calculators: false, form: true, form1: false }));
+                        setMode((prev) => ({ referencebook: false, calculators: false, form: true, form1: false }));
                       }}
                       className="dashboard-submenu-href"
                     >
@@ -155,7 +156,7 @@ export default function Dashboard() {
                     <button
                       style={{ padding: "10px" }}
                       onClick={() => {
-                        setMode((prev) => ({ calculators: false, form: false, form1: true }));
+                        setMode((prev) => ({ referencebook: false, calculators: false, form: false, form1: true }));
                       }}
                       className="dashboard-submenu-href"
                     >
@@ -168,7 +169,13 @@ export default function Dashboard() {
                 <span>Справочники ▾</span>
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
-                    <button style={{ padding: "10px" }} className="dashboard-submenu-href">
+                    <button
+                      onClick={() => {
+                        setMode((prev) => ({ referencebook: true, calculators: false, form: false, form1: false }));
+                      }}
+                      style={{ padding: "10px" }}
+                      className="dashboard-submenu-href"
+                    >
                       Все справочники
                     </button>
                   </div>
@@ -180,6 +187,7 @@ export default function Dashboard() {
       </header>
       <main>
         {mode.form && <CommercialOfferForm setMode={setMode} initialRows={exportedRows} />}
+        {mode.referencebook && <ReferenceBook />}
         {mode.form1 && <SecondCommercialOfferForm setMode={setMode} setExportedRows={setExportedRows} />}
         {mode.calculators ? (
           <CalculatorComponent mode={mode} setMode={setMode} />
@@ -194,7 +202,7 @@ export default function Dashboard() {
               onConfirm={() => console.log("confirm")}
               onCancel={() => setIsOpen(false)}
             />
-            {!mode.calculators && !mode.form && !mode.form1 ? (
+            {!mode.calculators && !mode.form && !mode.form1 && !mode.referencebook ? (
               <>
                 {Array.isArray(newsData) && <New item={newsData[0]} />}
                 <div className="block__slider">

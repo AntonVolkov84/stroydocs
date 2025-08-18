@@ -25,7 +25,7 @@ function New({ item, reversed }: NewProps) {
     hour: "2-digit",
     minute: "2-digit",
   });
-
+  console.log(item);
   return (
     <div className="news-card">
       <div className="news-header">

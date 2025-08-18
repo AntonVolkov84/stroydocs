@@ -23,6 +23,7 @@ export interface Mode {
   calculators: ModalState<CalculatorInterface>;
   form: boolean;
   form1: boolean;
+  referencebook: boolean;
 }
 export interface User {
   id: string | number;
@@ -177,4 +178,23 @@ export interface RowData {
   type: "работы" | "материалы" | "механизмы" | "оборудование";
   quantity: number;
   price: number;
+}
+export interface RefDataInput {
+  title: string;
+  text: string;
+  textImages: File[];
+  tableImages: File[];
+}
+
+export interface RefData {
+  id: number;
+  title: string;
+  text: string;
+  textImages: UploadedImage[];
+  tableImages: UploadedImage[];
+  updated_at: string;
+}
+export interface UploadedImage {
+  url: string;
+  publicId: string;
 }
