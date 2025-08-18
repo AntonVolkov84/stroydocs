@@ -143,7 +143,7 @@ function ManageReferenceBooks() {
           await cloudinaryServise.delFromStorage(img.publicId);
         }
       }
-      await referenceService.deleteReference(id);
+      await referenceService.removeReferenceBook(id);
       getData();
     } catch (err) {
       console.error("Ошибка при удалении справочника:", err);
@@ -317,7 +317,10 @@ function ManageReferenceBooks() {
                     >
                       Изменить
                     </Button>
-                    <Button onClick={() => deleteRef(item.id)} className="button_btn--red-hover">
+                    <Button
+                      onClick={() => deleteRef(item.id, item.textImages, item.tableImages)}
+                      className="button_btn--red-hover"
+                    >
                       Удалить
                     </Button>
                   </div>

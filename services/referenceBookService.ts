@@ -52,3 +52,14 @@ export const getAllReferenceBooks = async () => {
     console.log("getAllNews", error);
   }
 };
+export const removeReferenceBook = async (id: number | string) => {
+  try {
+    const res = await axios.delete(`${apiUrl}/referencebook/removeref`, {
+      params: { id },
+      withCredentials: true,
+    });
+    return res.data;
+  } catch (error) {
+    console.log("getAllNews", error);
+  }
+};
