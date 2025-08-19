@@ -31,23 +31,23 @@ function ManageReferenceBooks() {
     const res = await referenceService.getAllReferenceBooks();
     setRefData(res);
   };
-  const handleRemoveImage = async (field: "textImages" | "tableImages", index: number) => {
-    const image = form[field][index];
-    if (image instanceof File) {
-      setForm((prev) => ({
-        ...prev,
-        [field]: prev[field].filter((_, i) => i !== index),
-      }));
-    } else {
-      if (image.publicId) {
-        await cloudinaryServise.delFromStorage(image.publicId);
-      }
-      setForm((prev) => ({
-        ...prev,
-        [field]: prev[field].filter((_, i) => i !== index),
-      }));
-    }
-  };
+  // const handleRemoveImage = async (field: "textImages" | "tableImages", index: number) => {
+  //   const image = form[field][index];
+  //   if (image instanceof File) {
+  //     setForm((prev) => ({
+  //       ...prev,
+  //       [field]: prev[field].filter((_, i) => i !== index),
+  //     }));
+  //   } else {
+  //     if (image.publicId) {
+  //       await cloudinaryServise.delFromStorage(image.publicId);
+  //     }
+  //     setForm((prev) => ({
+  //       ...prev,
+  //       [field]: prev[field].filter((_, i) => i !== index),
+  //     }));
+  //   }
+  // };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value } as any);
   };
@@ -153,9 +153,9 @@ function ManageReferenceBooks() {
       });
     }
   };
+
   const removeAllImages = async (field: "textImages" | "tableImages") => {
     const imagesToDelete = form[field].filter((img) => !(img instanceof File));
-
     try {
       for (const img of imagesToDelete) {
         if (img.publicId) await cloudinaryServise.delFromStorage(img.publicId);
@@ -205,7 +205,12 @@ function ManageReferenceBooks() {
           })}
         </div>
         {form.textImages.length > 0 && (
-          <Button styled={{ maxWidth: "150px" }} onClick={() => removeAllImages("textImages")} typeBtn="button">
+          <Button
+            className="button_btn--red-hover"
+            styled={{ maxWidth: "150px" }}
+            onClick={() => removeAllImages("textImages")}
+            typeBtn="button"
+          >
             Удалить все картинки
           </Button>
         )}
@@ -227,7 +232,12 @@ function ManageReferenceBooks() {
           })}
         </div>
         {form.textImages.length > 0 && (
-          <Button styled={{ maxWidth: "150px" }} onClick={() => removeAllImages("tableImages")} typeBtn="button">
+          <Button
+            className="button_btn--red-hover"
+            styled={{ maxWidth: "150px" }}
+            onClick={() => removeAllImages("tableImages")}
+            typeBtn="button"
+          >
             Удалить все таблицы
           </Button>
         )}
