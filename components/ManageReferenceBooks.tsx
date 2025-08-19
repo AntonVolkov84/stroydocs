@@ -231,7 +231,7 @@ function ManageReferenceBooks() {
             return <img key={idx} src={src} alt="preview" />;
           })}
         </div>
-        {form.textImages.length > 0 && (
+        {form.tableImages.length > 0 && (
           <Button
             className="button_btn--red-hover"
             styled={{ maxWidth: "150px" }}
