@@ -26,7 +26,7 @@ function ReferenceBook() {
         <div className="reference-book__block">
           <h2 className="reference-book__title">Справочники</h2>
           <ul
-            className={`reference-book__list ${referenceBooksData.length > 15 && "reference-book__list--two-columns"}`}
+            className={`reference-book__list ${referenceBooksData.length > 5 && "reference-book__list--two-columns"}`}
           >
             {referenceBooksData.map((ref) => (
               <li key={ref.id} className="reference-book__item" onClick={() => setMode(ref)}>
@@ -51,8 +51,11 @@ function ReferenceBook() {
               ))}
             </div>
           )}
-
-          <p className="reference-book__info-text">{mode.text}</p>
+          <div className="reference-book__info-text">
+            {mode.text.split("\n").map((paragraph, idx) => (
+              <p key={idx}>{paragraph}</p>
+            ))}
+          </div>
           {mode.tableImages?.length > 0 && (
             <div className="reference-book__info-tables">
               {mode.tableImages.map((img, index) => (
