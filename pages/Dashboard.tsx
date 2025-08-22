@@ -38,6 +38,9 @@ export default function Dashboard() {
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
   const [mode, setMode] = useState<Mode>({ calculators: false, form: false, form1: false, referencebook: false });
 
+  const clearMode = () => {
+    setMode({ calculators: false, form: false, form1: false, referencebook: false });
+  };
   const getNewsData = async () => {
     try {
       const res = await getAllNews();
@@ -187,7 +190,7 @@ export default function Dashboard() {
       </header>
       <main>
         {mode.form && <CommercialOfferForm setMode={setMode} initialRows={exportedRows} />}
-        {mode.referencebook && <ReferenceBook />}
+        {mode.referencebook && <ReferenceBook clearMode={clearMode} />}
         {mode.form1 && <SecondCommercialOfferForm setMode={setMode} setExportedRows={setExportedRows} />}
         {mode.calculators ? (
           <CalculatorComponent mode={mode} setMode={setMode} />

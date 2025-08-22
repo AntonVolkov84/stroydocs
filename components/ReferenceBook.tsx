@@ -4,7 +4,11 @@ import * as referenceBookService from "../services/referenceBookService";
 import { RefData } from "../type";
 import Button from "./Button";
 
-function ReferenceBook() {
+interface ReferenceBookProps {
+  clearMode: () => void;
+}
+
+function ReferenceBook({ clearMode }: ReferenceBookProps) {
   const [referenceBooksData, setReferenceBooksData] = useState<RefData[]>();
   const [mode, setMode] = useState<RefData | null>(null);
   const getReferenceBooksData = async () => {
@@ -21,7 +25,16 @@ function ReferenceBook() {
   }, []);
   return (
     <div className="reference-book">
-      <Button onClick={() => setMode(null)}>← Назад</Button>
+      <Button
+        onClick={() => {
+          if (!mode) {
+            clearMode();
+          }
+          setMode(null);
+        }}
+      >
+        ← Назад
+      </Button>
       {referenceBooksData && !mode && (
         <div className="reference-book__block">
           <h2 className="reference-book__title">Справочники</h2>
