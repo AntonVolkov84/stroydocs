@@ -18,6 +18,7 @@ import Logo from "../src/StroydoksLogo2.png";
 import Feedback from "../components/Feedback";
 import BannerFeedback from "../components/BannerFeedback";
 import ReferenceBook from "../components/ReferenceBook";
+import Management from "../components/Management";
 import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 interface NewsData {
   author_email: string;
@@ -36,10 +37,16 @@ export default function Dashboard() {
   const [exportedRows, setExportedRows] = useState<RowData[] | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<boolean>(false);
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
-  const [mode, setMode] = useState<Mode>({ calculators: false, form: false, form1: false, referencebook: false });
+  const [mode, setMode] = useState<Mode>({
+    calculators: false,
+    form: false,
+    form1: false,
+    referencebook: false,
+    management: false,
+  });
 
   const clearMode = () => {
-    setMode({ calculators: false, form: false, form1: false, referencebook: false });
+    setMode({ calculators: false, form: false, form1: false, referencebook: false, management: false });
   };
   const getNewsData = async () => {
     try {
@@ -114,11 +121,20 @@ export default function Dashboard() {
                 <span>О компании ▾</span>
                 <div className="dashboard-submenu">
                   <div className="dashboard-submenu-inner">
-                    <button style={{ padding: "10px" }} className="dashboard-submenu-href">
+                    <button
+                      onClick={() => {
+                        setMode((prev) => ({
+                          referencebook: false,
+                          calculators: false,
+                          form: false,
+                          form1: false,
+                          management: true,
+                        }));
+                      }}
+                      style={{ padding: "10px" }}
+                      className="dashboard-submenu-href"
+                    >
                       Руководство
-                    </button>
-                    <button style={{ padding: "10px" }} className="dashboard-submenu-href">
-                      Департаменты
                     </button>
                   </div>
                 </div>
@@ -133,7 +149,13 @@ export default function Dashboard() {
                           style={{ padding: "10px" }}
                           key={calc.id}
                           onClick={() => {
-                            setMode((prev) => ({ referencebook: false, form: false, form1: false, calculators: calc }));
+                            setMode((prev) => ({
+                              referencebook: false,
+                              form: false,
+                              form1: false,
+                              calculators: calc,
+                              management: false,
+                            }));
                           }}
                           className="dashboard-submenu-href"
                         >
@@ -150,7 +172,13 @@ export default function Dashboard() {
                     <button
                       style={{ padding: "10px" }}
                       onClick={() => {
-                        setMode((prev) => ({ referencebook: false, calculators: false, form: true, form1: false }));
+                        setMode((prev) => ({
+                          referencebook: false,
+                          calculators: false,
+                          form: true,
+                          form1: false,
+                          management: false,
+                        }));
                       }}
                       className="dashboard-submenu-href"
                     >
@@ -159,7 +187,13 @@ export default function Dashboard() {
                     <button
                       style={{ padding: "10px" }}
                       onClick={() => {
-                        setMode((prev) => ({ referencebook: false, calculators: false, form: false, form1: true }));
+                        setMode((prev) => ({
+                          referencebook: false,
+                          calculators: false,
+                          form: false,
+                          form1: true,
+                          management: false,
+                        }));
                       }}
                       className="dashboard-submenu-href"
                     >
@@ -174,7 +208,13 @@ export default function Dashboard() {
                   <div className="dashboard-submenu-inner">
                     <button
                       onClick={() => {
-                        setMode((prev) => ({ referencebook: true, calculators: false, form: false, form1: false }));
+                        setMode((prev) => ({
+                          referencebook: true,
+                          calculators: false,
+                          form: false,
+                          form1: false,
+                          management: false,
+                        }));
                       }}
                       style={{ padding: "10px" }}
                       className="dashboard-submenu-href"
@@ -189,6 +229,7 @@ export default function Dashboard() {
         </div>
       </header>
       <main>
+        {mode.management && <Management setMode={setMode} />}
         {mode.form && <CommercialOfferForm setMode={setMode} initialRows={exportedRows} />}
         {mode.referencebook && <ReferenceBook clearMode={clearMode} />}
         {mode.form1 && <SecondCommercialOfferForm setMode={setMode} setExportedRows={setExportedRows} />}
@@ -205,7 +246,7 @@ export default function Dashboard() {
               onConfirm={() => console.log("confirm")}
               onCancel={() => setIsOpen(false)}
             />
-            {!mode.calculators && !mode.form && !mode.form1 && !mode.referencebook ? (
+            {!mode.calculators && !mode.form && !mode.form1 && !mode.referencebook && !mode.management ? (
               <>
                 {Array.isArray(newsData) && <New item={newsData[0]} />}
                 <div className="block__slider">
