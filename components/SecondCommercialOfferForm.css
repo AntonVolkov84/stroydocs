@@ -11,15 +11,18 @@
 
 .offer-table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  table-layout: auto;
 }
 
 .offer-table th,
 .offer-table td {
   border: 1px solid #ccc;
-  padding: 4px 8px;
+  padding: 4px 2px;
   text-align: center;
+  overflow: hidden;
 }
 .title-placeholder,
 .title-line {
@@ -74,8 +77,21 @@ td {
   word-break: break-word;
   vertical-align: top;
 }
+.title__th {
+  font-size: 12px;
+  font-weight: 600;
+}
+.nested {
+  font-size: 10px;
+  font-weight: 400;
+}
 @media print {
   .print-only {
     display: block;
+  }
+}
+@media (max-width: 1400px) {
+  .commercial-wrapper {
+    margin: 0;
   }
 }

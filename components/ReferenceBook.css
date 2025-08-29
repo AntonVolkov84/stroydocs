@@ -88,3 +88,8 @@
   object-fit: contain;
   margin-bottom: 10px;
 }
+@media (max-width: 500px) {
+  .reference-book__list--two-columns {
+    grid-template-columns: 1fr;
+  }
+}

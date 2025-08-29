@@ -57,7 +57,7 @@ function Management({ setMode }: ManagementProps) {
       ) : (
         <BannerFeedback
           title="Напишите нам"
-          description="Ваше сообщение будет отправлено нам двоим, для бытрого реагирования и большего внимания к Вашему вопросу"
+          description="Ваше сообщение будет отправлено нам двоим, для бытрого реагирования и большего внимания!"
           setFeedbackModal={setFeedbackModal}
         />
       )}

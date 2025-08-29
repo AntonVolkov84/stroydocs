@@ -66,7 +66,7 @@ function Slider({ slides, title }: SliderProps) {
         </button>
         <div className="slider__image-wrapper">
           {slides && <h3>{slides[currentIndex].title}</h3>}
-          {slides && <h4>{slides[currentIndex].formula}</h4>}
+          {slides && <h4 className="slider__image-wrapper-description">{slides[currentIndex].formula}</h4>}
         </div>
         {slides && (
           <div className="slider__image-block">

@@ -159,3 +159,32 @@
     justify-content: space-around;
   }
 }
+@media (max-width: 1220px) {
+  .dashboard-container {
+    padding: 0;
+  }
+}
+@media (max-width: 850px) {
+  .dashboard-main-menu {
+    flex-direction: column;
+    position: relative;
+    height: 100%;
+  }
+  .dashboard-container {
+    padding: 0;
+  }
+  .dashboard-menu-item {
+    margin-top: 5px;
+    position: static;
+    width: 100%;
+  }
+  .dashboard-menu-bar {
+    height: 100%;
+  }
+  .dashboard-submenu {
+    top: 100%;
+  }
+  .dashboard-menu-logo {
+    margin-top: 5px;
+  }
+}

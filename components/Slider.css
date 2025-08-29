@@ -76,3 +76,29 @@ h4 {
 .slider__button:hover {
   color: rgba(0, 0, 0, 0.5);
 }
+@media (max-width: 450px) {
+  .slider__container {
+    padding-bottom: 5px;
+    height: fit-content;
+  }
+  .slider__title {
+    font-size: 23px;
+    height: fit-content;
+    text-align: center;
+  }
+  .slider__button {
+    display: none;
+  }
+  .slider__image-wrapper {
+    width: 100%;
+    padding: 0 20px;
+  }
+  .slider__content {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .slider__image-wrapper-description {
+    padding: 0 20px;
+  }
+}

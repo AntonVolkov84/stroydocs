@@ -355,42 +355,70 @@ export default function SecondCommercialOfferForm({
       <h6 className="title-placeholder print-only">(наименование работ и затрат, наименование объекта)</h6>
       <table className="offer-table" style={{ tableLayout: "fixed", width: "100%" }}>
         <colgroup>
-          <col style={{ width: "40px" }} />
-          <col style={{ width: "250px" }} />
-          <col style={{ width: "70px" }} />
-          <col style={{ width: "70px" }} />
-          <col style={{ width: "120px" }} />
-          <col style={{ width: "100px" }} />
-          <col style={{ width: "100px" }} />
-          <col style={{ width: "120px" }} />
-          <col style={{ width: "100px" }} />
-          <col style={{ width: "100px" }} />
-          <col style={{ width: "100px" }} />
-          <col style={{ width: "100px" }} />
-          <col style={{ width: "40px" }} />
-          <col style={{ width: "40px" }} />
+          <col style={{ width: "3%" }} />
+          <col style={{ width: "25%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "9%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "8%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "7%" }} />
+          <col style={{ width: "3%" }} />
         </colgroup>
         <thead>
           <tr>
-            <th rowSpan={3}>№ п/п</th>
-            <th rowSpan={3}>Наименование работ</th>
-            <th rowSpan={3}>Ед. изм.</th>
-            <th rowSpan={3}>Кол-во</th>
-            <th rowSpan={3}>Цена за единицу, руб. без НДС</th>
-            <th colSpan={3}>Цена за единицу, руб. без НДС</th>
-            <th colSpan={4}>Стоимость, руб. без НДС</th>
-            <th rowSpan={3} colSpan={2}>
+            <th className="title__th" rowSpan={3}>
+              № п/п
+            </th>
+            <th className="title__th" rowSpan={3}>
+              Наименование работ
+            </th>
+            <th className="title__th" rowSpan={3}>
+              Ед. изм.
+            </th>
+            <th className="title__th" rowSpan={3}>
+              Кол-во
+            </th>
+            <th className="title__th" rowSpan={3}>
+              Цена за единицу, руб. без НДС
+            </th>
+            <th className="title__th" colSpan={3}>
+              Цена за единицу, руб. без НДС
+            </th>
+            <th className="title__th" colSpan={4}>
+              Стоимость, руб. без НДС
+            </th>
+            <th className="title__th" rowSpan={3} colSpan={2}>
               Действия
             </th>
           </tr>
           <tr>
-            <th rowSpan={2}>Заработная плата</th>
-            <th rowSpan={2}>Материал</th>
-            <th rowSpan={2}>Эксплуатация машин</th>
-            <th rowSpan={2}>ВСЕГО</th>
-            <th rowSpan={2}>Осн. зарплата</th>
-            <th rowSpan={2}>Материалы</th>
-            <th rowSpan={2}>Экспл. машин</th>
+            <th className="title__th nested" rowSpan={2}>
+              Заработная плата
+            </th>
+            <th className="title__th nested" rowSpan={2}>
+              Материал
+            </th>
+            <th className="title__th nested" rowSpan={2}>
+              Эксплуатация машин
+            </th>
+            <th className="title__th nested" rowSpan={2}>
+              ВСЕГО
+            </th>
+            <th className="title__th nested" rowSpan={2}>
+              Осн. зарплата
+            </th>
+            <th className="title__th nested" rowSpan={2}>
+              Материалы
+            </th>
+            <th className="title__th nested" rowSpan={2}>
+              Экспл. машин
+            </th>
           </tr>
           <tr />
         </thead>

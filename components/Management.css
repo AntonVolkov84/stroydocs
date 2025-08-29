@@ -53,3 +53,18 @@
   line-height: 1.5;
   color: #444;
 }
+@media (max-width: 465px) {
+  .management__image {
+    max-width: 150px;
+    max-height: 150px;
+  }
+  .management__card {
+    flex-direction: column;
+  }
+  .management__image-wrapper {
+    align-self: center;
+  }
+  .management__title {
+    font-size: 22px;
+  }
+}

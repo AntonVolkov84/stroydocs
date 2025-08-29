@@ -52,3 +52,10 @@
   color: #333;
   text-align: justify;
 }
+@media (max-width: 400px) {
+  .news-header {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+}
