@@ -154,3 +154,5 @@ input[type="number"].no-spinner {
     display: flex;
   }
 }
+@media (max-width: 1420px) {
+}

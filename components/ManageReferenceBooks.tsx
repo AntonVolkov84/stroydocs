@@ -294,7 +294,7 @@ function ManageReferenceBooks() {
           <tr>
             <th>Название</th>
             <th>Дата изменения</th>
-            <th>Действия</th>
+            <th className="managereferencebooks__table-action">Действия</th>
           </tr>
         </thead>
         <tbody>

@@ -87,3 +87,57 @@
     z-index: 9999;
   }
 }
+@media (min-width: 951px) {
+  .personalpage__menu-toggle {
+    display: none;
+  }
+}
+@media (max-width: 950px) {
+  .personalpage {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .personalpage__sidebar {
+    width: 97%;
+    padding: 10px 15px;
+    box-shadow: none;
+    position: relative;
+  }
+  .personalpage__menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+
+  .personalpage__sidebar ul {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    background: #1e1e2f;
+    padding: 10px;
+    border-radius: 6px;
+  }
+
+  .personalpage__sidebar ul.show {
+    display: flex;
+  }
+
+  .personalpage__main {
+    padding: 20px;
+  }
+
+  .personalpage__main h1 {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+  }
+
+  .personalpage__content {
+    width: 100%;
+    padding: 20px;
+  }
+}

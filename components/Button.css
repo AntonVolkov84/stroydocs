@@ -12,3 +12,8 @@
   background-color: #ff6f61;
   color: rgb(16, 14, 26);
 }
+@media (max-width: 950px) {
+  .button_btn {
+    font-size: 10px;
+  }
+}

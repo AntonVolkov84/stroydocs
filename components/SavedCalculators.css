@@ -11,6 +11,7 @@
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  min-width: 0;
 }
 
 .calculator-table th,
@@ -18,6 +19,9 @@
   padding: 10px;
   border: 1px solid #ccc;
   text-align: left;
+}
+.calculator-table-title:last-child {
+  min-width: 100px;
 }
 
 .details {
@@ -31,4 +35,16 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+@media (max-width: 950px) {
+  .calculator-table {
+    min-width: 0;
+  }
+  .calculator-table-title {
+    font-size: 12px;
+    padding: 5px;
+  }
+  .calculator-table-title:last-child {
+    min-width: 80px;
+  }
 }

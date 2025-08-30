@@ -23,6 +23,7 @@ function ReferenceBook({ clearMode }: ReferenceBookProps) {
   useEffect(() => {
     getReferenceBooksData();
   }, []);
+
   return (
     <div className="reference-book">
       <Button

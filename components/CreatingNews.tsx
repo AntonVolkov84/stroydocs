@@ -278,7 +278,7 @@ function CreatingNews() {
             <th>Заголовок</th>
             <th>Дата</th>
             <th>Текст</th>
-            <th>Действия</th>
+            <th className="creatingnews__table-action">Действия</th>
           </tr>
         </thead>
         <tbody>

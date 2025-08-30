@@ -132,3 +132,16 @@
   border-radius: 8px;
   border: 1px solid #ddd;
 }
+@media (max-width: 1420px) {
+  .ref-actions {
+    flex-direction: column;
+  }
+  .managereferencebooks__table-action {
+    min-width: 100px;
+  }
+}
+@media (max-width: 950px) {
+  .managereferencebooks__modal-content {
+    width: 70%;
+  }
+}

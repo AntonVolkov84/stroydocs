@@ -34,5 +34,11 @@
 }
 .commercial__actions {
   display: flex;
-  gap: 10px; /* Отступ между кнопками */
+  gap: 10px;
+}
+@media (max-width: 1420px) {
+  .commercial__actions {
+    flex-direction: column;
+    min-width: 85px;
+  }
 }

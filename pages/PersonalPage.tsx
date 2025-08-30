@@ -36,6 +36,7 @@ export default function PersonalPage() {
   const [selectedCalculator, setSelectedCalculator] = useState<Calculator | null>(null);
   const [savedCalculator, setSavedCalculator] = useState<boolean>(false);
   const [savedCommercialOffer, setSavedCommercialOffer] = useState<boolean>(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { user, setUser } = useAppContext();
   const currentUserEmail = user?.email;
@@ -49,6 +50,7 @@ export default function PersonalPage() {
     setSavedCommercialOffer(false);
     setSelectedCalculator(null);
     setManageReferenceBooks(false);
+    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -71,7 +73,10 @@ export default function PersonalPage() {
     <div className="personalpage">
       <aside className="personalpage__sidebar">
         <h2>{isAdmin ? "Профиль Администратора" : "Профиль"} </h2>
-        <ul>
+        <button className="personalpage__menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+          ☰ Меню
+        </button>
+        <ul className={menuOpen ? "show" : ""}>
           <Link to="/dashboard" className="personalpage__sidebar-dashboard" onClick={() => {}}>
             На главную
           </Link>

@@ -27,7 +27,7 @@
 .Users-table th,
 .Users-table td {
   padding: 12px 16px;
-  text-align: left;
+  text-align: center;
   border-bottom: 1px solid #ddd;
   vertical-align: middle;
 }
@@ -48,4 +48,37 @@
   align-items: center;
   gap: 20px;
   padding: 16px 0;
+}
+@media (max-width: 1130px) {
+  .actions-header {
+    min-width: 80px;
+  }
+  .Users-table {
+    min-width: 0;
+  }
+  .Users-table th {
+    padding: 12px 5px;
+    font-size: 12px;
+    text-align: center;
+  }
+  .Users-table td {
+    font-size: 12px;
+    text-align: center;
+  }
+}
+@media (max-width: 950px) {
+  .Users-table {
+    min-width: 0;
+  }
+  .Users-table th {
+    padding: 12px 5px;
+    font-size: 10px;
+    text-align: center;
+  }
+  .actions-header {
+    min-width: 87px;
+  }
+  .Users-table td {
+    padding: 12px 5px;
+  }
 }

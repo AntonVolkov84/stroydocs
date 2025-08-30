@@ -101,3 +101,26 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.creatingnews__table-action {
+  min-width: 180px;
+}
+@media (max-width: 1130px) {
+  .news-actions {
+    flex-direction: column;
+  }
+}
+@media (max-width: 950px) {
+  .creatingnews__table-action {
+    min-width: 0;
+  }
+  .news-text-cell {
+    width: 100%;
+    max-width: 200px;
+  }
+  .creatingnews__modal {
+    width: 100%;
+  }
+  .creatingnews__modal-content {
+    width: 70%;
+  }
+}

@@ -56,10 +56,10 @@ function SavedCalculators() {
         <table className="calculator-table">
           <thead>
             <tr>
-              <th>Название</th>
-              <th>Формула</th>
-              <th>Результат</th>
-              <th>Действия</th>
+              <th className="calculator-table-title">Название</th>
+              <th className="calculator-table-title">Формула</th>
+              <th className="calculator-table-title">Результат</th>
+              <th className="calculator-table-title">Действия</th>
             </tr>
           </thead>
           <tbody>
