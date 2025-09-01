@@ -1,6 +1,9 @@
-.commercial-wrapper {
+.secondcommercial-wrapper {
   padding: 20px;
   font-family: Arial, sans-serif;
+  width: 98%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .commercial__controlUnit {
@@ -91,7 +94,9 @@ td {
   }
 }
 @media (max-width: 1400px) {
-  .commercial-wrapper {
+  .secondcommercial-wrapper {
+    padding-right: 20px;
+    max-width: 100%;
     margin: 0;
   }
 }

@@ -327,7 +327,7 @@ export default function SecondCommercialOfferForm({
   };
 
   return (
-    <div className="commercial-wrapper">
+    <div className="secondcommercial-wrapper commercial-wrapper">
       {!user && (
         <h3 style={{ color: "red", alignSelf: "center", marginBottom: 20 }}>
           Для возможности сохранения рассчетов нужно авторизироваться!
@@ -367,8 +367,8 @@ export default function SecondCommercialOfferForm({
           <col style={{ width: "7%" }} />
           <col style={{ width: "7%" }} />
           <col style={{ width: "7%" }} />
-          <col style={{ width: "7%" }} />
-          <col style={{ width: "3%" }} />
+          <col style={{ width: "30px" }} />
+          <col style={{ width: "30px" }} />
         </colgroup>
         <thead>
           <tr>
@@ -432,7 +432,13 @@ export default function SecondCommercialOfferForm({
                 <td>{i + 1}</td>
                 <td style={{ whiteSpace: "normal", wordBreak: "break-word" }}>
                   <textarea
-                    style={{ resize: "none", width: "100%", whiteSpace: "normal", wordBreak: "break-word" }}
+                    style={{
+                      resize: "none",
+                      width: "100%",
+                      whiteSpace: "normal",
+                      wordBreak: "break-word",
+                      textAlign: "left",
+                    }}
                     value={row.name}
                     onChange={(e) => handleChange(i, "name", e.target.value)}
                     className="cell-input"
