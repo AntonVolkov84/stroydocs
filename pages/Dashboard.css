@@ -169,6 +169,7 @@
     flex-direction: column;
     position: relative;
     height: 100%;
+    padding-bottom: 8px;
   }
   .dashboard-container {
     padding: 0;

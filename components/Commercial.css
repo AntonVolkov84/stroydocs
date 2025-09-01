@@ -5,7 +5,7 @@
   margin: 20px 0;
   background-color: #f9f9f9;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  width: 95%;
+  width: 100%;
   margin: 50px auto;
 }
 .commercial__table-title {
@@ -29,8 +29,9 @@
 }
 .commercial-form1,
 .commercial-form0 {
-  width: 1200px;
+  max-width: 1200px;
   margin-left: 0;
+  padding-right: 10px;
 }
 .commercial__actions {
   display: flex;

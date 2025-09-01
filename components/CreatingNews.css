@@ -96,7 +96,7 @@
 }
 .news-text-cell {
   word-break: break-word;
-  max-width: 300px;
+  max-width: 220px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -114,8 +114,7 @@
     min-width: 0;
   }
   .news-text-cell {
-    width: 100%;
-    max-width: 200px;
+    max-width: 220px;
   }
   .creatingnews__modal {
     width: 100%;
