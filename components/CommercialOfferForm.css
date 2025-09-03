@@ -131,6 +131,9 @@ input[type="number"].no-spinner {
   .result-row {
     display: table-row !important;
   }
+  .no-pront {
+    display: none;
+  }
 
   .offer-table input {
     border: none;
@@ -156,9 +159,4 @@ input[type="number"].no-spinner {
   .cell-footer {
     display: flex;
   }
-}
-@media (max-width: 1420px) {
-  /* .offer-table {
-    max-width: 98%;
-  } */
 }

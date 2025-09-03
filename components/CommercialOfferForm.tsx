@@ -306,7 +306,14 @@ const CommercialOfferForm = ({
             styled={{ marginBottom: 20 }}
             onClick={() => {
               if (setMode) {
-                setMode({ referencebook: false, form: false, calculators: false, form1: false });
+                setMode({
+                  referencebook: false,
+                  form: false,
+                  calculators: false,
+                  form1: false,
+                  form2: false,
+                  management: false,
+                });
               } else {
                 console.warn("setMode не передан, ничего не делаем");
               }
