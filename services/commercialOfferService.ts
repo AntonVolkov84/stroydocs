@@ -6,6 +6,7 @@ import {
   PayloadForCommercialOfferSecondForm,
   PayloadUpdateCommercialOfferSecondForm,
   PayloadPendingDoc,
+  PayloadSavedBillOfQuantities,
 } from "../type";
 
 const apiUrl: string = import.meta.env.VITE_API_URL;
@@ -105,5 +106,46 @@ export const savePendingDocument = async (payload: PayloadPendingDoc): Promise<{
   } catch (error) {
     console.log("saveCommercialOfferSecondForm", error);
     throw error;
+  }
+};
+export const saveBillOfQuantities = async (payload: PayloadSavedBillOfQuantities): Promise<{ message: string }> => {
+  try {
+    const res: AxiosResponse<{ message: string }> = await axios.post(`${apiUrl}/stroydocs/savebillbook`, payload, {
+      withCredentials: true,
+    });
+    return res.data;
+  } catch (error) {
+    console.log("saveBillOfQuantitites", error);
+    throw error;
+  }
+};
+export const deleteSavedBillOfQuantities = async (id: number | string) => {
+  try {
+    await axios.delete(`${apiUrl}/stroydocs/delsavedbillbook`, {
+      params: { billId: id },
+      withCredentials: true,
+    });
+  } catch (error) {
+    console.log("deleteSavedBillOfQuantities", error);
+  }
+};
+export const updateSavedBillOfQuantities = async (payload: PayloadSavedBillOfQuantities) => {
+  try {
+    await axios.put(`${apiUrl}/stroydocs/updatesavedbillbook`, payload, {
+      withCredentials: true,
+    });
+  } catch (error) {
+    console.log("updateSavedBillOfQuantities", error);
+  }
+};
+export const getSavedBillOfQuantities = async (id: string | number) => {
+  try {
+    const response = await axios.get(`${apiUrl}/stroydocs/getsavedbillbook`, {
+      params: { userId: id },
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.log("getCommercialOffersSecondForm", error);
   }
 };

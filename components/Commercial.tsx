@@ -7,19 +7,23 @@ import {
   SavedOfferDataSecondForm,
   PayloadForCommercialOffer,
   PayloadForCommercialOfferSecondForm,
+  SavedBillOfQuantitiesData,
 } from "../type";
 import Button from "../components/Button";
 import CommercialOfferForm from "../components/CommercialOfferForm";
 import SecondCommercialOfferForm from "./SecondCommercialOfferForm";
+import BillOfQuantitiesForm from "./BillOfQuantities";
 import * as userService from "../services/userService";
 
 function Commercial() {
   const { user, confirm, prompt, alert } = useAppContext();
   const [selectedOffer, setSelectedOffer] = useState<SavedOfferData | null>(null);
   const [selectedOfferSecondForm, setSelectedOfferSecondForm] = useState<SavedOfferDataSecondForm | null>(null);
+  const [selectedBillOfQuantities, setSelectedBillOfQuantities] = useState<SavedBillOfQuantitiesData | null>(null);
   const [sendingOfferForm, setSendingOfferForm] = useState<boolean>(false);
   const [savedOfferData, setSavedOfferData] = useState<SavedOfferData[] | null>(null);
   const [savedOfferDataSecondForm, setSavedOfferDataSecondForm] = useState<SavedOfferDataSecondForm[] | null>(null);
+  const [savedBillOfQuantitiesData, setSavedBillOfQuantitiesData] = useState<SavedBillOfQuantitiesData[] | null>(null);
 
   const getSavedOfferData = async () => {
     if (!user) return;
@@ -58,6 +62,19 @@ function Commercial() {
     if (confirmResult) {
       await commercialOfferService.deleteCommercialOffersSecondForm(id);
       await getSavedOfferSecondFormData();
+    }
+  };
+  const handleDeleteBillOfquantities = async (id: number | string) => {
+    const confirmResult = await confirm({
+      title: "Удалить сохраненную ведомость объемов работ",
+      message: "Вы уверены, она будет стертa из Ваших сохранений?",
+      confirmText: "Да",
+      cancelText: "Нет",
+    });
+    if (!confirmResult) return;
+    if (confirmResult) {
+      await commercialOfferService.deleteSavedBillOfQuantities(id);
+      await getSavedBillOfQuantitisData();
     }
   };
 
@@ -118,7 +135,6 @@ function Commercial() {
           sender: `${user?.name} ${user?.surname}`,
         };
         const response = await commercialOfferService.savePendingDocument(payload);
-        console.log(response);
         await alert({
           title: "Такой получатель не зарегистрирован",
           message:
@@ -173,10 +189,20 @@ function Commercial() {
       setSendingOfferForm(false);
     }
   };
+  const getSavedBillOfQuantitisData = async () => {
+    try {
+      if (!user) return;
+      const res = await commercialOfferService.getSavedBillOfQuantities(user?.id);
+      setSavedBillOfQuantitiesData(res);
+    } catch (error) {
+      console.log("getSavedBillOfQuantitisData", error);
+    }
+  };
 
   useEffect(() => {
     getSavedOfferData();
     getSavedOfferSecondFormData();
+    getSavedBillOfQuantitisData();
   }, []);
 
   return (
@@ -201,6 +227,7 @@ function Commercial() {
                     <Button
                       onClick={() => {
                         setSelectedOfferSecondForm(null);
+                        setSelectedBillOfQuantities(null);
                         setSelectedOffer((prev) => (prev?.id === offer.id ? null : offer));
                       }}
                     >
@@ -259,6 +286,7 @@ function Commercial() {
                     <Button
                       onClick={() => {
                         setSelectedOffer(null);
+                        setSelectedBillOfQuantities(null);
                         setSelectedOfferSecondForm((prev) => (prev?.id === offer.id ? null : offer));
                       }}
                     >
@@ -298,6 +326,65 @@ function Commercial() {
       )}
       {!savedOfferDataSecondForm ||
         (savedOfferDataSecondForm.length === 0 && <p>Нет сохранённых предложений формы 1.</p>)}
+      <h2 className="commercial__table-title">Сохранённые ведомости объемов работ</h2>
+      {savedBillOfQuantitiesData && (
+        <>
+          <table className="commercial__table">
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th>Дата сохранения</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {savedBillOfQuantitiesData.map((bill) => (
+                <tr key={bill.id}>
+                  <td>{bill.title}</td>
+                  <td>{formatDate(bill.updated_at)}</td>
+                  <td className="commercial__actions">
+                    <Button
+                      onClick={() => {
+                        setSelectedOffer(null);
+                        setSelectedOfferSecondForm(null);
+                        setSelectedBillOfQuantities((prev) => (prev?.id === bill.id ? null : bill));
+                      }}
+                    >
+                      {selectedBillOfQuantities?.id === bill.id ? "Скрыть" : "Просмотреть"}
+                    </Button>
+                    <Button
+                      disabled={sendingOfferForm}
+                      onClick={async () => {
+                        console.log("Не сделано");
+                      }}
+                    >
+                      Отправить форму
+                    </Button>
+                    <Button className="button_btn--red-hover" onClick={() => handleDeleteBillOfquantities(bill.id)}>
+                      Удалить
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {selectedBillOfQuantities && (
+            <div className="commercial-form1">
+              <BillOfQuantitiesForm
+                key={selectedBillOfQuantities?.id}
+                showBackButton={!selectedBillOfQuantities}
+                initialRows={selectedBillOfQuantities.rows}
+                initialTitle={selectedBillOfQuantities.title}
+                initialOfferId={selectedBillOfQuantities.id}
+                onUpdateSuccess={getSavedBillOfQuantitisData}
+                setSelectedBill={setSelectedBillOfQuantities}
+              />
+            </div>
+          )}
+        </>
+      )}
+      {!savedBillOfQuantitiesData ||
+        (savedBillOfQuantitiesData.length === 0 && <p>Нет сохранённых ведомостей объемов работ</p>)}
     </div>
   );
 }

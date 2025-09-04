@@ -1,30 +1,62 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 import "./BillOfQuantities.css";
 import Button from "./Button";
 import { Trash2, Copy } from "lucide-react";
 import { useAppContext } from "../services/AppContext";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
+import { RowsBillOfQuantities, SavedBillOfQuantitiesData } from "../type";
+import * as commercialOfferService from "../services/commercialOfferService";
 
-interface RowData {
-  name: string;
-  unit: string;
-  quantity: string;
-  drawing?: string;
-  formula?: string;
-}
 interface BillOfQuantitiesProps {
-  clearMode: () => void;
+  clearMode?: () => void;
   showBackButton?: boolean;
+  initialRows?: RowsBillOfQuantities[];
+  initialTitle?: string;
+  initialOfferId?: string | number;
+  onUpdateSuccess?: () => void;
+  setSelectedBill?: Dispatch<SetStateAction<SavedBillOfQuantitiesData | null>>;
+  key?: string | number;
 }
 
-const BillOfQuantitiesForm = ({ clearMode, showBackButton = true }: BillOfQuantitiesProps) => {
-  const [rows, setRows] = useState<RowData[]>([{ name: "", unit: "", quantity: "", drawing: "", formula: "" }]);
+const BillOfQuantitiesForm = ({
+  clearMode,
+  showBackButton = true,
+  initialTitle,
+  initialRows,
+  initialOfferId,
+  onUpdateSuccess,
+  key,
+  setSelectedBill,
+}: BillOfQuantitiesProps) => {
+  const [rows, setRows] = useState<RowsBillOfQuantities[]>(
+    initialRows && initialRows.length > 0
+      ? initialRows
+      : [{ name: "", unit: "", quantity: "", drawing: "", formula: "" }]
+  );
+  const [title, setTitle] = useState<string>(initialTitle || "");
   const inputRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const { user, prompt, alert } = useAppContext();
-
+  useEffect(() => {
+    inputRefs.current.forEach((textarea) => {
+      if (textarea) {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+      }
+    });
+  }, [rows]);
+  useEffect(() => {
+    if (initialRows && initialRows.length > 0) {
+      setRows(initialRows);
+    }
+  }, [initialRows]);
+  useEffect(() => {
+    if (initialTitle) {
+      setTitle(initialTitle);
+    }
+  }, [initialTitle]);
   const addRow = (index?: number) => {
-    const newRow: RowData = { name: "", unit: "", quantity: "", drawing: "", formula: "" };
+    const newRow: RowsBillOfQuantities = { name: "", unit: "", quantity: "", drawing: "", formula: "" };
     setRows((prev) => {
       let newRows;
       if (index === undefined || index < 0 || index >= prev.length) {
@@ -52,12 +84,62 @@ const BillOfQuantitiesForm = ({ clearMode, showBackButton = true }: BillOfQuanti
     setRows((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleChange = (index: number, field: keyof RowData, value: string) => {
+  const handleChange = (index: number, field: keyof RowsBillOfQuantities, value: string) => {
     setRows((prev) => {
       const newRows = [...prev];
       newRows[index] = { ...newRows[index], [field]: value };
       return newRows;
     });
+  };
+  const saveBillOfQuantities = async () => {
+    let finalTitle: string = title;
+    if (!finalTitle) {
+      const userInput = await prompt({
+        title: "Придумайте название сохраняемой ведомости",
+        message: "",
+        placeholder: "Название",
+      });
+      if (!userInput) return;
+      finalTitle = userInput;
+    }
+    if (!user || !finalTitle) {
+      return;
+    }
+
+    const payload = {
+      userId: user.id,
+      title: finalTitle,
+      rows,
+    };
+    const res = await commercialOfferService.saveBillOfQuantities(payload);
+    await alert({
+      title: res.message,
+      message: "",
+    });
+  };
+  const updateBillOfQuantities = async () => {
+    let finalTitle: string = title;
+    if (!finalTitle) {
+      const userInput = await prompt({
+        title: "Придумайте название сохраняемой ведомости",
+        message: "",
+        placeholder: "Название",
+      });
+      if (!userInput) return;
+      finalTitle = userInput;
+    }
+    if (!user || !finalTitle) {
+      return;
+    }
+    const payload = {
+      billId: initialOfferId,
+      userId: user.id,
+      title: finalTitle,
+      rows,
+    };
+    await commercialOfferService.updateSavedBillOfQuantities(payload);
+    if (onUpdateSuccess) onUpdateSuccess();
+    if (setSelectedBill) setSelectedBill(null);
   };
   const exportToExcel = async () => {
     if (!rows || rows.length === 0) return;
@@ -139,11 +221,11 @@ const BillOfQuantitiesForm = ({ clearMode, showBackButton = true }: BillOfQuanti
         {user ? (
           <>
             {showBackButton ? (
-              <Button onClick={() => console.log()} styled={{ marginBottom: 20 }}>
+              <Button onClick={() => saveBillOfQuantities()} styled={{ marginBottom: 20 }}>
                 Сохранить
               </Button>
             ) : (
-              <Button onClick={() => console.log()} styled={{ marginBottom: 20 }}>
+              <Button onClick={() => updateBillOfQuantities()} styled={{ marginBottom: 20 }}>
                 Изменить
               </Button>
             )}
@@ -245,7 +327,9 @@ const BillOfQuantitiesForm = ({ clearMode, showBackButton = true }: BillOfQuanti
           ))}
           <tr>
             <td colSpan={7} style={{ textAlign: "center", padding: "10px" }}>
-              <Button onClick={() => addRow()}>Добавить строку</Button>
+              <Button styled={{ padding: 6 }} onClick={() => addRow()}>
+                ➕ Добавить строку
+              </Button>
             </td>
           </tr>
         </tbody>

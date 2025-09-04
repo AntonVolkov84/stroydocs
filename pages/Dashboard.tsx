@@ -20,6 +20,7 @@ import BannerFeedback from "../components/BannerFeedback";
 import ReferenceBook from "../components/ReferenceBook";
 import Management from "../components/Management";
 import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
+import BillOfQuantities from "../components/BillOfQuantities";
 interface NewsData {
   author_email: string;
   created_at: string;
@@ -41,12 +42,13 @@ export default function Dashboard() {
     calculators: false,
     form: false,
     form1: false,
+    form2: false,
     referencebook: false,
     management: false,
   });
 
   const clearMode = () => {
-    setMode({ calculators: false, form: false, form1: false, referencebook: false, management: false });
+    setMode({ calculators: false, form: false, form1: false, form2: false, referencebook: false, management: false });
   };
   const getNewsData = async () => {
     try {
@@ -128,6 +130,7 @@ export default function Dashboard() {
                           calculators: false,
                           form: false,
                           form1: false,
+                          form2: false,
                           management: true,
                         }));
                       }}
@@ -153,6 +156,7 @@ export default function Dashboard() {
                               referencebook: false,
                               form: false,
                               form1: false,
+                              form2: false,
                               calculators: calc,
                               management: false,
                             }));
@@ -177,6 +181,7 @@ export default function Dashboard() {
                           calculators: false,
                           form: true,
                           form1: false,
+                          form2: false,
                           management: false,
                         }));
                       }}
@@ -192,12 +197,29 @@ export default function Dashboard() {
                           calculators: false,
                           form: false,
                           form1: true,
+                          form2: false,
                           management: false,
                         }));
                       }}
                       className="dashboard-submenu-href"
                     >
                       Коммерческое предложение форма 1
+                    </button>
+                    <button
+                      style={{ padding: "10px" }}
+                      onClick={() => {
+                        setMode((prev) => ({
+                          referencebook: false,
+                          calculators: false,
+                          form: false,
+                          form1: false,
+                          form2: true,
+                          management: false,
+                        }));
+                      }}
+                      className="dashboard-submenu-href"
+                    >
+                      Ведомость объёмов работ
                     </button>
                   </div>
                 </div>
@@ -213,6 +235,7 @@ export default function Dashboard() {
                           calculators: false,
                           form: false,
                           form1: false,
+                          form2: false,
                           management: false,
                         }));
                       }}
@@ -230,6 +253,7 @@ export default function Dashboard() {
       </header>
       <main>
         {mode.management && <Management setMode={setMode} />}
+        {mode.form2 && <BillOfQuantities clearMode={clearMode} />}
         {mode.form && <CommercialOfferForm setMode={setMode} initialRows={exportedRows} />}
         {mode.referencebook && <ReferenceBook clearMode={clearMode} />}
         {mode.form1 && <SecondCommercialOfferForm setMode={setMode} setExportedRows={setExportedRows} />}
@@ -246,7 +270,12 @@ export default function Dashboard() {
               onConfirm={() => console.log("confirm")}
               onCancel={() => setIsOpen(false)}
             />
-            {!mode.calculators && !mode.form && !mode.form1 && !mode.referencebook && !mode.management ? (
+            {!mode.calculators &&
+            !mode.form &&
+            !mode.form1 &&
+            !mode.form2 &&
+            !mode.referencebook &&
+            !mode.management ? (
               <>
                 {Array.isArray(newsData) && <New item={newsData[0]} />}
                 <div className="block__slider">

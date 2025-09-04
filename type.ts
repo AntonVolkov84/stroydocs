@@ -23,6 +23,7 @@ export interface Mode {
   calculators: ModalState<CalculatorInterface>;
   form: boolean;
   form1: boolean;
+  form2: boolean;
   referencebook: boolean;
   management: boolean;
 }
@@ -206,3 +207,22 @@ export interface UploadedImage {
   publicId: string;
 }
 export type ImageType = File | UploadedImage;
+export interface RowsBillOfQuantities {
+  name: string;
+  unit: string;
+  quantity: string;
+  drawing?: string;
+  formula?: string;
+}
+export interface PayloadSavedBillOfQuantities {
+  userId: number | string;
+  title: string;
+  rows: RowsBillOfQuantities[];
+}
+export interface SavedBillOfQuantitiesData {
+  id: number | string;
+  rows: RowsBillOfQuantities[];
+  title: string;
+  userid: number | string;
+  updated_at: string;
+}
