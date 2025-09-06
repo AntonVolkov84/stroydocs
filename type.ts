@@ -168,7 +168,7 @@ export type PromptOptions = Omit<PromptModalProps, "open" | "onConfirm" | "onCan
 export interface PayloadPendingDoc {
   email: string;
   title: string;
-  rows: RowCommercialOfferSecondForm[] | RowCommercialOffer[];
+  rows: RowCommercialOfferSecondForm[] | RowCommercialOffer[] | RowsBillOfQuantities[];
   taxRate: number | string;
   type: string;
   receiver: string;

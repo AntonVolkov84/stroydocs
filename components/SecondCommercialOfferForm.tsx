@@ -1,6 +1,6 @@
 import React, { useState, Dispatch, SetStateAction, useRef } from "react";
 import "./SecondCommercialOfferForm.css";
-import { Mode, SavedOfferDataSecondForm } from "../type";
+import { Mode, SavedOfferDataSecondForm, RowsBillOfQuantities } from "../type";
 import Button from "./Button";
 import { useAppContext } from "../services/AppContext";
 import * as commercialOfferService from "../services/commercialOfferService";
@@ -33,7 +33,7 @@ interface SecondCommercialOfferFormProps {
   showBackButton?: boolean;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
-  setExportedRows: Dispatch<SetStateAction<RowData[] | null>>;
+  setExportedRows: Dispatch<SetStateAction<RowData[] | RowsBillOfQuantities[] | null>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferDataSecondForm | null>>;
 }
 
@@ -322,10 +322,22 @@ export default function SecondCommercialOfferForm({
     });
     setExportedRows(convertedRows);
     if (setMode) {
-      setMode({ form: true, form1: false, calculators: false });
+      setMode({ form: true, form1: false, calculators: false, management: false, form2: false, referencebook: false });
     }
   };
-
+  const exportInBillOfQuantities = async () => {
+    const convertedRows = rows.map((row) => {
+      return {
+        name: row.name,
+        unit: row.unit,
+        quantity: row.quantity,
+      };
+    });
+    setExportedRows(convertedRows);
+    if (setMode) {
+      setMode({ form: false, form1: false, calculators: false, management: false, form2: true, referencebook: false });
+    }
+  };
   return (
     <div className="secondcommercial-wrapper commercial-wrapper">
       {!user && (
@@ -337,6 +349,7 @@ export default function SecondCommercialOfferForm({
         <div className="commercial__controlUnit">
           {showBackButton && <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>}
           {showBackButton && <Button onClick={() => exportInForm0()}>🔀 Экспорт в форму 0</Button>}
+          {showBackButton && <Button onClick={() => exportInBillOfQuantities()}>🔀 Экспорт в ведомость</Button>}
           {showBackButton ? (
             <Button onClick={handleSave}>💾 Сохранить</Button>
           ) : (

@@ -102,6 +102,7 @@ button.cell-footer-btn:hover,
   }
 
   .bill-wrapper,
+  .commercial-form1,
   .bill-wrapper * {
     visibility: visible;
   }

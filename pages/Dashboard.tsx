@@ -8,7 +8,7 @@ import facebook from "../src/icons/facebook.svg";
 import { getAllNews } from "../services/newsServise";
 import * as calculatorService from "../services/calculatorService";
 import CalculatorComponent from "../components/Calculator";
-import { CalculatorInterface, Mode, RowData } from "../type";
+import { CalculatorInterface, Mode, RowData, RowsBillOfQuantities } from "../type";
 import CommercialOfferForm from "../components/CommercialOfferForm";
 import Confirmation from "../components/Confirmation";
 import Slider from "../components/Slider";
@@ -35,7 +35,7 @@ interface NewsData {
 export default function Dashboard() {
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [exportedRows, setExportedRows] = useState<RowData[] | null>(null);
+  const [exportedRows, setExportedRows] = useState<RowData[] | RowsBillOfQuantities[] | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<boolean>(false);
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
   const [mode, setMode] = useState<Mode>({
@@ -49,6 +49,7 @@ export default function Dashboard() {
 
   const clearMode = () => {
     setMode({ calculators: false, form: false, form1: false, form2: false, referencebook: false, management: false });
+    setExportedRows(null);
   };
   const getNewsData = async () => {
     try {
@@ -125,6 +126,7 @@ export default function Dashboard() {
                   <div className="dashboard-submenu-inner">
                     <button
                       onClick={() => {
+                        setExportedRows(null);
                         setMode((prev) => ({
                           referencebook: false,
                           calculators: false,
@@ -152,6 +154,7 @@ export default function Dashboard() {
                           style={{ padding: "10px" }}
                           key={calc.id}
                           onClick={() => {
+                            setExportedRows(null);
                             setMode((prev) => ({
                               referencebook: false,
                               form: false,
@@ -176,6 +179,7 @@ export default function Dashboard() {
                     <button
                       style={{ padding: "10px" }}
                       onClick={() => {
+                        setExportedRows(null);
                         setMode((prev) => ({
                           referencebook: false,
                           calculators: false,
@@ -192,6 +196,7 @@ export default function Dashboard() {
                     <button
                       style={{ padding: "10px" }}
                       onClick={() => {
+                        setExportedRows(null);
                         setMode((prev) => ({
                           referencebook: false,
                           calculators: false,
@@ -208,6 +213,7 @@ export default function Dashboard() {
                     <button
                       style={{ padding: "10px" }}
                       onClick={() => {
+                        setExportedRows(null);
                         setMode((prev) => ({
                           referencebook: false,
                           calculators: false,
@@ -230,6 +236,7 @@ export default function Dashboard() {
                   <div className="dashboard-submenu-inner">
                     <button
                       onClick={() => {
+                        setExportedRows(null);
                         setMode((prev) => ({
                           referencebook: true,
                           calculators: false,
@@ -253,8 +260,15 @@ export default function Dashboard() {
       </header>
       <main>
         {mode.management && <Management setMode={setMode} />}
-        {mode.form2 && <BillOfQuantities clearMode={clearMode} />}
-        {mode.form && <CommercialOfferForm setMode={setMode} initialRows={exportedRows} />}
+        {mode.form2 && <BillOfQuantities clearMode={clearMode} initialRows={exportedRows} />}
+        {mode.form && (
+          <CommercialOfferForm
+            clearMode={clearMode}
+            setMode={setMode}
+            initialRows={exportedRows}
+            setExportedRows={setExportedRows}
+          />
+        )}
         {mode.referencebook && <ReferenceBook clearMode={clearMode} />}
         {mode.form1 && <SecondCommercialOfferForm setMode={setMode} setExportedRows={setExportedRows} />}
         {mode.calculators ? (

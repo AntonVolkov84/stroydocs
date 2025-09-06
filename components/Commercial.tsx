@@ -7,6 +7,7 @@ import {
   SavedOfferDataSecondForm,
   PayloadForCommercialOffer,
   PayloadForCommercialOfferSecondForm,
+  PayloadSavedBillOfQuantities,
   SavedBillOfQuantitiesData,
 } from "../type";
 import Button from "../components/Button";
@@ -91,7 +92,7 @@ function Commercial() {
       .replace(",", " в");
   };
 
-  const sendForm = async (offer: SavedOfferData | SavedOfferDataSecondForm) => {
+  const sendForm = async (offer: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData) => {
     let recieverEmail = await prompt({
       title: "Укажите эл почту получателя формы",
       message: "",
@@ -121,6 +122,38 @@ function Commercial() {
         message: "У тебя уже есть эта форма",
       });
       return setSendingOfferForm(false);
+    }
+    if ("drawing" in offer.rows[0]) {
+      const res = await userService.getUserId(recieverEmail);
+      if (!res) {
+        const payload = {
+          email: recieverEmail,
+          title: offer.title,
+          taxRate: 20,
+          rows: offer.rows,
+          type: "billofquantities",
+          receiver: recieverEmail,
+          sender: `${user?.name} ${user?.surname}`,
+        };
+        await commercialOfferService.savePendingDocument(payload);
+        await alert({
+          title: "Такой получатель не зарегистрирован",
+          message:
+            "Возможно, Вы не верно ввели данные, либо получатель еще не зарегистрирован на сайте. В таком случае он получить сообщение на почту с информацией, что ему отправлены документы",
+        });
+        return setSendingOfferForm(false);
+      }
+      const payload = {
+        title: offer.title,
+        userId: res,
+        rows: offer.rows,
+      };
+      commercialOfferService.saveBillOfQuantities(payload as PayloadSavedBillOfQuantities);
+      await alert({
+        title: "Форма 0 отправлена",
+        message: "",
+      });
+      setSendingOfferForm(false);
     }
     if ("type" in offer.rows[0]) {
       const res = await userService.getUserId(recieverEmail);
@@ -155,38 +188,40 @@ function Commercial() {
       });
       setSendingOfferForm(false);
     } else {
-      const res = await userService.getUserId(recieverEmail);
-      if (!res) {
+      if (!("drawing" in offer.rows[0])) {
+        const res = await userService.getUserId(recieverEmail);
+        if (!res) {
+          const payload = {
+            email: recieverEmail,
+            title: offer.title,
+            taxRate: offer.taxrate,
+            rows: offer.rows,
+            type: "form1",
+            receiver: recieverEmail,
+            sender: `${user?.name} ${user?.surname}`,
+          };
+          const response = await commercialOfferService.savePendingDocument(payload);
+          console.log(response);
+          await alert({
+            title: "Такой получатель не зарегистрирован",
+            message:
+              "Возможно, Вы не верно ввели данные, либо получатель еще не зарегистрирован на сайте. В таком случае он получить сообщение на почту с информацией, что ему отправлены документы",
+          });
+          return setSendingOfferForm(false);
+        }
         const payload = {
-          email: recieverEmail,
           title: offer.title,
+          userId: res,
           taxRate: offer.taxrate,
           rows: offer.rows,
-          type: "form1",
-          receiver: recieverEmail,
-          sender: `${user?.name} ${user?.surname}`,
         };
-        const response = await commercialOfferService.savePendingDocument(payload);
-        console.log(response);
+        commercialOfferService.saveCommercialOfferSecondForm(payload as PayloadForCommercialOfferSecondForm);
         await alert({
-          title: "Такой получатель не зарегистрирован",
-          message:
-            "Возможно, Вы не верно ввели данные, либо получатель еще не зарегистрирован на сайте. В таком случае он получить сообщение на почту с информацией, что ему отправлены документы",
+          title: "Форма 1 отправлена",
+          message: "",
         });
-        return setSendingOfferForm(false);
+        setSendingOfferForm(false);
       }
-      const payload = {
-        title: offer.title,
-        userId: res,
-        taxRate: offer.taxrate,
-        rows: offer.rows,
-      };
-      commercialOfferService.saveCommercialOfferSecondForm(payload as PayloadForCommercialOfferSecondForm);
-      await alert({
-        title: "Форма 1 отправлена",
-        message: "",
-      });
-      setSendingOfferForm(false);
     }
   };
   const getSavedBillOfQuantitisData = async () => {
@@ -328,7 +363,7 @@ function Commercial() {
         (savedOfferDataSecondForm.length === 0 && <p>Нет сохранённых предложений формы 1.</p>)}
       <h2 className="commercial__table-title">Сохранённые ведомости объемов работ</h2>
       {savedBillOfQuantitiesData && (
-        <>
+        <div>
           <table className="commercial__table">
             <thead>
               <tr>
@@ -355,7 +390,7 @@ function Commercial() {
                     <Button
                       disabled={sendingOfferForm}
                       onClick={async () => {
-                        console.log("Не сделано");
+                        sendForm(bill);
                       }}
                     >
                       Отправить форму
@@ -381,7 +416,7 @@ function Commercial() {
               />
             </div>
           )}
-        </>
+        </div>
       )}
       {!savedBillOfQuantitiesData ||
         (savedBillOfQuantitiesData.length === 0 && <p>Нет сохранённых ведомостей объемов работ</p>)}

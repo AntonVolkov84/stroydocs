@@ -9,7 +9,7 @@ import { RowsBillOfQuantities, SavedBillOfQuantitiesData } from "../type";
 import * as commercialOfferService from "../services/commercialOfferService";
 
 interface BillOfQuantitiesProps {
-  clearMode?: () => void;
+  clearMode: () => void;
   showBackButton?: boolean;
   initialRows?: RowsBillOfQuantities[];
   initialTitle?: string;
@@ -37,6 +37,7 @@ const BillOfQuantitiesForm = ({
   const [title, setTitle] = useState<string>(initialTitle || "");
   const inputRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const { user, prompt, alert } = useAppContext();
+
   useEffect(() => {
     inputRefs.current.forEach((textarea) => {
       if (textarea) {
@@ -206,7 +207,7 @@ const BillOfQuantitiesForm = ({
   };
 
   return (
-    <div className="bill-wrapper">
+    <div className="commercial-wrapper">
       <div className="commercial__controlUnit">
         {!user && (
           <h3 style={{ color: "red", alignSelf: "center", marginBottom: 20 }}>

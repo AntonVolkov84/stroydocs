@@ -18,6 +18,8 @@ interface CommercialOfferFormProps {
   key?: string | number;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
+  clearMode: () => void;
+  setExportedRows: Dispatch<SetStateAction<RowData[]>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferData | null>>;
 }
 
@@ -29,7 +31,9 @@ const CommercialOfferForm = ({
   initialTitle,
   initialOfferId,
   key,
+  clearMode,
   onUpdateSuccess,
+  setExportedRows,
   setSelectedOffer,
 }: CommercialOfferFormProps) => {
   const [rows, setRows] = useState<RowData[]>(
@@ -297,7 +301,19 @@ const CommercialOfferForm = ({
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), "Коммерческое_предложение форма 0.xlsx");
   };
-
+  const exportInBillOfQuantities = async () => {
+    const convertedRows = rows.map((row) => {
+      return {
+        name: row.name,
+        unit: row.unit,
+        quantity: row.quantity,
+      };
+    });
+    setExportedRows(convertedRows);
+    if (setMode) {
+      setMode({ form: false, form1: false, calculators: false, management: false, form2: true, referencebook: false });
+    }
+  };
   return (
     <div className="commercial-wrapper">
       <div className="commercial__controlUnit">
@@ -305,18 +321,7 @@ const CommercialOfferForm = ({
           <Button
             styled={{ marginBottom: 20 }}
             onClick={() => {
-              if (setMode) {
-                setMode({
-                  referencebook: false,
-                  form: false,
-                  calculators: false,
-                  form1: false,
-                  form2: false,
-                  management: false,
-                });
-              } else {
-                console.warn("setMode не передан, ничего не делаем");
-              }
+              clearMode();
             }}
           >
             ← Назад
@@ -326,6 +331,11 @@ const CommercialOfferForm = ({
           <h3 style={{ color: "red", alignSelf: "center", marginBottom: 20 }}>
             Для возможности сохранения рассчетов нужно авторизироваться!
           </h3>
+        )}
+        {(user?.subscribe || user?.unlimited) && (
+          <Button styled={{ marginBottom: 20 }} onClick={() => exportInBillOfQuantities()}>
+            🔀 Экспорт в ведомость
+          </Button>
         )}
         {user ? (
           <>

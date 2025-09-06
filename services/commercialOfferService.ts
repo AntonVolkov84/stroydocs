@@ -104,7 +104,7 @@ export const savePendingDocument = async (payload: PayloadPendingDoc): Promise<{
     });
     return res.data;
   } catch (error) {
-    console.log("saveCommercialOfferSecondForm", error);
+    console.log("savePendingDocument", error);
     throw error;
   }
 };
