@@ -9,7 +9,7 @@ import { RowsBillOfQuantities, SavedBillOfQuantitiesData } from "../type";
 import * as commercialOfferService from "../services/commercialOfferService";
 
 interface BillOfQuantitiesProps {
-  clearMode: () => void;
+  clearMode?: () => void;
   showBackButton?: boolean;
   initialRows?: RowsBillOfQuantities[];
   initialTitle?: string;
@@ -215,7 +215,12 @@ const BillOfQuantitiesForm = ({
           </h3>
         )}
         {showBackButton && (
-          <Button styled={{ marginBottom: 20 }} onClick={() => clearMode()}>
+          <Button
+            styled={{ marginBottom: 20 }}
+            onClick={() => {
+              if (clearMode) clearMode();
+            }}
+          >
             ← Назад
           </Button>
         )}
@@ -265,7 +270,7 @@ const BillOfQuantitiesForm = ({
                   className="cell-input textarea"
                   value={row.name}
                   onChange={(e) => handleChange(i, "name", e.target.value)}
-                  ref={(el) => (inputRefs.current[i] = el)}
+                  ref={(el) => void (inputRefs.current[i] = el)}
                   rows={1}
                   onInput={(e) => {
                     const target = e.target as HTMLTextAreaElement;

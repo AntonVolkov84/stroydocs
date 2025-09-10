@@ -92,6 +92,28 @@ function Commercial() {
       .replace(",", " в");
   };
 
+  function isBillOfQuantities(
+    o: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData
+  ): o is SavedBillOfQuantitiesData {
+    return !!o && Array.isArray((o as any).rows) && (o as any).rows.length > 0 && "drawing" in (o as any).rows[0];
+  }
+
+  function isForm0(o: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData): o is SavedOfferData {
+    return !!o && Array.isArray((o as any).rows) && (o as any).rows.length > 0 && "type" in (o as any).rows[0];
+  }
+
+  function isForm1(
+    o: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData
+  ): o is SavedOfferDataSecondForm {
+    return (
+      !!o &&
+      Array.isArray((o as any).rows) &&
+      (o as any).rows.length > 0 &&
+      !("drawing" in (o as any).rows[0]) &&
+      !("type" in (o as any).rows[0])
+    );
+  }
+
   const sendForm = async (offer: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData) => {
     let recieverEmail = await prompt({
       title: "Укажите эл почту получателя формы",
@@ -123,7 +145,7 @@ function Commercial() {
       });
       return setSendingOfferForm(false);
     }
-    if ("drawing" in offer.rows[0]) {
+    if (isBillOfQuantities(offer)) {
       const res = await userService.getUserId(recieverEmail);
       if (!res) {
         const payload = {
@@ -155,7 +177,7 @@ function Commercial() {
       });
       setSendingOfferForm(false);
     }
-    if ("type" in offer.rows[0]) {
+    if (isForm0(offer)) {
       const res = await userService.getUserId(recieverEmail);
       if (!res) {
         const payload = {
@@ -188,7 +210,7 @@ function Commercial() {
       });
       setSendingOfferForm(false);
     } else {
-      if (!("drawing" in offer.rows[0])) {
+      if (isForm1(offer)) {
         const res = await userService.getUserId(recieverEmail);
         if (!res) {
           const payload = {

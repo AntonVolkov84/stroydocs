@@ -33,7 +33,7 @@ interface SecondCommercialOfferFormProps {
   showBackButton?: boolean;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
-  setExportedRows: Dispatch<SetStateAction<RowData[] | RowsBillOfQuantities[] | null>>;
+  setExportedRows?: Dispatch<SetStateAction<RowData[] | RowsBillOfQuantities[] | null>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferDataSecondForm | null>>;
 }
 
@@ -320,7 +320,9 @@ export default function SecondCommercialOfferForm({
         price,
       };
     });
-    setExportedRows(convertedRows);
+    if (setExportedRows) {
+      setExportedRows(convertedRows);
+    }
     if (setMode) {
       setMode({ form: true, form1: false, calculators: false, management: false, form2: false, referencebook: false });
     }
@@ -333,7 +335,9 @@ export default function SecondCommercialOfferForm({
         quantity: row.quantity,
       };
     });
-    setExportedRows(convertedRows);
+    if (setExportedRows) {
+      setExportedRows(convertedRows);
+    }
     if (setMode) {
       setMode({ form: false, form1: false, calculators: false, management: false, form2: true, referencebook: false });
     }

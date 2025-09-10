@@ -52,7 +52,7 @@ type Calculator = {
   image_public_id?: string;
 };
 export type Payload = {
-  userId: string;
+  userId: string | number;
   title: string;
   calculator: Calculator;
   variablesValues: InputValues;

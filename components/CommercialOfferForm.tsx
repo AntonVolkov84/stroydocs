@@ -18,8 +18,8 @@ interface CommercialOfferFormProps {
   key?: string | number;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
-  clearMode: () => void;
-  setExportedRows: Dispatch<SetStateAction<RowData[]>>;
+  clearMode?: () => void;
+  setExportedRows?: Dispatch<SetStateAction<RowData[]>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferData | null>>;
 }
 
@@ -275,7 +275,7 @@ const CommercialOfferForm = ({
             right: { style: "thin" },
           };
         }
-        if (cell.col === 6) {
+        if (colNumber === 6) {
           cell.alignment = { horizontal: "right" };
         }
       });
@@ -309,7 +309,9 @@ const CommercialOfferForm = ({
         quantity: row.quantity,
       };
     });
-    setExportedRows(convertedRows);
+    if (setExportedRows) {
+      setExportedRows(convertedRows);
+    }
     if (setMode) {
       setMode({ form: false, form1: false, calculators: false, management: false, form2: true, referencebook: false });
     }
@@ -321,7 +323,7 @@ const CommercialOfferForm = ({
           <Button
             styled={{ marginBottom: 20 }}
             onClick={() => {
-              clearMode();
+              if (clearMode) clearMode();
             }}
           >
             ← Назад
