@@ -176,7 +176,7 @@ export default function PersonalPage() {
                 setSelectedCalculator={setSelectedCalculator}
               />
             ) : (
-              <>{managerUser && <ManageUsers currentUserEmail={currentUserEmail} />}</>
+              <>{managerUser && user && <ManageUsers currentUserEmail={user.email} />}</>
             )}
           </>
         )}

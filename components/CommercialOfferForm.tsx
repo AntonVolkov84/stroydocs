@@ -275,6 +275,7 @@ const CommercialOfferForm = ({
             right: { style: "thin" },
           };
         }
+
         if (colNumber === 6) {
           cell.alignment = { horizontal: "right" };
         }

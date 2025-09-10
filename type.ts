@@ -226,3 +226,8 @@ export interface SavedBillOfQuantitiesData {
   userid: number | string;
   updated_at: string;
 }
+export interface ExportedDataInBillOfQuantities {
+  name: string;
+  unit: string;
+  quantity: string;
+}
