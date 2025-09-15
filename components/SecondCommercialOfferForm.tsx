@@ -35,6 +35,7 @@ interface SecondCommercialOfferFormProps {
   onUpdateSuccess?: () => void;
   setExportedRows?: Dispatch<SetStateAction<RowData[] | RowsBillOfQuantities[] | null>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferDataSecondForm | null>>;
+  clearMode?: () => void;
 }
 
 export default function SecondCommercialOfferForm({
@@ -48,6 +49,7 @@ export default function SecondCommercialOfferForm({
   setExportedRows,
   onUpdateSuccess,
   setSelectedOffer,
+  clearMode,
 }: SecondCommercialOfferFormProps) {
   const [rows, setRows] = useState<RowData[]>(initialRows || [{ ...defaultRow }]);
   const [taxPercent, setTaxPercent] = useState<string | number>(initialTaxRate || "20");
@@ -113,33 +115,34 @@ export default function SecondCommercialOfferForm({
   };
 
   const computeUnitPrice = (row: RowData) => {
-    const s = parseFloat(row.salary) || 0;
-    const m = parseFloat(row.material) || 0;
-    const mach = parseFloat(row.machine) || 0;
+    const s = parseNumber(row.salary) || 0;
+    const m = parseNumber(row.material) || 0;
+    const mach = parseNumber(row.machine) || 0;
     return s + m + mach;
   };
 
   const computeTotal = (row: RowData) => {
-    const q = parseFloat(row.quantity) || 0;
+    const q = parseNumber(row.quantity) || 0;
     const unit = computeUnitPrice(row);
     return q * unit;
   };
   const computeTotalSum = (row: RowData) => {
-    const salary = parseFloat(row.salary) || 0;
-    const material = parseFloat(row.material) || 0;
-    const machine = parseFloat(row.machine) || 0;
-    const quantity = parseFloat(row.quantity) || 0;
+    const salary = parseNumber(row.salary) || 0;
+    const material = parseNumber(row.material) || 0;
+    const machine = parseNumber(row.machine) || 0;
+    const quantity = parseNumber(row.quantity) || 0;
     return quantity * (salary + material + machine);
   };
-  const totalSalaryCost = rows.reduce((acc, row) => acc + parseFloat(row.salary) * (parseFloat(row.quantity) || 0), 0);
-  const totalMaterialCost = rows.reduce(
-    (acc, row) => acc + parseFloat(row.material) * (parseFloat(row.quantity) || 0),
-    0
-  );
-  const totalMachineCost = rows.reduce(
-    (acc, row) => acc + parseFloat(row.machine) * (parseFloat(row.quantity) || 0),
-    0
-  );
+  const parseNumber = (value: string | number) => {
+    if (value === undefined || value === null) return 0;
+    return parseFloat(value.toString().replace(",", "."));
+  };
+
+  const totalSalaryCost = rows.reduce((acc, row) => acc + parseNumber(row.salary) * parseNumber(row.quantity), 0);
+  const totalMaterialCost = rows.reduce((acc, row) => acc + parseNumber(row.material) * parseNumber(row.quantity), 0);
+
+  const totalMachineCost = rows.reduce((acc, row) => acc + parseNumber(row.machine) * parseNumber(row.quantity), 0);
+
   const totalCost = totalSalaryCost + totalMaterialCost + totalMachineCost;
   const taxValue = parseFloat(typeof taxPercent === "number" ? taxPercent.toString() : taxPercent) || 0;
   const taxAmount = totalCost * (taxValue / 100);
@@ -324,7 +327,15 @@ export default function SecondCommercialOfferForm({
       setExportedRows(convertedRows);
     }
     if (setMode) {
-      setMode({ form: true, form1: false, calculators: false, management: false, form2: false, referencebook: false });
+      setMode({
+        form: true,
+        fileimport: false,
+        form1: false,
+        calculators: false,
+        management: false,
+        form2: false,
+        referencebook: false,
+      });
     }
   };
   const exportInBillOfQuantities = async () => {
@@ -339,7 +350,15 @@ export default function SecondCommercialOfferForm({
       setExportedRows(convertedRows);
     }
     if (setMode) {
-      setMode({ form: false, form1: false, calculators: false, management: false, form2: true, referencebook: false });
+      setMode({
+        form: false,
+        form1: false,
+        calculators: false,
+        management: false,
+        form2: true,
+        referencebook: false,
+        fileimport: false,
+      });
     }
   };
   return (
@@ -351,7 +370,17 @@ export default function SecondCommercialOfferForm({
       )}
       {user ? (
         <div className="commercial__controlUnit">
-          {showBackButton && <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>}
+          {showBackButton && (
+            <Button
+              onClick={() => {
+                if (setMode) {
+                  setMode((prev) => ({ ...prev, form1: false }));
+                } else if (clearMode) clearMode();
+              }}
+            >
+              ← Назад
+            </Button>
+          )}
           {showBackButton && <Button onClick={() => exportInForm0()}>🔀 Экспорт в форму 0</Button>}
           {showBackButton && <Button onClick={() => exportInBillOfQuantities()}>🔀 Экспорт в ведомость</Button>}
           {showBackButton ? (
@@ -364,7 +393,17 @@ export default function SecondCommercialOfferForm({
         </div>
       ) : (
         <div className="commercial__controlUnit">
-          {showBackButton && <Button onClick={() => setMode?.((prev) => ({ ...prev, form1: false }))}>← Назад</Button>}
+          {showBackButton && (
+            <Button
+              onClick={() => {
+                if (setMode) {
+                  setMode((prev) => ({ ...prev, form1: false }));
+                } else if (clearMode) clearMode();
+              }}
+            >
+              ← Назад
+            </Button>
+          )}
         </div>
       )}
       <h2 className="title">КОММЕРЧЕСКОЕ ПРЕДЛОЖЕНИЕ</h2>
@@ -507,10 +546,10 @@ export default function SecondCommercialOfferForm({
                     className="cell-input smaller"
                   />
                 </td>
-                <td>{computeTotalSum(row).toFixed(2)}</td>
-                <td>{(parseFloat(row.salary) * parseFloat(row.quantity) || 0).toFixed(2)}</td>
-                <td>{(parseFloat(row.material) * parseFloat(row.quantity) || 0).toFixed(2)}</td>
-                <td>{(parseFloat(row.machine) * parseFloat(row.quantity) || 0).toFixed(2)}</td>
+                <td>{computeTotalSum(row).toFixed(3)}</td>
+                <td>{(parseNumber(row.salary) * parseNumber(row.quantity) || 0).toFixed(3)}</td>
+                <td>{(parseNumber(row.material) * parseNumber(row.quantity) || 0).toFixed(3)}</td>
+                <td>{(parseNumber(row.machine) * parseNumber(row.quantity) || 0).toFixed(3)}</td>
                 <td className="hide-in-print">
                   <button onClick={() => handleCopyRow(i)} className="icon-button icon-button-copy">
                     📄

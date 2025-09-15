@@ -1,0 +1,32 @@
+.fileimport-wrapper {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  width: 95%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.fileimport__info {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: red;
+}
+
+.file-upload-button {
+  background-color: #2563eb;
+  color: white;
+  font-weight: 500;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.file-upload-button:hover {
+  background-color: #1e40af;
+}
+
+.file-upload-input {
+  display: none;
+}

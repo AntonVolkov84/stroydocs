@@ -16,8 +16,8 @@ function ManageReferenceBooks() {
   const [form, setForm] = useState<RefDataInput>({
     title: "",
     text: "",
-    textImages: [] as ImageType[],
-    tableImages: [] as ImageType[],
+    textImages: [],
+    tableImages: [],
   });
 
   const textInputRef = useRef<HTMLInputElement | null>(null);
