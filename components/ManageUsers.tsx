@@ -11,6 +11,7 @@ interface ManageUserProps {
 
 export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
   const [users, setUsers] = useState<User[]>([]);
+  const [findByEmail, setFindByEmail] = useState<string>("");
   const { confirm } = useAppContext();
 
   const fetchUsers = async () => {
@@ -57,7 +58,7 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
       }
     }
   };
-
+  console.log(users);
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -65,6 +66,11 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
   return (
     <div className="Users-manager-container">
       <h2 className="Users-manager-title">Управление пользователями</h2>
+      <input
+        onChange={(e) => setFindByEmail(e.target.value)}
+        className="Users-manager-emailfind"
+        placeholder="Введите эмаил"
+      ></input>
       <div className="Users-table-wrapper">
         <table className="Users-table">
           <thead>
@@ -79,35 +85,41 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{user.username}</td>
-                <td>{user.email}</td>
-                <td>{user.emailconfirmed ? "✅" : "❌"}</td>
-                <td>{user.isadmin ? "✅" : "❌"}</td>
-                <td>{user.subscribe ? "✅" : "❌"}</td>
-                <td>{user.unlimited ? "✅" : "❌"} </td>
-                <td className="Users-actions">
-                  <div className="actions-buttons">
-                    {user.email !== currentUserEmail &&
-                      user.email !== "antvolkov84@gmail.com" &&
-                      user.email !== "aleks_e@inbox.ru" && (
-                        <>
-                          <Button onClick={() => toggleUnlim(user.id, user.unlimited ?? false)} className="edit-btn">
-                            {user.unlimited ? "Убрать безлим" : "Включить безлим"}
-                          </Button>
-                          <Button onClick={() => toggleAdmin(user.id, user.isadmin ?? false)} className="edit-btn">
-                            {user.isadmin ? "Убрать права" : "Сделать админом"}
-                          </Button>
-                          <Button onClick={() => deleteUser(user.id)} className="button_btn--red-hover">
-                            Удалить
-                          </Button>
-                        </>
-                      )}
-                  </div>
-                </td>
-              </tr>
-            ))}
+            {users
+              .filter(
+                (user) =>
+                  user.email.toLowerCase().includes(findByEmail.toLowerCase()) ||
+                  user.username.toLowerCase().includes(findByEmail.toLowerCase())
+              )
+              .map((user) => (
+                <tr key={user.id}>
+                  <td>{user.username}</td>
+                  <td>{user.email}</td>
+                  <td>{user.emailconfirmed ? "✅" : "❌"}</td>
+                  <td>{user.isadmin ? "✅" : "❌"}</td>
+                  <td>{user.subscribe ? "✅" : "❌"}</td>
+                  <td>{user.unlimited ? "✅" : "❌"} </td>
+                  <td className="Users-actions">
+                    <div className="actions-buttons">
+                      {user.email !== currentUserEmail &&
+                        user.email !== "antvolkov84@gmail.com" &&
+                        user.email !== "aleks_e@inbox.ru" && (
+                          <>
+                            <Button onClick={() => toggleUnlim(user.id, user.unlimited ?? false)} className="edit-btn">
+                              {user.unlimited ? "Убрать безлим" : "Включить безлим"}
+                            </Button>
+                            <Button onClick={() => toggleAdmin(user.id, user.isadmin ?? false)} className="edit-btn">
+                              {user.isadmin ? "Убрать права" : "Сделать админом"}
+                            </Button>
+                            <Button onClick={() => deleteUser(user.id)} className="button_btn--red-hover">
+                              Удалить
+                            </Button>
+                          </>
+                        )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

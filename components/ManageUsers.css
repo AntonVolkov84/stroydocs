@@ -13,6 +13,24 @@
   margin-bottom: 20px;
   text-align: center;
 }
+.Users-manager-emailfind {
+  height: 36px;
+  min-width: 280px;
+  padding: 0 12px;
+  font-size: 14px;
+  border: 2px solid #387bb6;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+}
+.Users-manager-emailfind:focus {
+  border-color: #2b5e8c;
+  box-shadow: 0 0 6px rgba(56, 123, 182, 0.4);
+}
+.Users-manager-emailfind::placeholder {
+  color: #888;
+  font-style: italic;
+}
 
 .Users-table-wrapper {
   overflow-x: auto;

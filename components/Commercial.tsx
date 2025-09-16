@@ -384,7 +384,7 @@ function Commercial() {
       {!savedOfferDataSecondForm ||
         (savedOfferDataSecondForm.length === 0 && <p>Нет сохранённых предложений формы 1.</p>)}
       <h2 className="commercial__table-title">Сохранённые ведомости объемов работ</h2>
-      {savedBillOfQuantitiesData && (
+      {savedBillOfQuantitiesData && savedBillOfQuantitiesData.length > 0 && (
         <div>
           <table className="commercial__table">
             <thead>
