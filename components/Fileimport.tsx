@@ -2,6 +2,7 @@ import "./Fileimport.css";
 import React, { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import Button from "./Button";
+import JSZip from "jszip";
 import { RowCommercialOfferSecondForm } from "../type";
 import SecondCommercialOfferForm from "./SecondCommercialOfferForm";
 
@@ -86,68 +87,191 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
     reader.readAsArrayBuffer(file);
   };
 
-  const importFromXML = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // const importFromXML = (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  //   const file = event.target.files?.[0];
+  //   if (!file) return;
+  //   const reader = new FileReader();
+  //   reader.onload = (e) => {
+  //     const buffer = e.target?.result as ArrayBuffer;
+  //     const head = new TextDecoder("utf-8").decode(buffer.slice(0, 200));
+  //     const encodingMatch = head.match(/encoding="([^"]+)"/i);
+  //     const encoding = encodingMatch ? encodingMatch[1].toLowerCase() : "utf-8";
+  //     let content: string;
+  //     try {
+  //       const decoder = new TextDecoder(encoding as any, { fatal: false });
+  //       content = decoder.decode(buffer);
+  //     } catch (e) {
+  //       try {
+  //         const decoder = new TextDecoder("windows-1251" as any, { fatal: false });
+  //         content = decoder.decode(buffer);
+  //       } catch {
+  //         content = new TextDecoder("utf-8").decode(buffer);
+  //       }
+  //     }
+  //     const parser = new DOMParser();
+  //     const xmlDoc = parser.parseFromString(content, "application/xml");
+  //     const positions = Array.from(xmlDoc.getElementsByTagName("Position"));
+  //     const importedRows: RowCommercialOfferSecondForm[] = positions.map((pos) => {
+  //       const name = pos.getAttribute("Caption") || "";
+  //       const unit = pos.getAttribute("Units") || "";
+  //       const quantity = pos.getElementsByTagName("Quantity")[0]?.getAttribute("Result") || "0";
+  //       const priceBase = pos.getElementsByTagName("PriceBase")[0];
+  //       const salary = priceBase?.getAttribute("PZ") || "0";
+  //       const material = priceBase?.getAttribute("MT") || "0";
+  //       const machine = priceBase?.getAttribute("OZ") || "0";
+  //       return {
+  //         name,
+  //         unit,
+  //         quantity,
+  //         salary,
+  //         material,
+  //         machine,
+  //       };
+  //     });
+  //     setOnParsed(importedRows);
+  //     const rangingRates = xmlDoc.getElementsByTagName("RangingRates")[0];
+  //     if (rangingRates) {
+  //       setTaxPercent(rangingRates.getAttribute("Mat") || "20");
+  //     }
+  //   };
+
+  //   reader.readAsArrayBuffer(file);
+  // };
+  function parseXmlContent(content: string) {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(content, "application/xml");
+
+    const positions = Array.from(xmlDoc.getElementsByTagName("Position"));
+    const importedRows: RowCommercialOfferSecondForm[] = positions.map((pos) => {
+      const name = pos.getAttribute("Caption") || "";
+      const unit = pos.getAttribute("Units") || "";
+      const quantity = pos.getElementsByTagName("Quantity")[0]?.getAttribute("Result") || "0";
+
+      const priceBase = pos.getElementsByTagName("PriceBase")[0];
+      const salary = priceBase?.getAttribute("PZ") || "0";
+      const material = priceBase?.getAttribute("MT") || "0";
+      const machine = priceBase?.getAttribute("OZ") || "0";
+
+      return { name, unit, quantity, salary, material, machine };
+    });
+
+    setOnParsed(importedRows);
+
+    const rangingRates = xmlDoc.getElementsByTagName("RangingRates")[0];
+    if (rangingRates) {
+      setTaxPercent(rangingRates.getAttribute("Mat") || "20");
+    }
+  }
+
+  // Чтение файла с учётом кодировки
+  function decodeBuffer(buffer: ArrayBuffer): string {
+    const head = new TextDecoder("utf-8").decode(buffer.slice(0, 200));
+    const encodingMatch = head.match(/encoding="([^"]+)"/i);
+    const encoding = encodingMatch ? encodingMatch[1].toLowerCase() : "utf-8";
+
+    try {
+      return new TextDecoder(encoding as any, { fatal: false }).decode(buffer);
+    } catch {
+      try {
+        return new TextDecoder("windows-1251" as any, { fatal: false }).decode(buffer);
+      } catch {
+        return new TextDecoder("utf-8").decode(buffer);
+      }
+    }
+  }
+
+  const importFromXML = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
 
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       const buffer = e.target?.result as ArrayBuffer;
+      if (!buffer) return;
 
-      // читаем первые байты и определяем encoding
-      const head = new TextDecoder("utf-8").decode(buffer.slice(0, 200));
-      const encodingMatch = head.match(/encoding="([^"]+)"/i);
-      const encoding = encodingMatch ? encodingMatch[1].toLowerCase() : "utf-8";
+      // функция для декодирования
+      const decodeBuffer = (buf: ArrayBuffer): string => {
+        const head = new TextDecoder("utf-8").decode(buf.slice(0, 200));
+        const encodingMatch = head.match(/encoding="([^"]+)"/i);
+        const encoding = encodingMatch ? encodingMatch[1].toLowerCase() : "utf-8";
 
-      let content: string;
-
-      try {
-        // пробуем основную кодировку из XML
-        const decoder = new TextDecoder(encoding as any, { fatal: false });
-        content = decoder.decode(buffer);
-      } catch (e) {
         try {
-          // если не сработало — пробуем windows-1251
-          const decoder = new TextDecoder("windows-1251" as any, { fatal: false });
-          content = decoder.decode(buffer);
+          return new TextDecoder(encoding as any, { fatal: false }).decode(buf);
         } catch {
-          // если совсем не получилось — откатываемся на utf-8
-          content = new TextDecoder("utf-8").decode(buffer);
+          try {
+            return new TextDecoder("windows-1251" as any, { fatal: false }).decode(buf);
+          } catch {
+            return new TextDecoder("utf-8").decode(buf);
+          }
         }
-      }
+      };
 
-      // парсим XML
-      const parser = new DOMParser();
-      const xmlDoc = parser.parseFromString(content, "application/xml");
+      const parseXmlContent = (content: string) => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(content, "application/xml");
+        let importedRows: RowCommercialOfferSecondForm[] = [];
 
-      const positions = Array.from(xmlDoc.getElementsByTagName("Position"));
-      const importedRows: RowCommercialOfferSecondForm[] = positions.map((pos) => {
-        const name = pos.getAttribute("Caption") || "";
-        const unit = pos.getAttribute("Units") || "";
-        const quantity = pos.getElementsByTagName("Quantity")[0]?.getAttribute("Result") || "0";
+        // Если есть Section → новый формат ГРАНД
+        const sections = Array.from(xmlDoc.getElementsByTagName("Section"));
+        if (sections.length) {
+          sections.forEach((section) => {
+            const items = Array.from(section.getElementsByTagName("Item"));
+            items.forEach((item) => {
+              const costs = Array.from(item.getElementsByTagName("Cost"));
+              costs.forEach((cost) => {
+                importedRows.push({
+                  name: cost.getElementsByTagName("Name")[0]?.textContent || "",
+                  unit: cost.getElementsByTagName("Unit")[0]?.textContent || "",
+                  quantity: cost.getElementsByTagName("Quantity")[0]?.textContent || "0",
+                  salary: cost.getElementsByTagName("WorkersSalary")[0]?.textContent || "0",
+                  material:
+                    cost.getElementsByTagName("Materials")[0]?.getElementsByTagName("Total")[0]?.textContent || "0",
+                  machine: cost.getElementsByTagName("Machines")[0]?.textContent || "0",
+                });
+              });
+            });
+          });
+        } else {
+          // старый формат с Position
+          const positions = Array.from(xmlDoc.getElementsByTagName("Position"));
+          importedRows = positions.map((pos) => {
+            const name = pos.getAttribute("Caption") || "";
+            const unit = pos.getAttribute("Units") || "";
+            const quantity = pos.getElementsByTagName("Quantity")[0]?.getAttribute("Result") || "0";
+            const priceBase = pos.getElementsByTagName("PriceBase")[0];
+            const salary = priceBase?.getAttribute("PZ") || "0";
+            const material = priceBase?.getAttribute("MT") || "0";
+            const machine = priceBase?.getAttribute("OZ") || "0";
+            return { name, unit, quantity, salary, material, machine };
+          });
+        }
 
-        const priceBase = pos.getElementsByTagName("PriceBase")[0];
-        const salary = priceBase?.getAttribute("PZ") || "0";
-        const material = priceBase?.getAttribute("MT") || "0";
-        const machine = priceBase?.getAttribute("OZ") || "0";
+        setOnParsed(importedRows);
 
-        return {
-          name,
-          unit,
-          quantity,
-          salary,
-          material,
-          machine,
-        };
-      });
+        // налоговые ставки, если есть
+        const rangingRates = xmlDoc.getElementsByTagName("RangingRates")[0];
+        if (rangingRates) {
+          setTaxPercent(rangingRates.getAttribute("Mat") || "20");
+        }
+      };
 
-      setOnParsed(importedRows);
-
-      // налоговые ставки
-      const rangingRates = xmlDoc.getElementsByTagName("RangingRates")[0];
-      if (rangingRates) {
-        setTaxPercent(rangingRates.getAttribute("Mat") || "20");
+      // Проверяем, XML или архив GSFX/GGE
+      const ext = file.name.toLowerCase();
+      if (ext.endsWith(".xml") || ext.endsWith(".gge")) {
+        const content = decodeBuffer(buffer);
+        parseXmlContent(content);
+      } else if (ext.endsWith(".gsfx") || ext.endsWith(".gge")) {
+        const zip = await JSZip.loadAsync(buffer);
+        const xmlFile = Object.keys(zip.files).find((name) => name.toLowerCase().endsWith(".xml"));
+        if (xmlFile) {
+          const xmlBuffer = await zip.files[xmlFile].async("arraybuffer");
+          const content = decodeBuffer(xmlBuffer);
+          parseXmlContent(content);
+        } else {
+          console.error("В архиве нет XML файла");
+        }
       }
     };
 
