@@ -2,6 +2,7 @@ import "./Commercial.css";
 import { useState, useEffect } from "react";
 import * as commercialOfferService from "../services/commercialOfferService";
 import { useAppContext } from "../services/AppContext";
+import { Link, useNavigate } from "react-router-dom";
 import {
   SavedOfferData,
   SavedOfferDataSecondForm,
@@ -17,7 +18,7 @@ import BillOfQuantitiesForm from "./BillOfQuantities";
 import * as userService from "../services/userService";
 
 function Commercial() {
-  const { user, confirm, prompt, alert } = useAppContext();
+  const { user, confirm, prompt, alert, setMode, exportedRows, setExportedRows } = useAppContext();
   const [selectedOffer, setSelectedOffer] = useState<SavedOfferData | null>(null);
   const [selectedOfferSecondForm, setSelectedOfferSecondForm] = useState<SavedOfferDataSecondForm | null>(null);
   const [selectedBillOfQuantities, setSelectedBillOfQuantities] = useState<SavedBillOfQuantitiesData | null>(null);
@@ -25,7 +26,7 @@ function Commercial() {
   const [savedOfferData, setSavedOfferData] = useState<SavedOfferData[] | null>(null);
   const [savedOfferDataSecondForm, setSavedOfferDataSecondForm] = useState<SavedOfferDataSecondForm[] | null>(null);
   const [savedBillOfQuantitiesData, setSavedBillOfQuantitiesData] = useState<SavedBillOfQuantitiesData[] | null>(null);
-
+  const navigate = useNavigate();
   const getSavedOfferData = async () => {
     if (!user) return;
     const id = user.id;
@@ -285,7 +286,19 @@ function Commercial() {
                       onClick={() => {
                         setSelectedOfferSecondForm(null);
                         setSelectedBillOfQuantities(null);
-                        setSelectedOffer((prev) => (prev?.id === offer.id ? null : offer));
+                        navigate("/dashboard");
+                        console.log(offer);
+                        // setSelectedOffer((prev) => (prev?.id === offer.id ? null : offer));
+                        setMode({
+                          calculators: false,
+                          form: true,
+                          form1: false,
+                          form2: false,
+                          referencebook: false,
+                          management: false,
+                          fileimport: false,
+                        });
+                        setExportedRows(offer.rows);
                       }}
                     >
                       {selectedOffer?.id === offer.id ? "Скрыть" : "Просмотреть"}
