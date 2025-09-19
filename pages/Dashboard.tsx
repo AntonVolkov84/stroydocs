@@ -40,7 +40,7 @@ export default function Dashboard() {
   const [isOpen, setIsOpen] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState<boolean>(false);
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
-  const { setMode, mode, exportedRows, setExportedRows } = useAppContext();
+  const { setMode, mode, exportedRows, setExportedRows, exportData, setExportData } = useAppContext();
 
   const clearMode = () => {
     setMode({
@@ -53,6 +53,7 @@ export default function Dashboard() {
       management: false,
     });
     setExportedRows(null);
+    setExportData(null);
   };
   const getNewsData = async () => {
     try {
@@ -135,6 +136,7 @@ export default function Dashboard() {
                     <button
                       onClick={() => {
                         setExportedRows(null);
+                        setExportData(null);
                         setMode((prev) => ({
                           referencebook: false,
                           calculators: false,
@@ -164,6 +166,7 @@ export default function Dashboard() {
                           key={calc.id}
                           onClick={() => {
                             setExportedRows(null);
+                            setExportData(null);
                             setMode((prev) => ({
                               referencebook: false,
                               form: false,
@@ -190,6 +193,7 @@ export default function Dashboard() {
                       style={{ padding: "10px" }}
                       onClick={() => {
                         setExportedRows(null);
+                        setExportData(null);
                         setMode((prev) => ({
                           referencebook: false,
                           calculators: false,
@@ -208,6 +212,7 @@ export default function Dashboard() {
                       style={{ padding: "10px" }}
                       onClick={() => {
                         setExportedRows(null);
+                        setExportData(null);
                         setMode((prev) => ({
                           referencebook: false,
                           calculators: false,
@@ -226,6 +231,7 @@ export default function Dashboard() {
                       style={{ padding: "10px" }}
                       onClick={() => {
                         setExportedRows(null);
+                        setExportData(null);
                         setMode((prev) => ({
                           referencebook: false,
                           calculators: false,
@@ -244,6 +250,7 @@ export default function Dashboard() {
                       style={{ padding: "10px" }}
                       onClick={() => {
                         setExportedRows(null);
+                        setExportData(null);
                         setMode((prev) => ({
                           referencebook: false,
                           calculators: false,
@@ -268,6 +275,7 @@ export default function Dashboard() {
                     <button
                       onClick={() => {
                         setExportedRows(null);
+                        setExportData(null);
                         setMode((prev) => ({
                           referencebook: true,
                           calculators: false,
@@ -299,6 +307,10 @@ export default function Dashboard() {
             setMode={setMode}
             initialRows={exportedRows}
             setExportedRows={setExportedRows}
+            initialTaxRate={exportData?.taxRate}
+            showBackButton={!exportData}
+            initialTitle={exportData?.title}
+            initialOfferId={exportData?.offerId}
           />
         )}
         {mode.referencebook && <ReferenceBook clearMode={clearMode} />}

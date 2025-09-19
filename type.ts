@@ -219,6 +219,7 @@ export interface PayloadSavedBillOfQuantities {
   userId: number | string;
   title: string;
   rows: RowsBillOfQuantities[];
+  billId?: string | number | undefined;
 }
 export interface SavedBillOfQuantitiesData {
   id: number | string;

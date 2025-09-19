@@ -132,6 +132,7 @@ const BillOfQuantitiesForm = ({
     if (!user || !finalTitle) {
       return;
     }
+    if (initialOfferId) return;
     const payload = {
       billId: initialOfferId,
       userId: user.id,

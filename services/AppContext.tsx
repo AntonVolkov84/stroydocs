@@ -11,6 +11,9 @@ import {
   Mode,
   RowData,
   RowsBillOfQuantities,
+  PayloadUpdateCommercialOffer,
+  PayloadUpdateCommercialOfferSecondForm,
+  SavedBillOfQuantitiesData,
 } from "../type";
 
 type ConfirmOptions = Omit<ConfirmModalProps, "open" | "onConfirm" | "onCancel">;
@@ -28,6 +31,12 @@ interface AppContextType {
   mode: Mode;
   exportedRows: RowData[] | RowsBillOfQuantities[] | null;
   setExportedRows: React.Dispatch<React.SetStateAction<RowData[] | RowsBillOfQuantities[] | null>>;
+  exportData: PayloadUpdateCommercialOffer | PayloadUpdateCommercialOfferSecondForm | SavedBillOfQuantitiesData | null;
+  setExportData: React.Dispatch<
+    React.SetStateAction<
+      PayloadUpdateCommercialOffer | PayloadUpdateCommercialOfferSecondForm | SavedBillOfQuantitiesData | null
+    >
+  >;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -47,6 +56,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [alertOptions, setAlertOptions] = useState<AlertOptions | null>(null);
   const [alertResolver, setAlertResolver] = useState<() => void>(() => () => {});
   const [exportedRows, setExportedRows] = useState<RowData[] | RowsBillOfQuantities[] | null>(null);
+  const [exportData, setExportData] = useState<
+    PayloadUpdateCommercialOffer | PayloadUpdateCommercialOfferSecondForm | SavedBillOfQuantitiesData | null
+  >(null);
   const [mode, setMode] = useState<Mode>({
     calculators: false,
     form: false,
@@ -112,7 +124,20 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AppContext.Provider
-      value={{ user, setUser, confirm, prompt, alert, loading, setMode, mode, exportedRows, setExportedRows }}
+      value={{
+        user,
+        setUser,
+        confirm,
+        prompt,
+        alert,
+        loading,
+        setMode,
+        mode,
+        exportedRows,
+        setExportedRows,
+        exportData,
+        setExportData,
+      }}
     >
       {children}
       {confirmOptions && <Confirmation open {...confirmOptions} onConfirm={handleConfirm} onCancel={handleCancel} />}

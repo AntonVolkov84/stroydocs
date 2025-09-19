@@ -18,7 +18,7 @@ import BillOfQuantitiesForm from "./BillOfQuantities";
 import * as userService from "../services/userService";
 
 function Commercial() {
-  const { user, confirm, prompt, alert, setMode, exportedRows, setExportedRows } = useAppContext();
+  const { user, confirm, prompt, alert, setMode, exportedRows, setExportedRows, setExportData } = useAppContext();
   const [selectedOffer, setSelectedOffer] = useState<SavedOfferData | null>(null);
   const [selectedOfferSecondForm, setSelectedOfferSecondForm] = useState<SavedOfferDataSecondForm | null>(null);
   const [selectedBillOfQuantities, setSelectedBillOfQuantities] = useState<SavedBillOfQuantitiesData | null>(null);
@@ -286,8 +286,14 @@ function Commercial() {
                       onClick={() => {
                         setSelectedOfferSecondForm(null);
                         setSelectedBillOfQuantities(null);
+                        setExportData({
+                          offerId: offer.id,
+                          title: offer.title,
+                          taxRate: offer.taxrate,
+                          userId: offer.userid,
+                          rows: offer.rows,
+                        });
                         navigate("/dashboard");
-                        console.log(offer);
                         // setSelectedOffer((prev) => (prev?.id === offer.id ? null : offer));
                         setMode({
                           calculators: false,
@@ -357,7 +363,6 @@ function Commercial() {
                       onClick={() => {
                         setSelectedOffer(null);
                         setSelectedBillOfQuantities(null);
-                        console.log(offer);
                         setSelectedOfferSecondForm((prev) => (prev?.id === offer.id ? null : offer));
                       }}
                     >

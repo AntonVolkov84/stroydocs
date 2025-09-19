@@ -39,10 +39,12 @@ const CommercialOfferForm = ({
   const [rows, setRows] = useState<RowData[]>(
     initialRows || [{ name: "", unit: "", type: "работы", quantity: 0, price: 0 }]
   );
+
   const { user, prompt, alert } = useAppContext();
   const [taxRate, setTaxRate] = useState(initialTaxRate || 20);
   const inputRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+
   const addRow = (type: RowData["type"], index?: number) => {
     const newRow: RowData = { name: "", unit: "", type, quantity: 0, price: 0 };
 
@@ -147,7 +149,7 @@ const CommercialOfferForm = ({
       message: initialTitle,
       placeholder: "Название",
     });
-
+    console.log(initialOfferId);
     if (!title || !user || !initialOfferId) return;
     const payload = {
       offerId: initialOfferId,
@@ -156,6 +158,7 @@ const CommercialOfferForm = ({
       rows: rows,
       taxRate,
     };
+    console.log(payload);
 
     try {
       await commercialOfferService.updateCommercialOffer(payload);
@@ -320,16 +323,15 @@ const CommercialOfferForm = ({
   return (
     <div className="commercial-wrapper">
       <div className="commercial__controlUnit">
-        {showBackButton && (
-          <Button
-            styled={{ marginBottom: 20 }}
-            onClick={() => {
-              if (clearMode) clearMode();
-            }}
-          >
-            ← Назад
-          </Button>
-        )}
+        <Button
+          styled={{ marginBottom: 20 }}
+          onClick={() => {
+            if (clearMode) clearMode();
+          }}
+        >
+          ← Назад
+        </Button>
+
         {!user && (
           <h3 style={{ color: "red", alignSelf: "center", marginBottom: 20 }}>
             Для возможности сохранения рассчетов нужно авторизироваться!
@@ -342,7 +344,7 @@ const CommercialOfferForm = ({
         )}
         {user ? (
           <>
-            {showBackButton ? (
+            {!initialRows ? (
               <Button onClick={() => handleSave()} styled={{ marginBottom: 20 }}>
                 Сохранить
               </Button>
