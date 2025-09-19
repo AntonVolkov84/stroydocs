@@ -344,6 +344,7 @@ function Commercial() {
                       onClick={() => {
                         setSelectedOffer(null);
                         setSelectedBillOfQuantities(null);
+                        console.log(offer);
                         setSelectedOfferSecondForm((prev) => (prev?.id === offer.id ? null : offer));
                       }}
                     >
