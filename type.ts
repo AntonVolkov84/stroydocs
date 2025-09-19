@@ -26,6 +26,7 @@ export interface Mode {
   form2: boolean;
   referencebook: boolean;
   management: boolean;
+  fileimport: boolean;
 }
 export interface User {
   id: string | number;

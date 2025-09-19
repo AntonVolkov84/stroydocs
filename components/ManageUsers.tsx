@@ -69,7 +69,7 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
       <input
         onChange={(e) => setFindByEmail(e.target.value)}
         className="Users-manager-emailfind"
-        placeholder="Введите эмаил"
+        placeholder="Введите эмаил или никнейм"
       ></input>
       <div className="Users-table-wrapper">
         <table className="Users-table">

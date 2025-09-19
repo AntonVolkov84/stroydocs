@@ -14,6 +14,7 @@ import Confirmation from "../components/Confirmation";
 import Slider from "../components/Slider";
 import CO0 from "../src/CO0.png";
 import CO1 from "../src/CO1.png";
+import VE1 from "../src/Vedomost.png";
 import Logo from "../src/StroydoksLogo2.png";
 import Feedback from "../components/Feedback";
 import BannerFeedback from "../components/BannerFeedback";
@@ -21,6 +22,8 @@ import ReferenceBook from "../components/ReferenceBook";
 import Management from "../components/Management";
 import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 import BillOfQuantities from "../components/BillOfQuantities";
+import Fileimport from "../components/Fileimport";
+import { useAppContext } from "../services/AppContext";
 interface NewsData {
   author_email: string;
   created_at: string;
@@ -35,20 +38,20 @@ interface NewsData {
 export default function Dashboard() {
   const [newsData, setNewsData] = useState<NewsData[] | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [exportedRows, setExportedRows] = useState<RowData[] | RowsBillOfQuantities[] | null>(null);
   const [feedbackModal, setFeedbackModal] = useState<boolean>(false);
   const [calculators, setCalculators] = useState<CalculatorInterface[] | null>(null);
-  const [mode, setMode] = useState<Mode>({
-    calculators: false,
-    form: false,
-    form1: false,
-    form2: false,
-    referencebook: false,
-    management: false,
-  });
+  const { setMode, mode, exportedRows, setExportedRows } = useAppContext();
 
   const clearMode = () => {
-    setMode({ calculators: false, form: false, form1: false, form2: false, referencebook: false, management: false });
+    setMode({
+      calculators: false,
+      fileimport: false,
+      form: false,
+      form1: false,
+      form2: false,
+      referencebook: false,
+      management: false,
+    });
     setExportedRows(null);
   };
   const getNewsData = async () => {
@@ -79,15 +82,20 @@ export default function Dashboard() {
   }, []);
   const customSlides = [
     {
-      title: "Форма 0",
+      title: "Коммерческое предложение форма 0",
       formula: "Форма ноль включает в себя краткое предложение с указанием общей стоимости",
       image_url: CO0,
     },
     {
-      title: "Форма 1",
+      title: "Коммерческое предложение форма 1",
       formula:
         "Форма 1 включает в себя разбивку цены на составляющие. В обоих формах есть возможность выбора налоговой ставки",
       image_url: CO1,
+    },
+    {
+      title: "Ведомость объемов работ",
+      formula: "Можно экспортировать данные в ведомость из форм коммерческого предложения",
+      image_url: VE1,
     },
   ];
 
@@ -134,6 +142,7 @@ export default function Dashboard() {
                           form1: false,
                           form2: false,
                           management: true,
+                          fileimport: false,
                         }));
                       }}
                       style={{ padding: "10px" }}
@@ -162,6 +171,7 @@ export default function Dashboard() {
                               form2: false,
                               calculators: calc,
                               management: false,
+                              fileimport: false,
                             }));
                           }}
                           className="dashboard-submenu-href"
@@ -187,6 +197,7 @@ export default function Dashboard() {
                           form1: false,
                           form2: false,
                           management: false,
+                          fileimport: false,
                         }));
                       }}
                       className="dashboard-submenu-href"
@@ -204,6 +215,7 @@ export default function Dashboard() {
                           form1: true,
                           form2: false,
                           management: false,
+                          fileimport: false,
                         }));
                       }}
                       className="dashboard-submenu-href"
@@ -221,11 +233,30 @@ export default function Dashboard() {
                           form1: false,
                           form2: true,
                           management: false,
+                          fileimport: false,
                         }));
                       }}
                       className="dashboard-submenu-href"
                     >
                       Ведомость объёмов работ
+                    </button>
+                    <button
+                      style={{ padding: "10px" }}
+                      onClick={() => {
+                        setExportedRows(null);
+                        setMode((prev) => ({
+                          referencebook: false,
+                          calculators: false,
+                          form: false,
+                          form1: false,
+                          form2: false,
+                          management: false,
+                          fileimport: true,
+                        }));
+                      }}
+                      className="dashboard-submenu-href"
+                    >
+                      Загрузить из файла
                     </button>
                   </div>
                 </div>
@@ -244,6 +275,7 @@ export default function Dashboard() {
                           form1: false,
                           form2: false,
                           management: false,
+                          fileimport: false,
                         }));
                       }}
                       style={{ padding: "10px" }}
@@ -271,6 +303,7 @@ export default function Dashboard() {
         )}
         {mode.referencebook && <ReferenceBook clearMode={clearMode} />}
         {mode.form1 && <SecondCommercialOfferForm setMode={setMode} setExportedRows={setExportedRows} />}
+        {mode.fileimport && <Fileimport clearMode={clearMode} />}
         {mode.calculators ? (
           <CalculatorComponent mode={mode} setMode={setMode} />
         ) : (
@@ -289,11 +322,12 @@ export default function Dashboard() {
             !mode.form1 &&
             !mode.form2 &&
             !mode.referencebook &&
+            !mode.fileimport &&
             !mode.management ? (
               <>
                 {Array.isArray(newsData) && <New item={newsData[0]} />}
                 <div className="block__slider">
-                  <Slider title="Коммерческие предложения разных форм" slides={customSlides} />
+                  <Slider title="Документы" slides={customSlides} />
                 </div>
                 {Array.isArray(newsData) && newsData[1] && <New reversed item={newsData[1]} />}
                 {feedbackModal ? (
