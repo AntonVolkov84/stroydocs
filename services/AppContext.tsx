@@ -1,9 +1,17 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, Dispatch, SetStateAction } from "react";
 import axios from "axios";
 import Confirmation from "../components/Confirmation";
 import PromptModal from "../components/PromptModal";
 import AlertModal from "../components/AlertModal";
-import { User, ConfirmModalProps, PromptModalProps, AlertModalProps } from "../type";
+import {
+  User,
+  ConfirmModalProps,
+  PromptModalProps,
+  AlertModalProps,
+  Mode,
+  RowData,
+  RowsBillOfQuantities,
+} from "../type";
 
 type ConfirmOptions = Omit<ConfirmModalProps, "open" | "onConfirm" | "onCancel">;
 type PromptOptions = Omit<PromptModalProps, "open" | "onConfirm" | "onCancel">;
@@ -16,6 +24,10 @@ interface AppContextType {
   prompt: (options: PromptOptions) => Promise<string | null>;
   loading: boolean;
   alert: (options: AlertOptions) => Promise<void>;
+  setMode: React.Dispatch<React.SetStateAction<Mode>>;
+  mode: Mode;
+  exportedRows: RowData[] | RowsBillOfQuantities[] | null;
+  setExportedRows: React.Dispatch<React.SetStateAction<RowData[] | RowsBillOfQuantities[] | null>>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -34,6 +46,16 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [promptResolver, setPromptResolver] = useState<(value: string | null) => void>(() => () => {});
   const [alertOptions, setAlertOptions] = useState<AlertOptions | null>(null);
   const [alertResolver, setAlertResolver] = useState<() => void>(() => () => {});
+  const [exportedRows, setExportedRows] = useState<RowData[] | RowsBillOfQuantities[] | null>(null);
+  const [mode, setMode] = useState<Mode>({
+    calculators: false,
+    form: false,
+    form1: false,
+    form2: false,
+    referencebook: false,
+    management: false,
+    fileimport: false,
+  });
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -89,7 +111,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AppContext.Provider value={{ user, setUser, confirm, prompt, alert, loading }}>
+    <AppContext.Provider
+      value={{ user, setUser, confirm, prompt, alert, loading, setMode, mode, exportedRows, setExportedRows }}
+    >
       {children}
       {confirmOptions && <Confirmation open {...confirmOptions} onConfirm={handleConfirm} onCancel={handleCancel} />}
       {alertOptions && <AlertModal open {...alertOptions} onConfirm={handleAlertConfirm} />}
