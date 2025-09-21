@@ -4,6 +4,7 @@ import "./Calculator.css";
 import Button from "./Button";
 import { Mode, Payload } from "../type";
 import { saveCalculatorResults } from "../services/calculatorService";
+import ImageToggle from "./ImageToggle";
 interface CalculatorProps {
   mode: Mode;
   setMode: Dispatch<SetStateAction<Mode>>;
@@ -79,17 +80,17 @@ function Calculator({ mode, setMode }: CalculatorProps) {
           <h2 className="calculator-title">{mode.calculators.title}</h2>
           {mode.calculators.image_url && (
             <div style={{ marginBottom: "20px" }}>
-              <img
+              <ImageToggle
                 src={mode.calculators.image_url}
                 alt="Иллюстрация к калькулятору"
-                style={{
-                  maxWidth: "100%",
-                  height: "auto",
-                  borderRadius: "8px",
-                  boxShadow: "0 0 8px rgba(0,0,0,0.1)",
-                  display: "block",
-                  margin: "0 auto",
-                }}
+                // style={{
+                //   maxWidth: "100%",
+                //   height: "auto",
+                //   borderRadius: "8px",
+                //   boxShadow: "0 0 8px rgba(0,0,0,0.1)",
+                //   display: "block",
+                //   margin: "0 auto",
+                // }}
               />
             </div>
           )}

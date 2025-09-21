@@ -6,6 +6,7 @@ import Feedback from "./Feedback";
 import BannerFeedback from "./BannerFeedback";
 import { Mode } from "../type";
 import Button from "./Button";
+import ImageToggle from "./ImageToggle";
 
 interface ManagementProps {
   setMode: Dispatch<SetStateAction<Mode>>;
@@ -23,8 +24,10 @@ function Management({ setMode }: ManagementProps) {
           ← Назад
         </Button>
         <div className="management__card">
-          <div className="management__image-wrapper">
-            <img src={Owner} alt="Создатель" className="management__image" />
+          <div className="management__card-blockimage">
+            <div className="management__image-wrapper">
+              <ImageToggle src={Owner} alt="Создатель" />
+            </div>
           </div>
           <div className="management__info">
             <h2 className="management__title">Евгений Александров</h2>
@@ -37,8 +40,10 @@ function Management({ setMode }: ManagementProps) {
           </div>
         </div>
         <div className="management__card">
-          <div className="management__image-wrapper">
-            <img src={Programmer} alt="Создатель" className="management__image" />
+          <div className="management__card-blockimage">
+            <div className="management__image-wrapper">
+              <ImageToggle src={Programmer} alt="Создатель" />
+            </div>
           </div>
           <div className="management__info">
             <h2 className="management__title"> Антон Волков</h2>

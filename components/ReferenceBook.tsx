@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import * as referenceBookService from "../services/referenceBookService";
 import { RefData } from "../type";
 import Button from "./Button";
+import ImageToggle from "./ImageToggle";
 
 interface ReferenceBookProps {
   clearMode: () => void;
@@ -56,12 +57,7 @@ function ReferenceBook({ clearMode }: ReferenceBookProps) {
           {mode.textImages?.length > 0 && (
             <div className="reference-book__info-images">
               {mode.textImages.map((img, index) => (
-                <img
-                  key={index}
-                  src={typeof img === "string" ? img : img.url}
-                  alt={`image-${index}`}
-                  className="reference-book__info-image"
-                />
+                <ImageToggle key={index} src={typeof img === "string" ? img : img.url} alt={`image-${index}`} />
               ))}
             </div>
           )}
@@ -73,12 +69,7 @@ function ReferenceBook({ clearMode }: ReferenceBookProps) {
           {mode.tableImages?.length > 0 && (
             <div className="reference-book__info-tables">
               {mode.tableImages.map((img, index) => (
-                <img
-                  key={index}
-                  src={typeof img === "string" ? img : img.url}
-                  alt={`table-${index}`}
-                  className="reference-book__info-table"
-                />
+                <ImageToggle key={index} src={typeof img === "string" ? img : img.url} alt={`table-${index}`} />
               ))}
             </div>
           )}

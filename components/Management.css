@@ -21,7 +21,10 @@
 .management__image-wrapper {
   flex-shrink: 0;
 }
-
+.management__card-blockimage {
+  width: 180px;
+  height: 180px;
+}
 .management__image {
   width: 180px;
   height: 180px;
