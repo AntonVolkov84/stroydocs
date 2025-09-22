@@ -1,5 +1,6 @@
 import "./New.css";
 import React from "react";
+import ImageToggle from "./ImageToggle";
 
 interface NewsData {
   author_email: string;
@@ -35,7 +36,9 @@ function New({ item, reversed }: NewProps) {
       <h2 className="news-title">{item.title}</h2>
       <div className="news-body">
         {item.imageurl && (
-          <img src={item.imageurl} alt="news" className={`news-image ${reversed ? "float-right" : "float-left"}`} />
+          <div className={`news-image ${reversed ? "float-right" : "float-left"}`}>
+            <ImageToggle src={item.imageurl} alt="news" />
+          </div>
         )}
         <p className="news-text">{item.text}</p>
       </div>
