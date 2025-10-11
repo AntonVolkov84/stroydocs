@@ -8,7 +8,7 @@ import facebook from "../src/icons/facebook.svg";
 import { getAllNews } from "../services/newsServise";
 import * as calculatorService from "../services/calculatorService";
 import CalculatorComponent from "../components/Calculator";
-import { CalculatorInterface, Mode, RowData, RowsBillOfQuantities } from "../type";
+import { CalculatorInterface } from "../type";
 import CommercialOfferForm from "../components/CommercialOfferForm";
 import Confirmation from "../components/Confirmation";
 import Slider from "../components/Slider";
@@ -300,7 +300,16 @@ export default function Dashboard() {
       </header>
       <main>
         {mode.management && <Management setMode={setMode} />}
-        {mode.form2 && <BillOfQuantities clearMode={clearMode} initialRows={exportedRows} />}
+        {mode.form2 && (
+          <BillOfQuantities
+            clearMode={clearMode}
+            setMode={setMode}
+            initialRows={exportedRows}
+            showBackButton={!exportData}
+            initialTitle={exportData?.title}
+            initialOfferId={exportData?.offerId}
+          />
+        )}
         {mode.form && (
           <CommercialOfferForm
             clearMode={clearMode}
@@ -314,7 +323,18 @@ export default function Dashboard() {
           />
         )}
         {mode.referencebook && <ReferenceBook clearMode={clearMode} />}
-        {mode.form1 && <SecondCommercialOfferForm setMode={setMode} setExportedRows={setExportedRows} />}
+        {mode.form1 && (
+          <SecondCommercialOfferForm
+            setMode={setMode}
+            clearMode={clearMode}
+            setExportedRows={setExportedRows}
+            initialRows={exportedRows}
+            initialTaxRate={exportData?.taxRate}
+            showBackButton={!exportData}
+            initialTitle={exportData?.title}
+            initialOfferId={exportData?.offerId}
+          />
+        )}
         {mode.fileimport && <Fileimport clearMode={clearMode} />}
         {mode.calculators ? (
           <CalculatorComponent mode={mode} setMode={setMode} />

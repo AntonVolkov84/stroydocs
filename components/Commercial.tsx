@@ -2,7 +2,7 @@ import "./Commercial.css";
 import { useState, useEffect } from "react";
 import * as commercialOfferService from "../services/commercialOfferService";
 import { useAppContext } from "../services/AppContext";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   SavedOfferData,
   SavedOfferDataSecondForm,
@@ -12,16 +12,10 @@ import {
   SavedBillOfQuantitiesData,
 } from "../type";
 import Button from "../components/Button";
-import CommercialOfferForm from "../components/CommercialOfferForm";
-import SecondCommercialOfferForm from "./SecondCommercialOfferForm";
-import BillOfQuantitiesForm from "./BillOfQuantities";
 import * as userService from "../services/userService";
 
 function Commercial() {
-  const { user, confirm, prompt, alert, setMode, exportedRows, setExportedRows, setExportData } = useAppContext();
-  const [selectedOffer, setSelectedOffer] = useState<SavedOfferData | null>(null);
-  const [selectedOfferSecondForm, setSelectedOfferSecondForm] = useState<SavedOfferDataSecondForm | null>(null);
-  const [selectedBillOfQuantities, setSelectedBillOfQuantities] = useState<SavedBillOfQuantitiesData | null>(null);
+  const { user, confirm, prompt, alert, setMode, setExportedRows, setExportData } = useAppContext();
   const [sendingOfferForm, setSendingOfferForm] = useState<boolean>(false);
   const [savedOfferData, setSavedOfferData] = useState<SavedOfferData[] | null>(null);
   const [savedOfferDataSecondForm, setSavedOfferDataSecondForm] = useState<SavedOfferDataSecondForm[] | null>(null);
@@ -284,8 +278,6 @@ function Commercial() {
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
-                        setSelectedOfferSecondForm(null);
-                        setSelectedBillOfQuantities(null);
                         setExportData({
                           offerId: offer.id,
                           title: offer.title,
@@ -294,7 +286,6 @@ function Commercial() {
                           rows: offer.rows,
                         });
                         navigate("/dashboard");
-                        // setSelectedOffer((prev) => (prev?.id === offer.id ? null : offer));
                         setMode({
                           calculators: false,
                           form: true,
@@ -307,7 +298,7 @@ function Commercial() {
                         setExportedRows(offer.rows);
                       }}
                     >
-                      {selectedOffer?.id === offer.id ? "Скрыть" : "Просмотреть"}
+                      Просмотреть
                     </Button>
                     <Button
                       disabled={sendingOfferForm}
@@ -325,20 +316,6 @@ function Commercial() {
               ))}
             </tbody>
           </table>
-          {selectedOffer && (
-            <div className="commercial-form0">
-              <CommercialOfferForm
-                key={selectedOffer?.id}
-                showBackButton={!selectedOffer}
-                initialRows={selectedOffer.rows}
-                initialTaxRate={selectedOffer.taxrate}
-                initialTitle={selectedOffer.title}
-                initialOfferId={selectedOffer.id}
-                onUpdateSuccess={getSavedOfferData}
-                setSelectedOffer={setSelectedOffer}
-              />
-            </div>
-          )}
         </>
       )}
       {!savedOfferData || (savedOfferData.length === 0 && <p>Нет сохранённых предложений формы 0.</p>)}
@@ -361,12 +338,27 @@ function Commercial() {
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
-                        setSelectedOffer(null);
-                        setSelectedBillOfQuantities(null);
-                        setSelectedOfferSecondForm((prev) => (prev?.id === offer.id ? null : offer));
+                        setExportData({
+                          offerId: offer.id,
+                          title: offer.title,
+                          taxRate: offer.taxrate,
+                          userId: offer.userid,
+                          rows: offer.rows,
+                        });
+                        navigate("/dashboard");
+                        setMode({
+                          calculators: false,
+                          form: false,
+                          form1: true,
+                          form2: false,
+                          referencebook: false,
+                          management: false,
+                          fileimport: false,
+                        });
+                        setExportedRows(offer.rows);
                       }}
                     >
-                      {selectedOfferSecondForm?.id === offer.id ? "Скрыть" : "Просмотреть"}
+                      Просмотреть
                     </Button>
                     <Button
                       disabled={sendingOfferForm}
@@ -384,20 +376,6 @@ function Commercial() {
               ))}
             </tbody>
           </table>
-          {selectedOfferSecondForm && (
-            <div className="commercial-form1">
-              <SecondCommercialOfferForm
-                key={selectedOfferSecondForm?.id}
-                showBackButton={!setSelectedOfferSecondForm}
-                initialRows={selectedOfferSecondForm.rows}
-                initialTaxRate={selectedOfferSecondForm.taxrate}
-                initialTitle={selectedOfferSecondForm.title}
-                initialOfferId={selectedOfferSecondForm.id}
-                onUpdateSuccess={getSavedOfferSecondFormData}
-                setSelectedOffer={setSelectedOfferSecondForm}
-              />
-            </div>
-          )}
         </>
       )}
       {!savedOfferDataSecondForm ||
@@ -421,12 +399,26 @@ function Commercial() {
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
-                        setSelectedOffer(null);
-                        setSelectedOfferSecondForm(null);
-                        setSelectedBillOfQuantities((prev) => (prev?.id === bill.id ? null : bill));
+                        setExportData({
+                          offerId: bill.id,
+                          title: bill.title,
+                          userId: bill.userid,
+                          rows: bill.rows,
+                        });
+                        navigate("/dashboard");
+                        setMode({
+                          calculators: false,
+                          form: false,
+                          form1: false,
+                          form2: true,
+                          referencebook: false,
+                          management: false,
+                          fileimport: false,
+                        });
+                        setExportedRows(bill.rows);
                       }}
                     >
-                      {selectedBillOfQuantities?.id === bill.id ? "Скрыть" : "Просмотреть"}
+                      Просмотреть
                     </Button>
                     <Button
                       disabled={sendingOfferForm}
@@ -444,19 +436,6 @@ function Commercial() {
               ))}
             </tbody>
           </table>
-          {selectedBillOfQuantities && (
-            <div className="commercial-form1">
-              <BillOfQuantitiesForm
-                key={selectedBillOfQuantities?.id}
-                showBackButton={!selectedBillOfQuantities}
-                initialRows={selectedBillOfQuantities.rows}
-                initialTitle={selectedBillOfQuantities.title}
-                initialOfferId={selectedBillOfQuantities.id}
-                onUpdateSuccess={getSavedBillOfQuantitisData}
-                setSelectedBill={setSelectedBillOfQuantities}
-              />
-            </div>
-          )}
         </div>
       )}
       {!savedBillOfQuantitiesData ||

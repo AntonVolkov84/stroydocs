@@ -14,6 +14,7 @@ import {
   PayloadUpdateCommercialOffer,
   PayloadUpdateCommercialOfferSecondForm,
   SavedBillOfQuantitiesData,
+  RowCommercialOfferSecondForm,
 } from "../type";
 
 type ConfirmOptions = Omit<ConfirmModalProps, "open" | "onConfirm" | "onCancel">;
@@ -55,7 +56,9 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [promptResolver, setPromptResolver] = useState<(value: string | null) => void>(() => () => {});
   const [alertOptions, setAlertOptions] = useState<AlertOptions | null>(null);
   const [alertResolver, setAlertResolver] = useState<() => void>(() => () => {});
-  const [exportedRows, setExportedRows] = useState<RowData[] | RowsBillOfQuantities[] | null>(null);
+  const [exportedRows, setExportedRows] = useState<
+    RowData[] | RowsBillOfQuantities[] | RowCommercialOfferSecondForm[] | null
+  >(null);
   const [exportData, setExportData] = useState<
     PayloadUpdateCommercialOffer | PayloadUpdateCommercialOfferSecondForm | SavedBillOfQuantitiesData | null
   >(null);

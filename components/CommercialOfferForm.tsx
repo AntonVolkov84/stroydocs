@@ -317,7 +317,15 @@ const CommercialOfferForm = ({
       setExportedRows(convertedRows);
     }
     if (setMode) {
-      setMode({ form: false, form1: false, calculators: false, management: false, form2: true, referencebook: false });
+      setMode({
+        form: false,
+        form1: false,
+        calculators: false,
+        management: false,
+        form2: true,
+        referencebook: false,
+        fileimport: false,
+      });
     }
   };
   return (

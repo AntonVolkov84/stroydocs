@@ -119,29 +119,25 @@ const BillOfQuantitiesForm = ({
     });
   };
   const updateBillOfQuantities = async () => {
-    let finalTitle: string = title;
-    if (!finalTitle) {
-      const userInput = await prompt({
-        title: "Придумайте название сохраняемой ведомости",
-        message: "",
-        placeholder: "Название",
-      });
-      if (!userInput) return;
-      finalTitle = userInput;
+    const promptResult = await prompt({
+      title: "Измените название",
+      message: "",
+      placeholder: initialTitle,
+      confirmText: "Изменить",
+    });
+
+    if (promptResult) {
+      if (!initialOfferId || !user) return;
+      const payload = {
+        billId: initialOfferId,
+        userId: user.id,
+        title: promptResult,
+        rows,
+      };
+      const res = await commercialOfferService.updateSavedBillOfQuantities(payload);
+      if (onUpdateSuccess) onUpdateSuccess();
+      if (setSelectedBill) setSelectedBill(null);
     }
-    if (!user || !finalTitle) {
-      return;
-    }
-    if (initialOfferId) return;
-    const payload = {
-      billId: initialOfferId,
-      userId: user.id,
-      title: finalTitle,
-      rows,
-    };
-    await commercialOfferService.updateSavedBillOfQuantities(payload);
-    if (onUpdateSuccess) onUpdateSuccess();
-    if (setSelectedBill) setSelectedBill(null);
   };
   const exportToExcel = async () => {
     if (!rows || rows.length === 0) return;
@@ -215,16 +211,16 @@ const BillOfQuantitiesForm = ({
             Для возможности сохранения рассчетов нужно авторизироваться!
           </h3>
         )}
-        {showBackButton && (
-          <Button
-            styled={{ marginBottom: 20 }}
-            onClick={() => {
-              if (clearMode) clearMode();
-            }}
-          >
-            ← Назад
-          </Button>
-        )}
+
+        <Button
+          styled={{ marginBottom: 20 }}
+          onClick={() => {
+            if (clearMode) clearMode();
+          }}
+        >
+          ← Назад
+        </Button>
+
         {user ? (
           <>
             {showBackButton ? (

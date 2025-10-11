@@ -370,19 +370,18 @@ export default function SecondCommercialOfferForm({
       )}
       {user ? (
         <div className="commercial__controlUnit">
-          {showBackButton && (
-            <Button
-              onClick={() => {
-                if (setMode) {
-                  setMode((prev) => ({ ...prev, form1: false }));
-                } else if (clearMode) clearMode();
-              }}
-            >
-              ← Назад
-            </Button>
-          )}
-          {showBackButton && <Button onClick={() => exportInForm0()}>🔀 Экспорт в форму 0</Button>}
-          {showBackButton && <Button onClick={() => exportInBillOfQuantities()}>🔀 Экспорт в ведомость</Button>}
+          <Button
+            onClick={() => {
+              if (setMode) {
+                setMode((prev) => ({ ...prev, form1: false }));
+              } else if (clearMode) clearMode();
+            }}
+          >
+            ← Назад
+          </Button>
+
+          {<Button onClick={() => exportInForm0()}>🔀 Экспорт в форму 0</Button>}
+          {<Button onClick={() => exportInBillOfQuantities()}>🔀 Экспорт в ведомость</Button>}
           {showBackButton ? (
             <Button onClick={handleSave}>💾 Сохранить</Button>
           ) : (
