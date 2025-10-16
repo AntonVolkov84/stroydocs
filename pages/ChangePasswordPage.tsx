@@ -24,7 +24,7 @@ export default function ChangePasswordPage({ user }: ChangePasswordPageProps) {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  console.log(token);
+
   const {
     register,
     handleSubmit,
@@ -38,7 +38,6 @@ export default function ChangePasswordPage({ user }: ChangePasswordPageProps) {
         setErrorMessage("Недействительная ссылка или требуется авторизация.");
         return;
       }
-
       const payload = token ? { token, password: data.password } : { password: data.password };
       if (!payload) {
         setErrorMessage("Недействительная ссылка или требуется авторизация.");
