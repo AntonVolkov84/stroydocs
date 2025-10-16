@@ -59,6 +59,9 @@ export default function LoginPage() {
           type="email"
           placeholder="Введите эмаил пользователя"
           {...register("email", {
+            onChange: (e) => {
+              e.target.value = e.target.value.toLowerCase();
+            },
             required: "email обязателен",
           })}
         />

@@ -61,7 +61,7 @@ export default function RegistrationPage() {
       const token = await window.grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: "register" });
       const success = await authServices.register({
         username: data.username,
-        email: data.email,
+        email: data.email.toLowerCase(),
         password: data.password,
         recaptchaToken: token,
         name: data.name,
@@ -145,6 +145,9 @@ export default function RegistrationPage() {
           placeholder="Введите email"
           {...register("email", {
             required: "Email обязателен",
+            onChange: (e) => {
+              e.target.value = e.target.value.toLowerCase();
+            },
             pattern: {
               value: /^\S+@\S+$/i,
               message: "Неверный формат email",
