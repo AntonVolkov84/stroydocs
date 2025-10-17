@@ -7,6 +7,7 @@ export default defineConfig({
     port: 3000,
     open: true,
   },
+  assetsInclude: ["**/*.apk"],
   test: {
     globals: true,
     environment: "jsdom",

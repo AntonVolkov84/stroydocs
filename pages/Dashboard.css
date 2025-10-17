@@ -19,7 +19,24 @@
 .dashboard-top-nav {
   display: flex;
   gap: 15px;
-  justify-self: flex-end;
+  justify-content: space-between;
+}
+.dashboard-top-left,
+.dashboard-top-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.dashboard-top-downloadapk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  height: 24px;
+  border-radius: 4px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
 }
 .dashboard-top-link {
   color: #fff;

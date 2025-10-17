@@ -5,6 +5,7 @@
 /node_modules
 /.pnp
 .pnp.js
+*.apk
 
 # testing
 /coverage

@@ -24,6 +24,7 @@ import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 import BillOfQuantities from "../components/BillOfQuantities";
 import Fileimport from "../components/Fileimport";
 import { useAppContext } from "../services/AppContext";
+import ApkFile from "../src/appstroydoks.apk";
 interface NewsData {
   author_email: string;
   created_at: string;
@@ -106,19 +107,26 @@ export default function Dashboard() {
         <div className="dashboard-top-bar">
           <div className="dashboard-container-top">
             <div className="dashboard-top-nav">
-              <Link to="/personalpage" className="dashboard-top-link">
-                Личный кабинет
-              </Link>
-              <div className="social-icons">
-                <a href="https://youtube.com" className="social-icons-item" target="_blank">
-                  <img className="inverted-icon" src={youtube} alt="YouTube" />
+              <div className="dashboard-top-left">
+                <a href={ApkFile} className="dashboard-top-downloadapk" download>
+                  📱 Скачать Stroydoks.apk
                 </a>
-                <a href="https://facebook.com" className="social-icons-item" target="_blank">
-                  <img className="inverted-icon" src={facebook} alt="Facebook" />
-                </a>
-                <a href="https://telegram.org" className="social-icons-item" target="_blank">
-                  <img className="inverted-icon" src={telegram} alt="Telegram" />
-                </a>
+              </div>
+              <div className="dashboard-top-right">
+                <Link to="/personalpage" className="dashboard-top-link">
+                  Личный кабинет
+                </Link>
+                <div className="social-icons">
+                  <a href="https://youtube.com" className="social-icons-item" target="_blank">
+                    <img className="inverted-icon" src={youtube} alt="YouTube" />
+                  </a>
+                  <a href="https://facebook.com" className="social-icons-item" target="_blank">
+                    <img className="inverted-icon" src={facebook} alt="Facebook" />
+                  </a>
+                  <a href="https://telegram.org" className="social-icons-item" target="_blank">
+                    <img className="inverted-icon" src={telegram} alt="Telegram" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
