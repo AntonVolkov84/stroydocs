@@ -1,11 +1,13 @@
-import React, { useState, Dispatch, SetStateAction, useRef } from "react";
+import React, { useState, Dispatch, SetStateAction, useRef, useEffect } from "react";
 import "./SecondCommercialOfferForm.css";
-import { Mode, SavedOfferDataSecondForm, RowsBillOfQuantities } from "../type";
+import { Mode, SavedOfferDataSecondForm, CalculatorInterface } from "../type";
 import Button from "./Button";
-import { useAppContext } from "../services/AppContext";
+import { useAppContext, ExportedRowsType } from "../services/AppContext";
 import * as commercialOfferService from "../services/commercialOfferService";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
+import * as calculatorService from "../services/calculatorService";
+import Calculator from "./Calculator";
 
 const defaultRow = {
   name: "",
@@ -15,7 +17,9 @@ const defaultRow = {
   material: "0",
   machine: "0",
 };
-type RowData = {
+
+// Переименованный локальный тип для предотвращения конфликта импорта RowData
+type SecondFormRowData = {
   name: string;
   unit: string;
   quantity: string;
@@ -26,17 +30,33 @@ type RowData = {
 
 interface SecondCommercialOfferFormProps {
   setMode?: React.Dispatch<React.SetStateAction<Mode>>;
-  initialRows?: RowData[];
+  initialRows?: ExportedRowsType | null;
   initialTaxRate?: string | number;
   initialTitle?: string;
   key?: string | number;
   showBackButton?: boolean;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
-  setExportedRows?: Dispatch<SetStateAction<RowData[] | RowsBillOfQuantities[] | null>>;
+  setExportedRows?: Dispatch<SetStateAction<ExportedRowsType>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferDataSecondForm | null>>;
   clearMode?: () => void;
 }
+
+// Функция нормализации входящего массива данных
+const normalizeRows = (incomingRows?: any[] | null): SecondFormRowData[] => {
+  if (!incomingRows || incomingRows.length === 0) {
+    return [{ ...defaultRow }];
+  }
+
+  return incomingRows.map((row) => ({
+    name: row.name || "",
+    unit: row.unit || "",
+    quantity: row.quantity !== undefined && row.quantity !== null ? String(row.quantity) : "0",
+    salary: row.salary !== undefined && row.salary !== null ? String(row.salary) : "0",
+    material: row.material !== undefined && row.material !== null ? String(row.material) : "0",
+    machine: row.machine !== undefined && row.machine !== null ? String(row.machine) : "0",
+  }));
+};
 
 export default function SecondCommercialOfferForm({
   setMode,
@@ -51,20 +71,53 @@ export default function SecondCommercialOfferForm({
   setSelectedOffer,
   clearMode,
 }: SecondCommercialOfferFormProps) {
-  const [rows, setRows] = useState<RowData[]>(initialRows || [{ ...defaultRow }]);
+  const [rows, setRows] = useState<SecondFormRowData[]>(() => normalizeRows(initialRows));
+
+  useEffect(() => {
+    if (initialRows && initialRows.length > 0) {
+      setRows(normalizeRows(initialRows));
+    }
+  }, [initialRows]);
+
   const [taxPercent, setTaxPercent] = useState<string | number>(initialTaxRate || "20");
   const { user, prompt, alert } = useAppContext();
   const inputRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
 
-  const handleChange = (index: number, field: keyof RowData, value: string) => {
+  const [calculators, setCalculators] = useState<CalculatorInterface[]>([]);
+  const [isCalcModalOpen, setIsCalcModalOpen] = useState(false);
+  const [activeRowForCalc, setActiveRowForCalc] = useState<number | null>(null);
+  const [activeCalculator, setActiveCalculator] = useState<any | null>(null);
+
+  const handleChange = (index: number, field: keyof SecondFormRowData, value: string) => {
     const newRows = [...rows];
     newRows[index][field] = value;
     setRows(newRows);
   };
 
+  useEffect(() => {
+    const fetchCalculators = async () => {
+      try {
+        const data = await calculatorService.getAllCalculators();
+        setCalculators(data || []);
+      } catch (err) {
+        console.error("Ошибка при получении калькуляторов", err);
+      }
+    };
+    fetchCalculators();
+  }, []);
+
+  const handleApplyCalcResult = (value: number) => {
+    if (activeRowForCalc !== null) {
+      handleChange(activeRowForCalc, "quantity", value.toString());
+    }
+    setIsCalcModalOpen(false);
+    setActiveCalculator(null);
+    setActiveRowForCalc(null);
+  };
+
   const handleAddRow = (index: number | null) => {
-    const newRow: RowData = { name: "", unit: "", quantity: "0", salary: "0", material: "0", machine: "0" };
+    const newRow: SecondFormRowData = { name: "", unit: "", quantity: "0", salary: "0", material: "0", machine: "0" };
     setRows((prev) => {
       let newRows;
       if (index === undefined || index === null || index < 0 || index >= prev.length) {
@@ -114,39 +167,41 @@ export default function SecondCommercialOfferForm({
     }
   };
 
-  const computeUnitPrice = (row: RowData) => {
+  const parseNumber = (value: string | number) => {
+    if (value === undefined || value === null) return 0;
+    return parseFloat(value.toString().replace(",", "."));
+  };
+
+  const computeUnitPrice = (row: SecondFormRowData) => {
     const s = parseNumber(row.salary) || 0;
     const m = parseNumber(row.material) || 0;
     const mach = parseNumber(row.machine) || 0;
     return s + m + mach;
   };
 
-  const computeTotal = (row: RowData) => {
+  const computeTotal = (row: SecondFormRowData) => {
     const q = parseNumber(row.quantity) || 0;
     const unit = computeUnitPrice(row);
     return q * unit;
   };
-  const computeTotalSum = (row: RowData) => {
+
+  const computeTotalSum = (row: SecondFormRowData) => {
     const salary = parseNumber(row.salary) || 0;
     const material = parseNumber(row.material) || 0;
     const machine = parseNumber(row.machine) || 0;
     const quantity = parseNumber(row.quantity) || 0;
     return quantity * (salary + material + machine);
   };
-  const parseNumber = (value: string | number) => {
-    if (value === undefined || value === null) return 0;
-    return parseFloat(value.toString().replace(",", "."));
-  };
 
   const totalSalaryCost = rows.reduce((acc, row) => acc + parseNumber(row.salary) * parseNumber(row.quantity), 0);
   const totalMaterialCost = rows.reduce((acc, row) => acc + parseNumber(row.material) * parseNumber(row.quantity), 0);
-
   const totalMachineCost = rows.reduce((acc, row) => acc + parseNumber(row.machine) * parseNumber(row.quantity), 0);
 
   const totalCost = totalSalaryCost + totalMaterialCost + totalMachineCost;
   const taxValue = parseFloat(typeof taxPercent === "number" ? taxPercent.toString() : taxPercent) || 0;
   const taxAmount = totalCost * (taxValue / 100);
   const totalByTable = totalCost + taxAmount;
+
   const handleUpdate = async () => {
     const promptResult = await prompt({
       title: "Измените название",
@@ -168,6 +223,7 @@ export default function SecondCommercialOfferForm({
       if (setSelectedOffer) setSelectedOffer(null);
     }
   };
+
   const exportToExcel = async () => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Коммерческое предложение");
@@ -282,18 +338,15 @@ export default function SecondCommercialOfferForm({
           right: { style: "thin" },
         };
 
-        if (colNumber === 9) {
-          cell.alignment = { horizontal: "right" };
-        }
-        if (colNumber > 9) {
+        if (colNumber === 9 || colNumber > 9) {
           cell.alignment = { horizontal: "right" };
         }
       });
     });
     worksheet.addRow([]);
-    const customerRow = worksheet.addRow(["", "Заказчик", "", "___________________ /_____________________/"]);
+    worksheet.addRow(["", "Заказчик", "", "___________________ /_____________________/"]);
     worksheet.addRow([]);
-    const contractorRow = worksheet.addRow(["", "Подрядчик", "", "___________________ /_____________________/"]);
+    worksheet.addRow(["", "Подрядчик", "", "___________________ /_____________________/"]);
     worksheet.columns = [
       { width: 6 },
       { width: 40 },
@@ -311,11 +364,11 @@ export default function SecondCommercialOfferForm({
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), "Коммерческое_предложение форма1.xlsx");
   };
+
   const exportInForm0 = async () => {
     const convertedRows = rows.map((row) => {
-      const total = parseFloat(row.salary || "0") + parseFloat(row.material || "0") + parseFloat(row.machine || "0");
-      const quantity = parseFloat(row.quantity || "0") || 1;
-      const price = total / quantity;
+      const price = computeUnitPrice(row);
+      const quantity = parseFloat(row.quantity || "0");
       return {
         name: row.name,
         unit: row.unit,
@@ -323,9 +376,14 @@ export default function SecondCommercialOfferForm({
         price,
       };
     });
+
     if (setExportedRows) {
-      setExportedRows(convertedRows);
+      setExportedRows({
+        rows: convertedRows,
+        taxRate: taxPercent,
+      } as any);
     }
+
     if (setMode) {
       setMode({
         form: true,
@@ -338,6 +396,7 @@ export default function SecondCommercialOfferForm({
       });
     }
   };
+
   const exportInBillOfQuantities = async () => {
     const convertedRows = rows.map((row) => {
       return {
@@ -347,7 +406,10 @@ export default function SecondCommercialOfferForm({
       };
     });
     if (setExportedRows) {
-      setExportedRows(convertedRows);
+      setExportedRows({
+        rows: convertedRows,
+        taxRate: taxPercent,
+      } as any);
     }
     if (setMode) {
       setMode({
@@ -361,6 +423,7 @@ export default function SecondCommercialOfferForm({
       });
     }
   };
+
   return (
     <div className="secondcommercial-wrapper commercial-wrapper">
       {!user && (
@@ -380,8 +443,8 @@ export default function SecondCommercialOfferForm({
             ← Назад
           </Button>
 
-          {<Button onClick={() => exportInForm0()}>🔀 Экспорт в форму 0</Button>}
-          {<Button onClick={() => exportInBillOfQuantities()}>🔀 Экспорт в ведомость</Button>}
+          <Button onClick={() => exportInForm0()}>🔀 Экспорт в форму 0</Button>
+          <Button onClick={() => exportInBillOfQuantities()}>🔀 Экспорт в ведомость</Button>
           {showBackButton ? (
             <Button onClick={handleSave}>💾 Сохранить</Button>
           ) : (
@@ -412,8 +475,8 @@ export default function SecondCommercialOfferForm({
         <colgroup>
           <col style={{ width: "3%" }} />
           <col style={{ width: "25%" }} />
-          <col style={{ width: "7%" }} />
-          <col style={{ width: "7%" }} />
+          <col style={{ width: "5%" }} />
+          <col style={{ width: "9%" }} />
           <col style={{ width: "9%" }} />
           <col style={{ width: "7%" }} />
           <col style={{ width: "7%" }} />
@@ -480,7 +543,6 @@ export default function SecondCommercialOfferForm({
         <tbody>
           {rows.map((row, i) => {
             const unitPrice = computeUnitPrice(row);
-            const total = computeTotal(row);
 
             return (
               <tr key={i} onFocus={() => setSelectedRowIndex(i)}>
@@ -514,14 +576,27 @@ export default function SecondCommercialOfferForm({
                     className="cell-input smaller"
                   />
                 </td>
-                <td>
-                  <input
-                    value={row.quantity}
-                    onChange={(e) => {
-                      handleChange(i, "quantity", e.target.value);
-                    }}
-                    className="cell-input smaller"
-                  />
+                <td className="calc-quantities">
+                  <div className="calc-quantities-wrapper">
+                    <input
+                      value={row.quantity}
+                      onChange={(e) => {
+                        handleChange(i, "quantity", e.target.value);
+                      }}
+                      className="cell-input smaller"
+                    />
+                    <button
+                      type="button"
+                      className="icon-button"
+                      title="Рассчитать через калькулятор"
+                      onClick={() => {
+                        setActiveRowForCalc(i);
+                        setIsCalcModalOpen(true);
+                      }}
+                    >
+                      🧮
+                    </button>
+                  </div>
                 </td>
                 <td style={{ textAlign: "right", paddingRight: 8, fontWeight: "bold" }}>{unitPrice.toFixed(2)}</td>
                 <td className="cell-blockinput">
@@ -567,70 +642,64 @@ export default function SecondCommercialOfferForm({
               <Button onClick={() => handleAddRow(selectedRowIndex)}>➕ Добавить строку</Button>
             </td>
           </tr>
-          <>
-            <tr className="total-row">
-              <td></td>
-              <td>ИТОГ без НДС</td>
-              <td>руб.</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>{totalCost.toFixed(2)}</td>
-              <td>{totalSalaryCost.toFixed(2)}</td>
-              <td>{totalMaterialCost.toFixed(2)}</td>
-              <td>{totalMachineCost.toFixed(2)}</td>
-              <td className="hide-in-print"></td>
-              <td className="hide-in-print"></td>
-            </tr>
-          </>
-          <>
-            <tr className="tax-row">
-              <td></td>
-              <td>Налоги, %</td>
-              <td>
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.01"
-                  value={taxPercent}
-                  onChange={(e) => setTaxPercent(e.target.value)}
-                  className="cell-input smaller"
-                />
-              </td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>{taxAmount.toFixed(2)}</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td className="hide-in-print"></td>
-              <td className="hide-in-print"></td>
-            </tr>
-          </>
-          <>
-            <tr className="tax-row">
-              <td></td>
-              <td>Всего с НДС</td>
-              <td>руб.</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td>{totalByTable.toFixed(2)}</td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td className="hide-in-print"></td>
-              <td className="hide-in-print"></td>
-            </tr>
-          </>
+          <tr className="total-row">
+            <td></td>
+            <td>ИТОГ без НДС</td>
+            <td>руб.</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{totalCost.toFixed(2)}</td>
+            <td>{totalSalaryCost.toFixed(2)}</td>
+            <td>{totalMaterialCost.toFixed(2)}</td>
+            <td>{totalMachineCost.toFixed(2)}</td>
+            <td className="hide-in-print"></td>
+            <td className="hide-in-print"></td>
+          </tr>
+          <tr className="tax-row">
+            <td></td>
+            <td>Налоги, %</td>
+            <td>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                value={taxPercent}
+                onChange={(e) => setTaxPercent(e.target.value)}
+                className="cell-input smaller"
+              />
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{taxAmount.toFixed(2)}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td className="hide-in-print"></td>
+            <td className="hide-in-print"></td>
+          </tr>
+          <tr className="tax-row">
+            <td></td>
+            <td>Всего с НДС</td>
+            <td>руб.</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{totalByTable.toFixed(2)}</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td className="hide-in-print"></td>
+            <td className="hide-in-print"></td>
+          </tr>
         </tbody>
       </table>
       <div className="cell-footer">
@@ -641,6 +710,80 @@ export default function SecondCommercialOfferForm({
           Подрядчик <br /> ___________________ /________________________/
         </div>
       </div>
+      {isCalcModalOpen && (
+        <div
+          className="modal-overlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="modal-content"
+            style={{
+              background: "#fff",
+              padding: "20px",
+              borderRadius: "8px",
+              maxWidth: "600px",
+              width: "100%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "15px" }}>
+              <h3>Выберите калькулятор</h3>
+              <button
+                className="button_btn button_btn"
+                onClick={() => {
+                  setIsCalcModalOpen(false);
+                  setActiveCalculator(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {!activeCalculator ? (
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {calculators.map((calc) => (
+                  <li key={calc.id || calc.title} style={{ marginBottom: "10px" }}>
+                    <Button styled={{ width: "100%", textAlign: "left" }} onClick={() => setActiveCalculator(calc)}>
+                      {calc.title}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div>
+                <Button styled={{ marginBottom: "15px" }} onClick={() => setActiveCalculator(null)}>
+                  ← К списку калькуляторов
+                </Button>
+                <Calculator
+                  mode={{
+                    form: false,
+                    form1: false,
+                    calculators: activeCalculator,
+                    management: false,
+                    form2: false,
+                    referencebook: false,
+                    fileimport: false,
+                  }}
+                  setMode={() => {}}
+                  onApplyResult={handleApplyCalcResult}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

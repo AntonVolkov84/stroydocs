@@ -8,8 +8,9 @@ import ImageToggle from "./ImageToggle";
 interface CalculatorProps {
   mode: Mode;
   setMode: Dispatch<SetStateAction<Mode>>;
+  onApplyResult?: (value: number) => void;
 }
-function Calculator({ mode, setMode }: CalculatorProps) {
+function Calculator({ mode, setMode, onApplyResult }: CalculatorProps) {
   const [variableValues, setVariableValues] = useState<Record<string, number>>({});
   const [calcResult, setCalcResult] = useState<number | string | null>(null);
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -31,6 +32,13 @@ function Calculator({ mode, setMode }: CalculatorProps) {
       return "Ошибка вычисления";
     }
   };
+
+  const handleApplyToForm = () => {
+    if (typeof calcResult === "number" && onApplyResult) {
+      onApplyResult(calcResult);
+    }
+  };
+
   const handleSave = async () => {
     if (!user || typeof mode.calculators !== "object") return;
     if (!calcResult || !variableValues) {
@@ -135,6 +143,14 @@ function Calculator({ mode, setMode }: CalculatorProps) {
               <strong>
                 {calcResult} {mode.calculators.result_unit}
               </strong>
+              {onApplyResult && typeof calcResult === "number" && (
+                <Button
+                  onClick={handleApplyToForm}
+                  styled={{ marginTop: 10, marginLeft: 10, backgroundColor: "#28a745" }}
+                >
+                  Вставить в количество
+                </Button>
+              )}
             </div>
           )}
           {user && (

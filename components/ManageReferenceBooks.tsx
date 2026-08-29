@@ -158,7 +158,9 @@ function ManageReferenceBooks() {
     const imagesToDelete = form[field].filter((img) => !(img instanceof File));
     try {
       for (const img of imagesToDelete) {
-        if (img.publicId) await cloudinaryServise.delFromStorage(img.publicId);
+        if ("publicId" in img && img.publicId) {
+          await cloudinaryServise.delFromStorage(img.publicId);
+        }
       }
       setForm((prev) => ({
         ...prev,
@@ -258,8 +260,8 @@ function ManageReferenceBooks() {
             ? "Обновление..."
             : "Создание..."
           : refChange
-          ? "Изменить справочник"
-          : "Создать справочник"}
+            ? "Изменить справочник"
+            : "Создать справочник"}
       </Button>
 
       {showPreview && (
@@ -319,8 +321,8 @@ function ManageReferenceBooks() {
                         setForm({
                           title: item.title,
                           text: item.text,
-                          textImages: item.textImages,
-                          tableImages: item.tableImages,
+                          textImages: item.textImages as any,
+                          tableImages: item.tableImages as any,
                         });
                       }}
                       className="edit-btn"

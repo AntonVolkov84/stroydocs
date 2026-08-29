@@ -8,14 +8,14 @@ import facebook from "../src/icons/facebook.svg";
 import { getAllNews } from "../services/newsServise";
 import * as calculatorService from "../services/calculatorService";
 import CalculatorComponent from "../components/Calculator";
-import { CalculatorInterface } from "../type";
+import { CalculatorInterface, RowsBillOfQuantities } from "../type";
 import CommercialOfferForm from "../components/CommercialOfferForm";
 import Confirmation from "../components/Confirmation";
 import Slider from "../components/Slider";
 import CO0 from "../src/CO0.png";
 import CO1 from "../src/CO1.png";
 import VE1 from "../src/Vedomost.png";
-import Logo from "../src/StroydoksLogo2.png";
+import Logo from "../src/logo.jpg";
 import Feedback from "../components/Feedback";
 import BannerFeedback from "../components/BannerFeedback";
 import ReferenceBook from "../components/ReferenceBook";
@@ -24,7 +24,7 @@ import SecondCommercialOfferForm from "../components/SecondCommercialOfferForm";
 import BillOfQuantities from "../components/BillOfQuantities";
 import Fileimport from "../components/Fileimport";
 import { useAppContext } from "../services/AppContext";
-import ApkFile from "../src/appstroydoks.apk";
+import ApkFile from "../src/stroydoks.apk";
 interface NewsData {
   author_email: string;
   created_at: string;
@@ -312,7 +312,7 @@ export default function Dashboard() {
           <BillOfQuantities
             clearMode={clearMode}
             setMode={setMode}
-            initialRows={exportedRows}
+            initialRows={exportedRows as RowsBillOfQuantities[] | undefined}
             showBackButton={!exportData}
             initialTitle={exportData?.title}
             initialOfferId={exportData?.offerId}

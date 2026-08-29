@@ -11,7 +11,8 @@ import * as commercialOfferService from "../services/commercialOfferService";
 interface BillOfQuantitiesProps {
   clearMode?: () => void;
   showBackButton?: boolean;
-  initialRows?: RowsBillOfQuantities[];
+  setMode?: Dispatch<SetStateAction<any>>;
+  initialRows?: RowsBillOfQuantities[] | null;
   initialTitle?: string;
   initialOfferId?: string | number;
   onUpdateSuccess?: () => void;
@@ -32,7 +33,7 @@ const BillOfQuantitiesForm = ({
   const [rows, setRows] = useState<RowsBillOfQuantities[]>(
     initialRows && initialRows.length > 0
       ? initialRows
-      : [{ name: "", unit: "", quantity: "", drawing: "", formula: "" }]
+      : [{ name: "", unit: "", quantity: "", drawing: "", formula: "" }],
   );
   const [title, setTitle] = useState<string>(initialTitle || "");
   const inputRefs = useRef<(HTMLTextAreaElement | null)[]>([]);

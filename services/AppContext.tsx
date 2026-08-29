@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, Dispatch, SetStateAction } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import Confirmation from "../components/Confirmation";
 import PromptModal from "../components/PromptModal";
@@ -21,6 +21,16 @@ type ConfirmOptions = Omit<ConfirmModalProps, "open" | "onConfirm" | "onCancel">
 type PromptOptions = Omit<PromptModalProps, "open" | "onConfirm" | "onCancel">;
 type AlertOptions = Omit<AlertModalProps, "open" | "onConfirm">;
 
+// 1. Обобщенный тип для экспортируемых строк
+export type ExportedRowsType = RowData[] | RowsBillOfQuantities[] | RowCommercialOfferSecondForm[] | null;
+
+// 2. Обобщенный тип для экспортируемых данных
+type ExportDataType =
+  | PayloadUpdateCommercialOffer
+  | PayloadUpdateCommercialOfferSecondForm
+  | SavedBillOfQuantitiesData
+  | null;
+
 interface AppContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
@@ -30,17 +40,14 @@ interface AppContextType {
   alert: (options: AlertOptions) => Promise<void>;
   setMode: React.Dispatch<React.SetStateAction<Mode>>;
   mode: Mode;
-  exportedRows: RowData[] | RowsBillOfQuantities[] | null;
-  setExportedRows: React.Dispatch<React.SetStateAction<RowData[] | RowsBillOfQuantities[] | null>>;
-  exportData: PayloadUpdateCommercialOffer | PayloadUpdateCommercialOfferSecondForm | SavedBillOfQuantitiesData | null;
-  setExportData: React.Dispatch<
-    React.SetStateAction<
-      PayloadUpdateCommercialOffer | PayloadUpdateCommercialOfferSecondForm | SavedBillOfQuantitiesData | null
-    >
-  >;
+  exportedRows: ExportedRowsType;
+  setExportedRows: React.Dispatch<React.SetStateAction<ExportedRowsType>>;
+  exportData: ExportDataType;
+  setExportData: React.Dispatch<React.SetStateAction<ExportDataType>>;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);
+
 export const useAppContext = () => {
   const ctx = useContext(AppContext);
   if (!ctx) throw new Error("useAppContext must be used within AppProvider");
@@ -56,12 +63,11 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [promptResolver, setPromptResolver] = useState<(value: string | null) => void>(() => () => {});
   const [alertOptions, setAlertOptions] = useState<AlertOptions | null>(null);
   const [alertResolver, setAlertResolver] = useState<() => void>(() => () => {});
-  const [exportedRows, setExportedRows] = useState<
-    RowData[] | RowsBillOfQuantities[] | RowCommercialOfferSecondForm[] | null
-  >(null);
-  const [exportData, setExportData] = useState<
-    PayloadUpdateCommercialOffer | PayloadUpdateCommercialOfferSecondForm | SavedBillOfQuantitiesData | null
-  >(null);
+
+  // Синхронизированные состояния с интерфейсом
+  const [exportedRows, setExportedRows] = useState<ExportedRowsType>(null);
+  const [exportData, setExportData] = useState<ExportDataType>(null);
+
   const [mode, setMode] = useState<Mode>({
     calculators: false,
     form: false,
@@ -81,16 +87,19 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
+
   const alert = (options: AlertOptions) => {
     setAlertOptions(options);
     return new Promise<void>((resolve) => {
       setAlertResolver(() => resolve);
     });
   };
+
   const handleAlertConfirm = () => {
     setAlertOptions(null);
     alertResolver();
   };
+
   const confirm = (options: ConfirmOptions) => {
     setConfirmOptions(options);
     return new Promise<boolean>((resolve) => {

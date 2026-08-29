@@ -1,17 +1,19 @@
-import { useState, Dispatch, SetStateAction, useRef } from "react";
+import { useState, Dispatch, SetStateAction, useRef, useEffect } from "react";
 import "./CommercialOfferForm.css";
 import Button from "./Button";
 import { Mode } from "../type";
 import { Trash2, Copy } from "lucide-react";
-import { useAppContext } from "../services/AppContext";
-import { SavedOfferData, RowData } from "../type";
+import { useAppContext, ExportedRowsType } from "../services/AppContext";
+import { SavedOfferData, RowData, CalculatorInterface } from "../type";
 import * as commercialOfferService from "../services/commercialOfferService";
 import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
+import * as calculatorService from "../services/calculatorService";
+import Calculator from "./Calculator";
 
 interface CommercialOfferFormProps {
   setMode?: React.Dispatch<React.SetStateAction<Mode>>;
-  initialRows?: RowData[];
+  initialRows?: RowData[] | ExportedRowsType | null;
   initialTaxRate?: number | string;
   initialTitle?: string;
   showBackButton?: boolean;
@@ -19,9 +21,28 @@ interface CommercialOfferFormProps {
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
   clearMode?: () => void;
-  setExportedRows?: Dispatch<SetStateAction<RowData[]>>;
+  setExportedRows?: Dispatch<SetStateAction<ExportedRowsType>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferData | null>>;
 }
+
+// Функция-конвертер: приводит входящий массив любого типа к строгому формату RowData[]
+const normalizeRows = (incomingRows?: any | null): RowData[] => {
+  if (!incomingRows) {
+    return [{ name: "", unit: "", type: "работы", quantity: 0, price: 0 }];
+  }
+  const rowsArray = Array.isArray(incomingRows) ? incomingRows : incomingRows.rows;
+  if (!Array.isArray(rowsArray) || rowsArray.length === 0) {
+    return [{ name: "", unit: "", type: "работы", quantity: 0, price: 0 }];
+  }
+
+  return rowsArray.map((row) => ({
+    name: row.name || "",
+    unit: row.unit || "",
+    type: row.type || "работы",
+    quantity: Number(row.quantity) || 0,
+    price: Number(row.price || row.cost || 0),
+  }));
+};
 
 const CommercialOfferForm = ({
   setMode,
@@ -36,14 +57,48 @@ const CommercialOfferForm = ({
   setExportedRows,
   setSelectedOffer,
 }: CommercialOfferFormProps) => {
-  const [rows, setRows] = useState<RowData[]>(
-    initialRows || [{ name: "", unit: "", type: "работы", quantity: 0, price: 0 }]
-  );
+  const [rows, setRows] = useState<RowData[]>(() => normalizeRows(initialRows));
+
+  // Безопасное получение списка строк для проверок
+  const extractedRowsList = Array.isArray(initialRows) ? initialRows : initialRows?.rows;
+
+  // 2. Обновление state при задержке пропсов
+  useEffect(() => {
+    if (extractedRowsList && extractedRowsList.length > 0) {
+      setRows(normalizeRows(initialRows));
+    }
+  }, [initialRows]);
+
+  // Функция для первичного получения налога
+  const getInitialTaxRate = (): number | string => {
+    if (initialRows && !Array.isArray(initialRows) && typeof initialRows === "object" && "taxRate" in initialRows) {
+      return (initialRows as ExportedRowsType).taxRate ?? initialTaxRate ?? 20;
+    }
+    return initialTaxRate ?? 20;
+  };
+
+  const [taxRate, setTaxRate] = useState<number | string>(getInitialTaxRate);
+
+  // Синхронизация налога
+  useEffect(() => {
+    if (initialRows && typeof initialRows === "object" && !Array.isArray(initialRows) && "taxRate" in initialRows) {
+      const extractedTax = (initialRows as ExportedRowsType).taxRate;
+      if (extractedTax !== undefined && extractedTax !== null) {
+        setTaxRate(extractedTax);
+      }
+    } else if (initialTaxRate !== undefined) {
+      setTaxRate(initialTaxRate);
+    }
+  }, [initialRows, initialTaxRate]);
 
   const { user, prompt, alert } = useAppContext();
-  const [taxRate, setTaxRate] = useState(initialTaxRate || 20);
+
   const inputRefs = useRef<(HTMLTextAreaElement | null)[]>([]);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  const [calculators, setCalculators] = useState<CalculatorInterface[]>([]);
+  const [isCalcModalOpen, setIsCalcModalOpen] = useState(false);
+  const [activeRowForCalc, setActiveRowForCalc] = useState<number | null>(null);
+  const [activeCalculator, setActiveCalculator] = useState<any | null>(null);
 
   const addRow = (type: RowData["type"], index?: number) => {
     const newRow: RowData = { name: "", unit: "", type, quantity: 0, price: 0 };
@@ -74,6 +129,30 @@ const CommercialOfferForm = ({
   const sanitizeInput = (value: string) => {
     return value.replace(/<\/?[^>]+(>|$)/g, "");
   };
+
+  useEffect(() => {
+    const fetchCalculators = async () => {
+      try {
+        const data = await calculatorService.getAllCalculators();
+        setCalculators(data || []); // Если пришел null, записываем пустой массив []
+      } catch (err) {
+        console.error("Ошибка при получении калькуляторов", err);
+      }
+    };
+    fetchCalculators();
+  }, []);
+
+  // 4. Функция применения результата калькулятора к строке
+  const handleApplyCalcResult = (value: number) => {
+    if (activeRowForCalc !== null) {
+      handleChange(activeRowForCalc, "quantity", value.toString());
+    }
+    // Закрываем модальное окно и сбрасываем выбор
+    setIsCalcModalOpen(false);
+    setActiveCalculator(null);
+    setActiveRowForCalc(null);
+  };
+
   const handleChange = (index: number, field: keyof RowData, value: string) => {
     const newRows = [...rows];
     if (field === "type") {
@@ -93,7 +172,7 @@ const CommercialOfferForm = ({
       newRows[index] = { ...newRows[index], [field]: parsed };
       const { name, unit, price } = newRows[index];
       const matchingRow = newRows.find(
-        (r, i) => i !== index && r.name.trim() === name.trim() && r.unit.trim() === unit.trim() && r.price === price
+        (r, i) => i !== index && r.name.trim() === name.trim() && r.unit.trim() === unit.trim() && r.price === price,
       );
       if (matchingRow) {
         newRows[index].type = matchingRow.type;
@@ -113,7 +192,7 @@ const CommercialOfferForm = ({
   };
 
   const tax = +((summary.salary + summary.materials + summary.machines + summary.equipment) * (+taxRate / 100)).toFixed(
-    2
+    2,
   );
   const withVAT = +(total + tax).toFixed(2);
   const handleSave = async () => {
@@ -311,6 +390,8 @@ const CommercialOfferForm = ({
         name: row.name,
         unit: row.unit,
         quantity: row.quantity,
+        type: row.type,
+        price: row.price,
       };
     });
     if (setExportedRows) {
@@ -437,6 +518,17 @@ const CommercialOfferForm = ({
                   min="0"
                   onChange={(e) => handleChange(i, "quantity", e.target.value)}
                 />
+                <button
+                  type="button"
+                  className="icon-button"
+                  title="Рассчитать через калькулятор"
+                  onClick={() => {
+                    setActiveRowForCalc(i);
+                    setIsCalcModalOpen(true);
+                  }}
+                >
+                  🧮
+                </button>
               </td>
               <td>
                 <input
@@ -572,6 +664,82 @@ const CommercialOfferForm = ({
           Подрядчик <br /> ___________________ /________________________/
         </div>
       </div>
+      {isCalcModalOpen && (
+        <div
+          className="modal-overlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            className="modal-content"
+            style={{
+              background: "#fff",
+              padding: "20px",
+              borderRadius: "8px",
+              maxWidth: "600px",
+              width: "100%",
+              maxHeight: "80vh",
+              overflowY: "auto",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "15px" }}>
+              <h3>Выберите калькулятор</h3>
+              <button
+                className="button_btn button_btn"
+                onClick={() => {
+                  setIsCalcModalOpen(false);
+                  setActiveCalculator(null);
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            {!activeCalculator ? (
+              // Список калькуляторов для выбора
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {calculators.map((calc) => (
+                  <li key={calc.id || calc.title} style={{ marginBottom: "10px" }}>
+                    <Button styled={{ width: "100%", textAlign: "left" }} onClick={() => setActiveCalculator(calc)}>
+                      {calc.title}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              // Экран самого калькулятора
+              <div>
+                <Button styled={{ marginBottom: "15px" }} onClick={() => setActiveCalculator(null)}>
+                  ← К списку калькуляторов
+                </Button>
+                <Calculator
+                  mode={{
+                    form: false,
+                    form1: false,
+                    calculators: activeCalculator,
+                    management: false,
+                    form2: false,
+                    referencebook: false,
+                    fileimport: false,
+                  }}
+                  setMode={() => {}}
+                  onApplyResult={handleApplyCalcResult}
+                />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

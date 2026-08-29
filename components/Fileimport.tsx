@@ -29,11 +29,7 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
       const workbook = XLSX.read(data, { type: "array" });
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
-
-      // Получаем массив массивов, чтобы обрабатывать строки динамически
       const rows: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false });
-
-      // Находим индекс строки, где есть заголовки
       let headerRowIndex = -1;
       let headers: string[] = [];
       for (let i = 0; i < rows.length; i++) {
@@ -49,17 +45,12 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
         console.error("Не удалось найти строку с заголовками");
         return;
       }
-
-      // Данные начинаются со следующей строки после заголовков
       const dataRows = rows.slice(headerRowIndex + 1);
-
       const parsed: RowCommercialOfferSecondForm[] = dataRows.map((row: any[]) => {
         const rowObj: any = {};
         headers.forEach((header, idx) => {
           rowObj[header.trim()] = row[idx] ?? "";
         });
-
-        // Получаем значения с проверкой синонимов
         const getCell = (keys: string[]) => {
           for (const k of keys) {
             const foundKey = Object.keys(rowObj).find((rk) => rk.trim().toLowerCase() === k.toLowerCase());
@@ -69,8 +60,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
           }
           return "";
         };
-
-        // Числа с запятой оставляем как строки
         return {
           name: getCell(["Название строки", "Наименование работ"]),
           unit: getCell(["Единица измерения", "Ед. изм."]),
@@ -80,29 +69,22 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
           machine: getCell(["Эксплуатация машин", "Экспл. машин"]) || "0",
         };
       });
-
       setOnParsed(parsed);
     };
-
     reader.readAsArrayBuffer(file);
   };
 
   const importFromXML = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
-
     reader.onload = async (e) => {
       const buffer = e.target?.result as ArrayBuffer;
       if (!buffer) return;
-
-      // ----- helpers -----
       const parseNumber = (raw?: string | null): number => {
         if (!raw) return 0;
         let s = raw.toString().trim();
-        s = s.replace(/\u00A0/g, " "); // non-breaking
-        // keep only digits, dot, comma, minus
+        s = s.replace(/\u00A0/g, " ");
         s = s.replace(/[^\d.,-]/g, "");
         if (!s) return 0;
         const hasComma = s.includes(",");
@@ -111,11 +93,9 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
         if (hasComma && !hasDot) {
           normalized = normalized.replace(",", ".");
         } else if (hasComma && hasDot) {
-          // guess: if dot before comma => dot thousands, comma decimal (ru)
           if (normalized.indexOf(".") < normalized.indexOf(",")) {
             normalized = normalized.replace(/\./g, "").replace(",", ".");
           } else {
-            // else comma thousands, dot decimal
             normalized = normalized.replace(/,/g, "");
           }
         }
@@ -151,8 +131,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
         }
         return cur?.textContent?.trim() ?? "";
       };
-
-      // try several possible paths to find numeric value
       const tryNumberPaths = (node: Element, paths: string[][]) => {
         for (const p of paths) {
           const t = getNestedText(node, p);
@@ -160,14 +138,10 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
         }
         return 0;
       };
-
-      // ----- парсер XML содержимого -----
       const parseXmlContent = (content: string) => {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(content, "application/xml");
         const importedRows: RowCommercialOfferSecondForm[] = [];
-
-        // helper: нормализация единицы: "100 м2" -> {multiplier:100, unit: "м2"}
         const normalizeUnit = (rawUnit: string) => {
           if (!rawUnit) return { multiplier: 1, unit: "" };
           const trimmed = rawUnit.trim();
@@ -179,8 +153,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
           }
           return { multiplier: 1, unit: trimmed };
         };
-
-        // --- новый формат: Sections -> Item -> Cost ---
         const sections = Array.from(xmlDoc.getElementsByTagName("Section"));
         if (sections.length) {
           sections.forEach((section) => {
@@ -188,19 +160,14 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
             items.forEach((item) => {
               const costs = Array.from(item.getElementsByTagName("Cost"));
               costs.forEach((cost) => {
-                // main cost row
                 const rawUnit = getText(cost, "Unit") || getText(cost, "UnitType");
                 const { multiplier, unit } = normalizeUnit(rawUnit);
-
-                // quantity: предпочитаем QuantityTotal -> Quantity
                 const rawQuantity =
                   getNestedText(cost, ["QuantityTotal"]) ||
                   getNestedText(cost, ["Quantity"]) ||
                   getText(cost, "Quantity") ||
                   "0";
                 const quantity = parseNumber(rawQuantity) * multiplier;
-
-                // per-unit price attempts (TotalsUnit/Current, PerUnit, PerUnit/LaborCosts)
                 const perUnitCandidates = [
                   ["TotalsUnit", "Current"],
                   ["PerUnit", "PricePerUnitCur"],
@@ -208,8 +175,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
                   ["PerUnit", "PricePerUnit"],
                 ];
                 let unitPrice = tryNumberPaths(cost, perUnitCandidates);
-
-                // totalDirect fallback (Totals/Current/Direct) -> compute per unit
                 const totalDirect = tryNumberPaths(cost, [
                   ["Totals", "Current", "Direct"],
                   ["Totals", "Current", "Price"],
@@ -219,8 +184,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
                 if ((!unitPrice || unitPrice === 0) && totalDirect && quantity) {
                   unitPrice = totalDirect / quantity;
                 }
-
-                // salary / material / machine (try common locations)
                 const salary = tryNumberPaths(cost, [
                   ["Totals", "Current", "WorkersSalary"],
                   ["Totals", "Current", "Salary"],
@@ -248,9 +211,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
                   material: material.toString(),
                   machine: machine.toString(),
                 });
-
-                // --- ресурсы внутри Cost ---
-                // Workers (ResourcesInternal -> Worker)
                 const workers = Array.from(cost.getElementsByTagName("Worker"));
                 workers.forEach((w) => {
                   const wName = getText(w, "Name") || "";
@@ -260,19 +220,16 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
                     getText(w, "Consumption") ||
                     getNestedText(w, ["Consumption"]) ||
                     "0";
-                  // стоимость рабочего ресурса — PriceTotalCur или PriceTotal
                   const wTotal = getNestedText(w, ["PriceTotalCur"]) || getNestedText(w, ["PriceTotal"]) || "0";
                   importedRows.push({
                     name: wName,
                     unit: wUnit,
                     quantity: parseNumber(wQty).toString(),
-                    salary: parseNumber(wTotal).toString(), // worker -> salary
+                    salary: parseNumber(wTotal).toString(),
                     material: "0",
                     machine: "0",
                   });
                 });
-
-                // Machines (ResourcesInternal -> Machine)
                 const machines = Array.from(cost.getElementsByTagName("Machine"));
                 machines.forEach((mEl) => {
                   const mName = getText(mEl, "Name") || "";
@@ -292,8 +249,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
                     machine: parseNumber(mTotal).toString(),
                   });
                 });
-
-                // Materials (Resources -> Material)
                 const materials = Array.from(cost.getElementsByTagName("Material"));
                 materials.forEach((mat) => {
                   const matName = getText(mat, "Name") || "";
@@ -317,8 +272,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
                     machine: "0",
                   });
                 });
-
-                // Отладочный лог по Cost
                 console.log("PARSED COST:", {
                   name: getText(cost, "Name"),
                   unit: unit || rawUnit,
@@ -336,7 +289,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
             });
           });
         } else {
-          // --- старый формат: Position ---
           const positions = Array.from(xmlDoc.getElementsByTagName("Position"));
           positions.forEach((pos) => {
             const name = pos.getAttribute("Caption") || "";
@@ -356,26 +308,18 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
             });
           });
         }
-
-        // Сохранить
         console.log("IMPORTED ROWS COUNT:", importedRows.length);
         setOnParsed(importedRows);
-
-        // налоговые ставки (если есть)
         const rangingRates = xmlDoc.getElementsByTagName("RangingRates")[0];
         if (rangingRates) {
           setTaxPercent(rangingRates.getAttribute("Mat") || "20");
         }
       };
-
-      // ----- определить тип файла и получить текст -----
       const ext = file.name.toLowerCase();
       if (ext.endsWith(".xml") || ext.endsWith(".gge")) {
-        // .gge в твоём случае — plain xml, поэтому читаем как xml
         const content = decodeBuffer(buffer);
         parseXmlContent(content);
       } else if (ext.endsWith(".gsfx")) {
-        // gsfx — zip-пакет: ищем xml внутри
         try {
           const zip = await JSZip.loadAsync(buffer);
           const xmlFileName = Object.keys(zip.files).find((name) => name.toLowerCase().endsWith(".xml"));
@@ -390,7 +334,6 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
           console.error("Ошибка чтения .gsfx архива:", err);
         }
       } else {
-        // fallback: пробуем декодировать как xml
         const content = decodeBuffer(buffer);
         parseXmlContent(content);
       }
@@ -428,7 +371,7 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
         onChange={handleFileChange}
         className="file-upload-input"
       />
-      <Button
+      {/* <Button
         styled={{ marginLeft: 25 }}
         onClick={() => {
           setOnParsed(null);
@@ -436,7 +379,7 @@ function Fileimport({ clearMode, showBackButton = true }: FileImportProps) {
         }}
       >
         📂 Загрузить файл XML, GGE, GSFX
-      </Button>
+      </Button> */}
       <input
         type="file"
         accept=".xml,.gge,.gsfx"

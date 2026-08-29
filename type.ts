@@ -185,8 +185,8 @@ export interface RowData {
 export interface RefDataInput {
   title: string;
   text: string;
-  textImages: File[];
-  tableImages: File[];
+  textImages: ImageType[];
+  tableImages: ImageType[];
 }
 
 export interface RefData {
@@ -227,6 +227,9 @@ export interface SavedBillOfQuantitiesData {
   title: string;
   userid: number | string;
   updated_at: string;
+  offerId?: string | number;
+  taxRate?: number | string;
+  taxrate?: number | string;
 }
 export interface ExportedDataInBillOfQuantities {
   name: string;

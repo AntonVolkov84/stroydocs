@@ -88,7 +88,7 @@ function Commercial() {
   };
 
   function isBillOfQuantities(
-    o: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData
+    o: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData,
   ): o is SavedBillOfQuantitiesData {
     return !!o && Array.isArray((o as any).rows) && (o as any).rows.length > 0 && "drawing" in (o as any).rows[0];
   }
@@ -98,7 +98,7 @@ function Commercial() {
   }
 
   function isForm1(
-    o: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData
+    o: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData,
   ): o is SavedOfferDataSecondForm {
     return (
       !!o &&
@@ -400,10 +400,11 @@ function Commercial() {
                     <Button
                       onClick={() => {
                         setExportData({
-                          offerId: bill.id,
+                          id: bill.id,
                           title: bill.title,
-                          userId: bill.userid,
+                          userid: bill.userid,
                           rows: bill.rows,
+                          updated_at: bill.updated_at,
                         });
                         navigate("/dashboard");
                         setMode({
