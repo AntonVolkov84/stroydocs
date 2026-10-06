@@ -302,6 +302,20 @@ export default function Dashboard() {
                   </div>
                 </div>
               </li>
+              <li className="dashboard-menu-item">
+                <span>Сервисы ▾</span>
+                <div className="dashboard-submenu">
+                  <div className="dashboard-submenu-inner">
+                    <Link
+                      className="dashboard-submenu-href"
+                      style={{ paddingBottom: 10, paddingTop: 10 }}
+                      to="/servicepage"
+                    >
+                      Коммерческие предложения
+                    </Link>
+                  </div>
+                </div>
+              </li>
             </ul>
           </div>
         </div>
@@ -328,6 +342,7 @@ export default function Dashboard() {
             showBackButton={!exportData}
             initialTitle={exportData?.title}
             initialOfferId={exportData?.offerId}
+            tableOwnerId={exportData?.userId}
           />
         )}
         {mode.referencebook && <ReferenceBook clearMode={clearMode} />}
@@ -341,6 +356,7 @@ export default function Dashboard() {
             showBackButton={!exportData}
             initialTitle={exportData?.title}
             initialOfferId={exportData?.offerId}
+            tableOwnerId={exportData?.userId}
           />
         )}
         {mode.fileimport && <Fileimport clearMode={clearMode} />}

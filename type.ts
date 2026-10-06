@@ -92,6 +92,7 @@ export interface RowCommercialOfferSecondForm {
   quantity: string;
   salary: string;
   unit: string;
+  taxRate?: string | number;
 }
 export interface PayloadForCommercialOfferSecondForm {
   title: string;
@@ -102,21 +103,32 @@ export interface PayloadForCommercialOfferSecondForm {
 export interface PayloadUpdateCommercialOfferSecondForm extends PayloadForCommercialOfferSecondForm {
   offerId: number | string;
 }
-export interface SavedOfferDataSecondForm {
-  id: number | string;
-  created_at: string;
-  title: string;
-  userid: number | string;
-  taxrate: number | string;
-  rows: RowCommercialOfferSecondForm[];
+export interface UserAuthorInfo {
+  user_name?: string;
+  user_surname?: string;
+  user_email?: string;
 }
-export interface SavedOfferData {
+
+export interface SavedOfferData extends UserAuthorInfo {
   id: number | string;
   created_at: string;
   title: string;
   userid: number | string;
   taxrate: number | string;
   rows: RowCommercialOffer[];
+  isPublic: boolean;
+  ispublic?: boolean;
+}
+
+export interface SavedOfferDataSecondForm extends UserAuthorInfo {
+  id: number | string;
+  created_at: string;
+  title: string;
+  userid: number | string;
+  taxrate: number | string;
+  rows: RowCommercialOfferSecondForm[];
+  isPublic: boolean;
+  ispublic?: boolean;
 }
 export interface ReturnOfCloudinaryUpload {
   url: string;
@@ -226,6 +238,7 @@ export interface SavedBillOfQuantitiesData {
   rows: RowsBillOfQuantities[];
   title: string;
   userid: number | string;
+  userId?: number | string;
   updated_at: string;
   offerId?: string | number;
   taxRate?: number | string;

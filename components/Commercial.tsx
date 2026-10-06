@@ -13,7 +13,8 @@ import {
 } from "../type";
 import Button from "../components/Button";
 import * as userService from "../services/userService";
-
+import axios from "axios";
+const apiUrl: string = import.meta.env.VITE_API_URL;
 function Commercial() {
   const { user, confirm, prompt, alert, setMode, setExportedRows, setExportData } = useAppContext();
   const [sendingOfferForm, setSendingOfferForm] = useState<boolean>(false);
@@ -25,6 +26,7 @@ function Commercial() {
     if (!user) return;
     const id = user.id;
     const data = await commercialOfferService.getCommercialOffers(id);
+    console.log(data);
     setSavedOfferData(data);
   };
   const getSavedOfferSecondFormData = async () => {
@@ -108,6 +110,49 @@ function Commercial() {
       !("type" in (o as any).rows[0])
     );
   }
+  const togglePublicStatusCommercialOffer = async (id: number) => {
+    try {
+      const res = await axios.put(`${apiUrl}/stroydocs/toggleprivatcomerc`, { id }, { withCredentials: true });
+
+      if (res.status === 200 && res.data && typeof res.data.isPublic === "boolean") {
+        const newStatus = res.data.isPublic;
+
+        setSavedOfferData((prevData) =>
+          prevData
+            ? prevData.map((offer) =>
+                offer.id === id ? { ...offer, isPublic: newStatus, ispublic: newStatus } : offer,
+              )
+            : [],
+        );
+      }
+    } catch (error) {
+      console.error("togglePublicStatusCommercialOffer error:", error);
+    }
+  };
+
+  const togglePublicStatusCommercialOfferSecondForm = async (id: number) => {
+    try {
+      const res = await axios.put(
+        `${apiUrl}/stroydocs/toggleprivatcomercsecondform`,
+        { id },
+        { withCredentials: true },
+      );
+
+      if (res.status === 200 && res.data && typeof res.data.isPublic === "boolean") {
+        const newStatus = res.data.isPublic;
+
+        setSavedOfferDataSecondForm((prevData) =>
+          prevData
+            ? prevData.map((offer) =>
+                offer.id === id ? { ...offer, isPublic: newStatus, ispublic: newStatus } : offer,
+              )
+            : [],
+        );
+      }
+    } catch (error) {
+      console.error("togglePublicStatusCommercialOfferSecondForm error:", error);
+    }
+  };
 
   const sendForm = async (offer: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData) => {
     let recieverEmail = await prompt({
@@ -311,6 +356,12 @@ function Commercial() {
                     <Button className="button_btn--red-hover" onClick={() => handleDelete(offer.id)}>
                       Удалить
                     </Button>
+                    <Button
+                      className={offer.isPublic || offer.ispublic ? "button_btn--red-hover" : ""}
+                      onClick={async () => await togglePublicStatusCommercialOffer(Number(offer.id))}
+                    >
+                      {offer.isPublic || offer.ispublic ? "Убрать из доступа" : "Сделать публичной"}
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -371,6 +422,12 @@ function Commercial() {
                     <Button className="button_btn--red-hover" onClick={() => handleDeleteSecondForm(offer.id)}>
                       Удалить
                     </Button>
+                    <Button
+                      className={offer.isPublic || offer.ispublic ? "button_btn--red-hover" : ""}
+                      onClick={async () => await togglePublicStatusCommercialOfferSecondForm(Number(offer.id))}
+                    >
+                      {offer.isPublic || offer.ispublic ? "Убрать из доступа" : "Сделать публичной"}
+                    </Button>
                   </td>
                 </tr>
               ))}
@@ -405,6 +462,7 @@ function Commercial() {
                           userid: bill.userid,
                           rows: bill.rows,
                           updated_at: bill.updated_at,
+                          taxrate: bill.taxrate,
                         });
                         navigate("/dashboard");
                         setMode({

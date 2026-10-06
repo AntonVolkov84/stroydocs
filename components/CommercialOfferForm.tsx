@@ -23,6 +23,7 @@ interface CommercialOfferFormProps {
   clearMode?: () => void;
   setExportedRows?: Dispatch<SetStateAction<ExportedRowsType>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferData | null>>;
+  tableOwnerId?: string | number;
 }
 
 // Функция-конвертер: приводит входящий массив любого типа к строгому формату RowData[]
@@ -56,6 +57,7 @@ const CommercialOfferForm = ({
   onUpdateSuccess,
   setExportedRows,
   setSelectedOffer,
+  tableOwnerId,
 }: CommercialOfferFormProps) => {
   const [rows, setRows] = useState<RowData[]>(() => normalizeRows(initialRows));
 
@@ -409,6 +411,8 @@ const CommercialOfferForm = ({
       });
     }
   };
+  const isOwner = !tableOwnerId || (user && String(tableOwnerId) === String(user.id));
+
   return (
     <div className="commercial-wrapper">
       <div className="commercial__controlUnit">
@@ -434,16 +438,17 @@ const CommercialOfferForm = ({
         {user ? (
           <>
             {!initialRows ? (
-              <Button onClick={() => handleSave()} styled={{ marginBottom: 20 }}>
+              <Button onClick={() => handleSave()} disabled={!isOwner} styled={{ marginBottom: 20 }}>
                 Сохранить
               </Button>
             ) : (
-              <Button onClick={() => handleUpdate()} styled={{ marginBottom: 20 }}>
+              <Button onClick={() => handleUpdate()} disabled={!isOwner} styled={{ marginBottom: 20 }}>
                 Изменить
               </Button>
             )}
           </>
         ) : null}
+
         {(user?.subscribe || user?.unlimited) && (
           <Button styled={{ marginBottom: 20 }} onClick={() => window.print()}>
             🖨️ Печать

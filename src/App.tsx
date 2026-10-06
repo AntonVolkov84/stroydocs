@@ -10,6 +10,7 @@ import PersonalPage from "../pages/PersonalPage";
 import NoPage from "../pages/NoPage";
 import { AppProvider, useAppContext } from "../services/AppContext";
 import Loader from "../components/Loader";
+import ServicePage from "../pages/ServicePage";
 
 function AppRoutes() {
   const { user, loading } = useAppContext();
@@ -22,6 +23,7 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/confirm-email" element={<ConfirmEmail />} />
       <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
+      <Route path="servicepage" element={<ServicePage />} />
       <Route path="/changepassword" element={<ChangePasswordPage user={user} />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/personalpage" element={user && user.emailconfirmed ? <PersonalPage /> : <Navigate to="/login" />} />

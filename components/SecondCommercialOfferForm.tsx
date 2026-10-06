@@ -40,6 +40,7 @@ interface SecondCommercialOfferFormProps {
   setExportedRows?: Dispatch<SetStateAction<ExportedRowsType>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferDataSecondForm | null>>;
   clearMode?: () => void;
+  tableOwnerId?: string | number;
 }
 
 // Функция нормализации входящего массива данных
@@ -69,6 +70,7 @@ export default function SecondCommercialOfferForm({
   setExportedRows,
   onUpdateSuccess,
   setSelectedOffer,
+  tableOwnerId,
   clearMode,
 }: SecondCommercialOfferFormProps) {
   const [rows, setRows] = useState<SecondFormRowData[]>(() => normalizeRows(initialRows));
@@ -406,10 +408,7 @@ export default function SecondCommercialOfferForm({
       };
     });
     if (setExportedRows) {
-      setExportedRows({
-        rows: convertedRows,
-        taxRate: taxPercent,
-      } as any);
+      setExportedRows(convertedRows);
     }
     if (setMode) {
       setMode({
@@ -423,6 +422,7 @@ export default function SecondCommercialOfferForm({
       });
     }
   };
+  const isOwner = !tableOwnerId || (user && String(tableOwnerId) === String(user.id));
 
   return (
     <div className="secondcommercial-wrapper commercial-wrapper">
@@ -446,9 +446,13 @@ export default function SecondCommercialOfferForm({
           <Button onClick={() => exportInForm0()}>🔀 Экспорт в форму 0</Button>
           <Button onClick={() => exportInBillOfQuantities()}>🔀 Экспорт в ведомость</Button>
           {showBackButton ? (
-            <Button onClick={handleSave}>💾 Сохранить</Button>
+            <Button onClick={handleSave} disabled={!isOwner}>
+              💾 Сохранить
+            </Button>
           ) : (
-            <Button onClick={handleUpdate}>💾 Изменить</Button>
+            <Button onClick={handleUpdate} disabled={!isOwner}>
+              💾 Изменить
+            </Button>
           )}
           {(user.subscribe || user.unlimited) && <Button onClick={() => window.print()}>🖨️ Печать</Button>}
           {(user.subscribe || user.unlimited) && <Button onClick={() => exportToExcel()}>📊 Выгрузить в Excel</Button>}
