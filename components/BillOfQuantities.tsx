@@ -122,7 +122,7 @@ const BillOfQuantitiesForm = ({
   const updateBillOfQuantities = async () => {
     const promptResult = await prompt({
       title: "Измените название",
-      message: "",
+      message: initialTitle,
       placeholder: initialTitle,
       confirmText: "Изменить",
     });
@@ -130,12 +130,16 @@ const BillOfQuantitiesForm = ({
     if (promptResult) {
       if (!initialOfferId || !user) return;
       const payload = {
-        billId: initialOfferId,
+        billId: Number(initialOfferId),
         userId: user.id,
         title: promptResult,
         rows,
       };
       const res = await commercialOfferService.updateSavedBillOfQuantities(payload);
+      await alert({
+        title: res?.message,
+        message: "",
+      });
       if (onUpdateSuccess) onUpdateSuccess();
       if (setSelectedBill) setSelectedBill(null);
     }

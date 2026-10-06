@@ -26,7 +26,6 @@ function Commercial() {
     if (!user) return;
     const id = user.id;
     const data = await commercialOfferService.getCommercialOffers(id);
-    console.log(data);
     setSavedOfferData(data);
   };
   const getSavedOfferSecondFormData = async () => {

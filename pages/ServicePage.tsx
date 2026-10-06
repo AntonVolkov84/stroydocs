@@ -32,6 +32,8 @@ interface FlatPublicOfferRow {
   updatedAt: string;
 }
 
+const ITEMS_PER_PAGE = 20;
+
 function PublicCommercial() {
   const navigate = useNavigate();
   const { setMode, setExportedRows, setExportData } = useAppContext();
@@ -40,6 +42,11 @@ function PublicCommercial() {
   const [loading, setLoading] = useState<boolean>(true);
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, sortOrder]);
 
   // Загрузка данных
   const fetchPublicOffers = async () => {
@@ -64,24 +71,15 @@ function PublicCommercial() {
           const updatedAt = offer.updated_at || offer.created_at;
           const rows: OfferRow[] = Array.isArray(offer.rows) ? offer.rows : [];
 
-          // Если rows пустой, создаем запись-заглушку
-          if (rows.length === 0) {
-            return [
-              {
-                id: `${formType}-${offer.id}-0`,
-                originalOffer: offer,
-                formType,
-                positionName: offer.title || "—",
-                unit: "—",
-                price: "—",
-                email,
-                updatedAt,
-              },
-            ];
+          // Отфильтровываем элементы, у которых нет наименования позиции
+          const validRows = rows.filter((row) => row.name && String(row.name).trim() !== "");
+
+          // Если валидных строк нет — ничего не возвращаем (пропускаем оффер)
+          if (validRows.length === 0) {
+            return [];
           }
 
-          // Обрабатываем каждую строку из rows
-          return rows.map((row, index) => {
+          return validRows.map((row, index) => {
             let calculatedPrice: number | string = "—";
 
             if (formType === "secondForm") {
@@ -98,7 +96,7 @@ function PublicCommercial() {
               id: `${formType}-${offer.id}-${index}`,
               originalOffer: offer,
               formType,
-              positionName: row.name || offer.title || "—",
+              positionName: row.name!.trim(),
               unit: row.unit || "—",
               price: calculatedPrice,
               email,
@@ -139,11 +137,11 @@ function PublicCommercial() {
       .replace(",", " в");
   };
 
-  // Фильтрация по поисковому запросу и последующая сортировка по дате
+  // 1. Фильтрация и сортировка (Сначала объявляем этот массив)
   const filteredAndSortedOfferRows = useMemo(() => {
     let result = [...offerRows];
 
-    // 1. Фильтрация
+    // Фильтрация
     if (searchQuery.trim() !== "") {
       const query = searchQuery.toLowerCase().trim();
       result = result.filter((item) => {
@@ -155,13 +153,21 @@ function PublicCommercial() {
       });
     }
 
-    // 2. Сортировка
+    // Сортировка
     return result.sort((a, b) => {
       const timeA = new Date(a.updatedAt).getTime() || 0;
       const timeB = new Date(b.updatedAt).getTime() || 0;
       return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
     });
   }, [offerRows, searchQuery, sortOrder]);
+
+  // 2. Пагинация (Объявляем ПОСЛЕ filteredAndSortedOfferRows)
+  const paginatedOfferRows = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredAndSortedOfferRows.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredAndSortedOfferRows, currentPage]);
+
+  const totalPages = Math.ceil(filteredAndSortedOfferRows.length / ITEMS_PER_PAGE);
 
   const handleViewOffer = (item: FlatPublicOfferRow) => {
     const offer = item.originalOffer;
@@ -242,7 +248,8 @@ function PublicCommercial() {
         <p className="public-com__loading">Загрузка коммерческих предложений...</p>
       ) : filteredAndSortedOfferRows.length > 0 ? (
         <div className="public-com__list">
-          {filteredAndSortedOfferRows.map((item) => (
+          {/* Мапим paginatedOfferRows вместо отфильтрованного целиком списка */}
+          {paginatedOfferRows.map((item) => (
             <div key={item.id} className="public-com__item">
               <div className="public-com__field public-com__field--title">
                 <span className="public-com__label">Название позиции:</span>
@@ -278,6 +285,26 @@ function PublicCommercial() {
               </div>
             </div>
           ))}
+
+          {/* Пагинация */}
+          {totalPages > 1 && (
+            <div className="public-com__pagination">
+              <Button disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>
+                ← Назад
+              </Button>
+
+              <span className="public-com__page-info">
+                Страница <strong>{currentPage}</strong> из <strong>{totalPages}</strong>
+              </span>
+
+              <Button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              >
+                Вперед →
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
         <p className="public-com__empty">

@@ -51,7 +51,7 @@ export const deleteCommercialOffers = async (id: number | string) => {
   }
 };
 export const saveCommercialOfferSecondForm = async (
-  payload: PayloadForCommercialOfferSecondForm
+  payload: PayloadForCommercialOfferSecondForm,
 ): Promise<{ message: string }> => {
   try {
     const res: AxiosResponse<{ message: string }> = await axios.post(
@@ -59,7 +59,7 @@ export const saveCommercialOfferSecondForm = async (
       payload,
       {
         withCredentials: true,
-      }
+      },
     );
     return res.data;
   } catch (error) {
@@ -131,9 +131,10 @@ export const deleteSavedBillOfQuantities = async (id: number | string) => {
 };
 export const updateSavedBillOfQuantities = async (payload: PayloadSavedBillOfQuantities) => {
   try {
-    await axios.put(`${apiUrl}/stroydocs/updatesavedbillbook`, payload, {
+    const response = await axios.put(`${apiUrl}/stroydocs/updatesavedbillbook`, payload, {
       withCredentials: true,
     });
+    return response.data;
   } catch (error) {
     console.log("updateSavedBillOfQuantities", error);
   }

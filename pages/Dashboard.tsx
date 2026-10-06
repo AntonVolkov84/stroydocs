@@ -56,6 +56,7 @@ export default function Dashboard() {
     setExportedRows(null);
     setExportData(null);
   };
+
   const getNewsData = async () => {
     try {
       const res = await getAllNews();
@@ -329,7 +330,7 @@ export default function Dashboard() {
             initialRows={exportedRows as RowsBillOfQuantities[] | undefined}
             showBackButton={!exportData}
             initialTitle={exportData?.title}
-            initialOfferId={exportData?.offerId}
+            initialOfferId={exportData?.id}
           />
         )}
         {mode.form && (

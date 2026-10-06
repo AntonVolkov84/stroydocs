@@ -81,6 +81,7 @@ export interface PayloadForCommercialOffer {
   userId: number | string;
   taxRate: number | string;
   rows: RowCommercialOffer[];
+  id?: string | number | undefined;
 }
 export interface PayloadUpdateCommercialOffer extends PayloadForCommercialOffer {
   offerId: number | string;
@@ -99,6 +100,7 @@ export interface PayloadForCommercialOfferSecondForm {
   userId: number | string;
   taxRate: number | string;
   rows: RowCommercialOfferSecondForm[];
+  id?: string | number | undefined;
 }
 export interface PayloadUpdateCommercialOfferSecondForm extends PayloadForCommercialOfferSecondForm {
   offerId: number | string;
@@ -232,6 +234,7 @@ export interface PayloadSavedBillOfQuantities {
   title: string;
   rows: RowsBillOfQuantities[];
   billId?: string | number | undefined;
+  id?: string | number | undefined;
 }
 export interface SavedBillOfQuantitiesData {
   id: number | string;

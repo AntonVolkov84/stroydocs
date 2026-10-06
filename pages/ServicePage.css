@@ -184,3 +184,16 @@
 .public-com__clear-btn:hover {
   color: #333;
 }
+.public-com__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 12px 0;
+}
+
+.public-com__page-info {
+  font-size: 14px;
+  color: #555;
+}
