@@ -153,6 +153,28 @@ function Commercial() {
     }
   };
 
+  const togglePublicStatusBillOfQuantities = async (id: number) => {
+    try {
+      const res = await axios.put(
+        `${apiUrl}/stroydocs/toggleprivatbillofquantities`,
+        { id },
+        { withCredentials: true },
+      );
+
+      if (res.status === 200 && res.data && typeof res.data.isPublic === "boolean") {
+        const newStatus = res.data.isPublic;
+
+        setSavedBillOfQuantitiesData((prevData) =>
+          prevData
+            ? prevData.map((item) => (item.id === id ? { ...item, isPublic: newStatus, ispublic: newStatus } : item))
+            : [],
+        );
+      }
+    } catch (error) {
+      console.error("togglePublicStatusBillOfQuantities error:", error);
+    }
+  };
+
   const sendForm = async (offer: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData) => {
     let recieverEmail = await prompt({
       title: "Укажите эл почту получателя формы",
@@ -290,6 +312,7 @@ function Commercial() {
       if (!user) return;
       const res = await commercialOfferService.getSavedBillOfQuantities(user?.id);
       setSavedBillOfQuantitiesData(res);
+      console.log(res);
     } catch (error) {
       console.log("getSavedBillOfQuantitisData", error);
     }
@@ -488,6 +511,12 @@ function Commercial() {
                     </Button>
                     <Button className="button_btn--red-hover" onClick={() => handleDeleteBillOfquantities(bill.id)}>
                       Удалить
+                    </Button>
+                    <Button
+                      className={bill.ispublic ? "button_btn--red-hover" : ""}
+                      onClick={async () => await togglePublicStatusBillOfQuantities(Number(bill.id))}
+                    >
+                      {bill.ispublic ? "Убрать из доступа" : "Сделать публичной"}
                     </Button>
                   </td>
                 </tr>

@@ -3,5 +3,5 @@
   "compilerOptions": {
     "types": ["vitest"]
   },
-  "include": ["tests", "src"]
+  "include": ["tests", "src", "Pages"]
 }

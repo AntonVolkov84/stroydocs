@@ -1,0 +1,189 @@
+.public-bill__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.public-bill__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.public-bill__filters {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.public-bill__search-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.public-bill__input {
+  padding: 8px 30px 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  width: 260px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.public-bill__input:focus {
+  border-color: #007bff;
+}
+
+.public-bill__clear-btn {
+  position: absolute;
+  right: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #888;
+}
+
+.public-bill__clear-btn:hover {
+  color: #333;
+}
+
+.public-bill__filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.public-bill__filter-label {
+  font-size: 14px;
+  color: #555;
+}
+
+.public-bill__select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.public-bill__page-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.public-bill__loading,
+.public-bill__empty {
+  text-align: center;
+  font-size: 16px;
+  color: #666;
+  margin-top: 40px;
+}
+
+.public-bill__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.public-bill__item {
+  display: grid;
+  grid-template-columns: 2fr 0.8fr 0.8fr 1.5fr 1.5fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background-color: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s;
+}
+
+.public-bill__item:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08);
+}
+
+.public-bill__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.public-bill__label {
+  font-size: 12px;
+  color: #718096;
+}
+
+.public-bill__title {
+  font-weight: 600;
+  color: #2d3748;
+  word-break: break-word;
+}
+
+.public-bill__unit,
+.public-bill__quantity,
+.public-bill__price,
+.public-bill__date,
+.public-bill__email {
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.public-bill__price {
+  font-weight: 600;
+  color: #2b6cb0;
+}
+
+.public-bill__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.public-bill__pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 12px 0;
+}
+
+.public-bill__page-info {
+  font-size: 14px;
+  color: #4a5568;
+}
+
+@media (max-width: 992px) {
+  .public-bill__item {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .public-bill__actions {
+    grid-column: span 2;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 576px) {
+  .public-bill__item {
+    grid-template-columns: 1fr;
+  }
+
+  .public-bill__actions {
+    grid-column: span 1;
+  }
+
+  .public-bill__input {
+    width: 100%;
+  }
+}

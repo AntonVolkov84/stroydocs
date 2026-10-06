@@ -314,6 +314,13 @@ export default function Dashboard() {
                     >
                       Коммерческие предложения
                     </Link>
+                    <Link
+                      className="dashboard-submenu-href"
+                      style={{ paddingBottom: 10, paddingTop: 10 }}
+                      to="/servicepagebill"
+                    >
+                      Заявки на работу
+                    </Link>
                   </div>
                 </div>
               </li>
@@ -331,6 +338,7 @@ export default function Dashboard() {
             showBackButton={!exportData}
             initialTitle={exportData?.title}
             initialOfferId={exportData?.id}
+            tableOwnerId={exportData?.userid}
           />
         )}
         {mode.form && (

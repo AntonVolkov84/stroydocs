@@ -18,6 +18,7 @@ interface BillOfQuantitiesProps {
   onUpdateSuccess?: () => void;
   setSelectedBill?: Dispatch<SetStateAction<SavedBillOfQuantitiesData | null>>;
   key?: string | number;
+  tableOwnerId?: string | number;
 }
 
 const BillOfQuantitiesForm = ({
@@ -29,6 +30,7 @@ const BillOfQuantitiesForm = ({
   onUpdateSuccess,
   key,
   setSelectedBill,
+  tableOwnerId,
 }: BillOfQuantitiesProps) => {
   const [rows, setRows] = useState<RowsBillOfQuantities[]>(
     initialRows && initialRows.length > 0
@@ -208,6 +210,8 @@ const BillOfQuantitiesForm = ({
     saveAs(new Blob([buffer]), "Ведомость объемов работ.xlsx");
   };
 
+  const isOwner = !tableOwnerId || (user && String(tableOwnerId) === String(user.id));
+
   return (
     <div className="commercial-wrapper">
       <div className="commercial__controlUnit">
@@ -229,11 +233,11 @@ const BillOfQuantitiesForm = ({
         {user ? (
           <>
             {showBackButton ? (
-              <Button onClick={() => saveBillOfQuantities()} styled={{ marginBottom: 20 }}>
+              <Button disabled={!isOwner} onClick={() => saveBillOfQuantities()} styled={{ marginBottom: 20 }}>
                 Сохранить
               </Button>
             ) : (
-              <Button onClick={() => updateBillOfQuantities()} styled={{ marginBottom: 20 }}>
+              <Button disabled={!isOwner} onClick={() => updateBillOfQuantities()} styled={{ marginBottom: 20 }}>
                 Изменить
               </Button>
             )}

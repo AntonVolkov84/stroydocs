@@ -145,6 +145,7 @@ export const getSavedBillOfQuantities = async (id: string | number) => {
       params: { userId: id },
       withCredentials: true,
     });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.log("getCommercialOffersSecondForm", error);
