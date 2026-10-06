@@ -9,6 +9,7 @@ import ManageUsers from "../components/ManageUsers";
 import CreatingNews from "../components/CreatingNews";
 import SavedCalculators from "../components/SavedCalculators";
 import Commercial from "../components/Commercial";
+import CompanyProfile from "../components/CompanyProfile";
 import { useAppContext } from "../services/AppContext";
 import ManageReferenceBooks from "../components/ManageReferenceBooks";
 
@@ -191,7 +192,7 @@ export default function PersonalPage() {
           !savedCalculator &&
           !savedCommercialOffer && (
             <div className="personalpage__content">
-              <p>Здесь будет персональная информация, действия пользователя, уведомления и т.п.</p>
+              <CompanyProfile />
             </div>
           )}
       </main>
