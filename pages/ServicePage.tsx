@@ -4,24 +4,42 @@ import axios from "axios";
 import { useAppContext } from "../services/AppContext";
 import { SavedOfferData, SavedOfferDataSecondForm } from "../type";
 import Button from "../components/Button";
-import "../components/Commercial.css";
+import "./ServicePage.css";
 
 const apiUrl: string = import.meta.env.VITE_API_URL;
 
-type FilterType = "all" | "form0" | "secondForm";
 type SortOrder = "desc" | "asc";
+
+// Структура одного элемента строки из rows
+interface OfferRow {
+  name?: string;
+  unit?: string;
+  price?: number | string;
+  quantity?: number;
+  type?: string;
+  [key: string]: any;
+}
+
+// Расширенная структура отдельной позиции для рендера
+interface FlatPublicOfferRow {
+  id: string; // уникальный ключ (id предложения + индекс строки)
+  originalOffer: SavedOfferData | SavedOfferDataSecondForm;
+  formType: "form0" | "secondForm";
+  positionName: string;
+  unit: string;
+  price: number | string;
+  email: string;
+  updatedAt: string;
+}
 
 function PublicCommercial() {
   const navigate = useNavigate();
   const { setMode, setExportedRows, setExportData } = useAppContext();
 
-  const [form0Data, setForm0Data] = useState<SavedOfferData[]>([]);
-  const [secondFormData, setSecondFormData] = useState<SavedOfferDataSecondForm[]>([]);
+  const [offerRows, setOfferRows] = useState<FlatPublicOfferRow[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
-  // Фильтры и сортировка
-  const [filterType, setFilterType] = useState<FilterType>("all");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   // Загрузка данных
   const fetchPublicOffers = async () => {
@@ -32,12 +50,68 @@ function PublicCommercial() {
         axios.put(`${apiUrl}/stroydocs/getpubliccomercsecondform`, {}, { withCredentials: true }),
       ]);
 
-      // Извлекаем массив из свойства .data
-      const dataForm0 = resForm0.data?.data || resForm0.data;
-      const dataSecondForm = resSecondForm.data?.data || resSecondForm.data;
+      const dataForm0: SavedOfferData[] = Array.isArray(resForm0.data?.data || resForm0.data)
+        ? resForm0.data?.data || resForm0.data
+        : [];
+      const dataSecondForm: SavedOfferDataSecondForm[] = Array.isArray(resSecondForm.data?.data || resSecondForm.data)
+        ? resSecondForm.data?.data || resSecondForm.data
+        : [];
 
-      setForm0Data(Array.isArray(dataForm0) ? dataForm0 : []);
-      setSecondFormData(Array.isArray(dataSecondForm) ? dataSecondForm : []);
+      // Функция разворачивания предложений в массив отдельных позиций из rows
+      const processOffers = (list: any[], formType: "form0" | "secondForm"): FlatPublicOfferRow[] => {
+        return list.flatMap((offer) => {
+          const email = offer.user_email || offer.email || "—";
+          const updatedAt = offer.updated_at || offer.created_at;
+          const rows: OfferRow[] = Array.isArray(offer.rows) ? offer.rows : [];
+
+          // Если rows пустой, создаем запись-заглушку
+          if (rows.length === 0) {
+            return [
+              {
+                id: `${formType}-${offer.id}-0`,
+                originalOffer: offer,
+                formType,
+                positionName: offer.title || "—",
+                unit: "—",
+                price: "—",
+                email,
+                updatedAt,
+              },
+            ];
+          }
+
+          // Обрабатываем каждую строку из rows
+          return rows.map((row, index) => {
+            let calculatedPrice: number | string = "—";
+
+            if (formType === "secondForm") {
+              const salary = Number(row.salary) || 0;
+              const material = Number(row.material) || 0;
+              const machine = Number(row.machine) || 0;
+
+              calculatedPrice = salary + material + machine;
+            } else {
+              calculatedPrice = row.price ?? "—";
+            }
+
+            return {
+              id: `${formType}-${offer.id}-${index}`,
+              originalOffer: offer,
+              formType,
+              positionName: row.name || offer.title || "—",
+              unit: row.unit || "—",
+              price: calculatedPrice,
+              email,
+              updatedAt,
+            };
+          });
+        });
+      };
+
+      const flatForm0 = processOffers(dataForm0, "form0");
+      const flatSecondForm = processOffers(dataSecondForm, "secondForm");
+
+      setOfferRows([...flatForm0, ...flatSecondForm]);
     } catch (error) {
       console.error("Ошибка при получении публичных коммерческих предложений:", error);
     } finally {
@@ -52,6 +126,8 @@ function PublicCommercial() {
   const formatDate = (dateString: string) => {
     if (!dateString) return "—";
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return "—";
+
     return new Intl.DateTimeFormat("ru-RU", {
       day: "numeric",
       month: "long",
@@ -63,102 +139,95 @@ function PublicCommercial() {
       .replace(",", " в");
   };
 
-  // Сортировка данных по дате
-  const sortOffers = <T extends SavedOfferData | SavedOfferDataSecondForm>(list: T[]): T[] => {
-    return [...list].sort((a, b) => {
-      const timeA = new Date(a.created_at).getTime();
-      const timeB = new Date(b.created_at).getTime();
+  // Фильтрация по поисковому запросу и последующая сортировка по дате
+  const filteredAndSortedOfferRows = useMemo(() => {
+    let result = [...offerRows];
+
+    // 1. Фильтрация
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase().trim();
+      result = result.filter((item) => {
+        const nameMatch = item.positionName.toLowerCase().includes(query);
+        const emailMatch = item.email.toLowerCase().includes(query);
+        const titleMatch = (item.originalOffer.title || "").toLowerCase().includes(query);
+
+        return nameMatch || emailMatch || titleMatch;
+      });
+    }
+
+    // 2. Сортировка
+    return result.sort((a, b) => {
+      const timeA = new Date(a.updatedAt).getTime() || 0;
+      const timeB = new Date(b.updatedAt).getTime() || 0;
       return sortOrder === "desc" ? timeB - timeA : timeA - timeB;
     });
-  };
+  }, [offerRows, searchQuery, sortOrder]);
 
-  const sortedForm0 = useMemo(() => sortOffers(form0Data), [form0Data, sortOrder]);
-  const sortedSecondForm = useMemo(() => sortOffers(secondFormData), [secondFormData, sortOrder]);
+  const handleViewOffer = (item: FlatPublicOfferRow) => {
+    const offer = item.originalOffer;
 
-  const handleViewForm0 = (offer: SavedOfferData) => {
+    const formattedRows = (offer.rows || []).map((row: any) => ({
+      ...row,
+      quantity: String(row.quantity ?? ""),
+    }));
+
     setExportData({
       offerId: offer.id,
       title: offer.title,
       taxRate: offer.taxrate,
       userId: offer.userid,
-      rows: offer.rows,
+      rows: formattedRows,
     });
-    setMode({
-      calculators: false,
-      form: true,
-      form1: false,
-      form2: false,
-      referencebook: false,
-      management: false,
-      fileimport: false,
-    });
-    setExportedRows(offer.rows);
-    navigate("/dashboard");
-  };
 
-  const handleViewSecondForm = (offer: SavedOfferDataSecondForm) => {
-    setExportData({
-      offerId: offer.id,
-      title: offer.title,
-      taxRate: offer.taxrate,
-      userId: offer.userid,
-      rows: offer.rows,
-    });
+    const isSecondForm = item.formType === "secondForm";
+
     setMode({
       calculators: false,
-      form: false,
-      form1: true,
+      form: !isSecondForm,
+      form1: isSecondForm,
       form2: false,
       referencebook: false,
       management: false,
       fileimport: false,
     });
-    setExportedRows(offer.rows);
+
+    setExportedRows(formattedRows);
     navigate("/dashboard");
   };
 
   return (
-    <div className="commercial__container">
-      {/* Верхняя панель с кнопкой Назад и фильтрами */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-          flexWrap: "wrap",
-          gap: "10px",
-          marginRight: 35,
-        }}
-      >
+    <div className="public-com__container">
+      {/* Верхняя панель управления */}
+      <div className="public-com__header">
         <Button onClick={() => navigate(-1)}>Назад</Button>
 
-        <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-          <div>
-            <label htmlFor="filterType" style={{ marginRight: "8px", fontWeight: "bold" }}>
-              Форма:
-            </label>
-            <select
-              id="filterType"
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value as FilterType)}
-              style={{ padding: "6px 12px", borderRadius: "4px", border: "1px solid #ccc" }}
-            >
-              <option value="all">Все таблицы</option>
-              <option value="form0">Форма 0</option>
-              <option value="secondForm">Форма 1</option>
-            </select>
+        <div className="public-com__filters">
+          {/* Поле поиска */}
+          <div className="public-com__search-group">
+            <input
+              type="text"
+              className="public-com__input"
+              placeholder="Поиск по названию или email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            {searchQuery && (
+              <button type="button" className="public-com__clear-btn" onClick={() => setSearchQuery("")}>
+                ✕
+              </button>
+            )}
           </div>
 
-          <div>
-            <label htmlFor="sortOrder" style={{ marginRight: "8px", fontWeight: "bold" }}>
-              Дата:
+          {/* Сортировка по дате */}
+          <div className="public-com__filter-group">
+            <label htmlFor="sortOrder" className="public-com__filter-label">
+              Дата изменения:
             </label>
             <select
               id="sortOrder"
+              className="public-com__select"
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as SortOrder)}
-              style={{ padding: "6px 12px", borderRadius: "4px", border: "1px solid #ccc" }}
             >
               <option value="desc">Сначала новые</option>
               <option value="asc">Сначала старые</option>
@@ -167,74 +236,53 @@ function PublicCommercial() {
         </div>
       </div>
 
-      <h1>Публичные коммерческие предложения</h1>
+      <h1 className="public-com__page-title">Публичные коммерческие предложения</h1>
 
       {loading ? (
-        <p>Загрузка коммерческих предложений...</p>
-      ) : (
-        <>
-          {/* ТАБЛИЦА ФОРМА 0 */}
-          {(filterType === "all" || filterType === "form0") && (
-            <div>
-              <h2 className="commercial__table-title">Публичные коммерческие предложения (Форма 0)</h2>
-              {sortedForm0.length > 0 ? (
-                <table className="commercial__table">
-                  <thead>
-                    <tr>
-                      <th>Название</th>
-                      <th>Дата сохранения</th>
-                      <th>Действие</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedForm0.map((offer) => (
-                      <tr key={offer.id}>
-                        <td>{offer.title}</td>
-                        <td>{formatDate(offer.created_at)}</td>
-                        <td className="commercial__actions">
-                          <Button onClick={() => handleViewForm0(offer)}>Просмотреть</Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p>Нет доступных публичных предложений Формы 0.</p>
-              )}
-            </div>
-          )}
+        <p className="public-com__loading">Загрузка коммерческих предложений...</p>
+      ) : filteredAndSortedOfferRows.length > 0 ? (
+        <div className="public-com__list">
+          {filteredAndSortedOfferRows.map((item) => (
+            <div key={item.id} className="public-com__item">
+              <div className="public-com__field public-com__field--title">
+                <span className="public-com__label">Название позиции:</span>
+                <span className="public-com__title">{item.positionName}</span>
+              </div>
 
-          {/* ТАБЛИЦА ФОРМА 1 (SECOND FORM) */}
-          {(filterType === "all" || filterType === "secondForm") && (
-            <div>
-              <h2 className="commercial__table-title">Публичные коммерческие предложения (Форма 1)</h2>
-              {sortedSecondForm.length > 0 ? (
-                <table className="commercial__table">
-                  <thead>
-                    <tr>
-                      <th>Название</th>
-                      <th>Дата сохранения</th>
-                      <th>Действие</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedSecondForm.map((offer) => (
-                      <tr key={offer.id}>
-                        <td>{offer.title}</td>
-                        <td>{formatDate(offer.created_at)}</td>
-                        <td className="commercial__actions">
-                          <Button onClick={() => handleViewSecondForm(offer)}>Просмотреть</Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              ) : (
-                <p>Нет доступных публичных предложений Формы 1.</p>
-              )}
+              <div className="public-com__field public-com__field--unit">
+                <span className="public-com__label">Ед. изм.:</span>
+                <span className="public-com__unit">{item.unit}</span>
+              </div>
+
+              <div className="public-com__field public-com__field--price">
+                <span className="public-com__label">Цена:</span>
+                <span className="public-com__price">
+                  {typeof item.price === "number"
+                    ? item.price.toLocaleString("ru-RU", { style: "currency", currency: "RUB" })
+                    : item.price}
+                </span>
+              </div>
+
+              <div className="public-com__field public-com__field--date">
+                <span className="public-com__label">Дата изменения:</span>
+                <span className="public-com__date">{formatDate(item.updatedAt)}</span>
+              </div>
+
+              <div className="public-com__field public-com__field--email">
+                <span className="public-com__label">Email владельца:</span>
+                <span className="public-com__email">{item.email}</span>
+              </div>
+
+              <div className="public-com__actions">
+                <Button onClick={() => handleViewOffer(item)}>Просмотреть</Button>
+              </div>
             </div>
-          )}
-        </>
+          ))}
+        </div>
+      ) : (
+        <p className="public-com__empty">
+          {searchQuery ? "По вашему запросу ничего не найдено." : "Нет доступных публичных предложений."}
+        </p>
       )}
     </div>
   );

@@ -1,0 +1,186 @@
+/* Контейнер страницы */
+.public-com__container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Верхняя панель управления */
+.public-com__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.public-com__filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.public-com__filter-label {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.public-com__select {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+/* Заголовок */
+.public-com__page-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Список карточек/строк элементов */
+.public-com__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Отдельная карточка объекта данных */
+.public-com__item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1.5fr 1.5fr auto;
+  align-items: center;
+  gap: 15px;
+  padding: 16px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.public-com__item:hover {
+  border-color: #b0b0b0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Блок отдельного поля */
+.public-com__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.public-com__label {
+  font-size: 12px;
+  color: #777;
+  display: none; /* Скрываем подписи на десктопе, если верстка в линию */
+}
+
+/* Стили для отдельных значений данных */
+.public-com__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #222;
+}
+
+.public-com__unit {
+  font-size: 14px;
+  color: #555;
+}
+
+.public-com__price {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a73e8;
+}
+
+.public-com__date {
+  font-size: 13px;
+  color: #666;
+}
+
+.public-com__email {
+  font-size: 14px;
+  color: #444;
+  word-break: break-all;
+}
+
+.public-com__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.public-com__loading,
+.public-com__empty {
+  font-size: 16px;
+  color: #666;
+  margin-top: 20px;
+}
+
+/* Адаптированность под мобильные устройства */
+@media (max-width: 900px) {
+  .public-com__item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .public-com__label {
+    display: inline-block; /* Показываем подписи на узких экранах */
+  }
+
+  .public-com__field {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .public-com__actions {
+    margin-top: 10px;
+    justify-content: flex-start;
+  }
+}
+.public-com__filters {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.public-com__search-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.public-com__input {
+  padding: 8px 32px 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  min-width: 240px;
+  outline: none;
+}
+
+.public-com__input:focus {
+  border-color: #2563eb;
+}
+
+.public-com__clear-btn {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  font-size: 14px;
+}
+
+.public-com__clear-btn:hover {
+  color: #333;
+}
