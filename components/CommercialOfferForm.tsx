@@ -10,6 +10,7 @@ import { saveAs } from "file-saver";
 import ExcelJS from "exceljs";
 import * as calculatorService from "../services/calculatorService";
 import Calculator from "./Calculator";
+import { useNavigate } from "react-router-dom";
 
 interface CommercialOfferFormProps {
   setMode?: React.Dispatch<React.SetStateAction<Mode>>;
@@ -60,7 +61,7 @@ const CommercialOfferForm = ({
   tableOwnerId,
 }: CommercialOfferFormProps) => {
   const [rows, setRows] = useState<RowData[]>(() => normalizeRows(initialRows));
-
+  const navigate = useNavigate();
   // Безопасное получение списка строк для проверок
   const extractedRowsList = Array.isArray(initialRows) ? initialRows : initialRows?.rows;
 
@@ -387,29 +388,21 @@ const CommercialOfferForm = ({
     saveAs(new Blob([buffer]), "Коммерческое_предложение форма 0.xlsx");
   };
   const exportInBillOfQuantities = async () => {
-    const convertedRows = rows.map((row) => {
-      return {
-        name: row.name,
-        unit: row.unit,
-        quantity: row.quantity,
-        type: row.type,
-        price: row.price,
-      };
+    const convertedRows = rows.map((row) => ({
+      name: row.name,
+      unit: row.unit,
+      quantity: row.quantity,
+      type: row.type,
+      price: row.price,
+    }));
+
+    // Переходим на страницу ведомости, передавая строки и текущую налоговую ставку
+    navigate("/forms/bill-of-quantities", {
+      state: {
+        rows: convertedRows,
+        taxRate: taxRate,
+      },
     });
-    if (setExportedRows) {
-      setExportedRows(convertedRows);
-    }
-    if (setMode) {
-      setMode({
-        form: false,
-        form1: false,
-        calculators: false,
-        management: false,
-        form2: true,
-        referencebook: false,
-        fileimport: false,
-      });
-    }
   };
   const isOwner = !tableOwnerId || (user && String(tableOwnerId) === String(user.id));
 
@@ -737,7 +730,7 @@ const CommercialOfferForm = ({
                     referencebook: false,
                     fileimport: false,
                   }}
-                  setMode={() => {}}
+                  onBack={() => setActiveCalculator(null)}
                   onApplyResult={handleApplyCalcResult}
                 />
               </div>

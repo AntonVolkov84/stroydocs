@@ -5,19 +5,25 @@ import Button from "./Button";
 import { Mode, Payload } from "../type";
 import { saveCalculatorResults } from "../services/calculatorService";
 import ImageToggle from "./ImageToggle";
+
 interface CalculatorProps {
   mode: Mode;
-  setMode: Dispatch<SetStateAction<Mode>>;
+  setMode?: Dispatch<SetStateAction<Mode>>;
   onApplyResult?: (value: number) => void;
+  onBack?: () => void;
 }
-function Calculator({ mode, setMode, onApplyResult }: CalculatorProps) {
+
+function Calculator({ mode, setMode, onApplyResult, onBack }: CalculatorProps) {
   const [variableValues, setVariableValues] = useState<Record<string, number>>({});
   const [calcResult, setCalcResult] = useState<number | string | null>(null);
-  const [isSaving, setIsSaving] = useState<boolean>(false);
+  const [isSaving] = useState<boolean>(false);
   const { user, prompt, alert } = useAppContext();
+
+  const activeCalc = typeof mode.calculators === "object" ? mode.calculators : null;
 
   useEffect(() => {
     setCalcResult(null);
+    setVariableValues({});
   }, [mode]);
 
   const calculateFormula = (formula: string, variables: Record<string, number>): number | string => {
@@ -26,8 +32,7 @@ function Calculator({ mode, setMode, onApplyResult }: CalculatorProps) {
       for (const [key, value] of Object.entries(variables)) {
         expression = expression.split(key).join(value.toString());
       }
-      const result = eval(expression);
-      return result;
+      return eval(expression);
     } catch (error) {
       return "Ошибка вычисления";
     }
@@ -40,8 +45,8 @@ function Calculator({ mode, setMode, onApplyResult }: CalculatorProps) {
   };
 
   const handleSave = async () => {
-    if (!user || typeof mode.calculators !== "object") return;
-    if (!calcResult || !variableValues) {
+    if (!user || !activeCalc) return;
+    if (calcResult === null || calcResult === "Ошибка вычисления" || !variableValues) {
       return await alert({
         title: "Внимание",
         message: "Нет данных для сохранения!",
@@ -56,15 +61,15 @@ function Calculator({ mode, setMode, onApplyResult }: CalculatorProps) {
     if (!title) return;
     const payload: Payload = {
       userId: user.id,
-      calculator: mode.calculators,
+      calculator: activeCalc,
       variablesValues: variableValues,
       result: calcResult,
       title: title,
-      imageUri: mode.calculators.image_url,
-      imagePublicId: mode.calculators.image_public_id,
+      imageUri: activeCalc.image_url,
+      imagePublicId: activeCalc.image_public_id,
     };
     try {
-      saveCalculatorResults(payload);
+      await saveCalculatorResults(payload);
       await alert({
         title: "Расчёт успешно сохранён!",
         message: "",
@@ -77,90 +82,90 @@ function Calculator({ mode, setMode, onApplyResult }: CalculatorProps) {
       });
     }
   };
+
+  if (!activeCalc) return null;
+
   return (
-    <>
-      {typeof mode.calculators === "object" && (
-        <div className="calculator-container">
-          {!user && <h3 style={{ color: "red" }}>Для возможности сохранения рассчетов нужно авторизироваться!</h3>}
-          <Button styled={{ marginTop: 25 }} onClick={() => setMode((prev) => ({ ...prev, calculators: false }))}>
-            ← Назад
-          </Button>
-          <h2 className="calculator-title">{mode.calculators.title}</h2>
-          {mode.calculators.image_url && (
-            <div style={{ marginBottom: "20px" }}>
-              <ImageToggle
-                src={mode.calculators.image_url}
-                alt="Иллюстрация к калькулятору"
-                // style={{
-                //   maxWidth: "100%",
-                //   height: "auto",
-                //   borderRadius: "8px",
-                //   boxShadow: "0 0 8px rgba(0,0,0,0.1)",
-                //   display: "block",
-                //   margin: "0 auto",
-                // }}
-              />
-            </div>
-          )}
-          <p className="calculator-formula">
-            Формула: <code>{mode.calculators.formula}</code>
-          </p>
-          <form
-            className="calculator-form"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (mode.calculators && typeof mode.calculators !== "boolean") {
-                const result = calculateFormula(mode.calculators.formula, variableValues);
-                setCalcResult(result);
+    <div className="calculator-container">
+      {!user && <h3 style={{ color: "red" }}>Для возможности сохранения рассчетов нужно авторизироваться!</h3>}
+
+      {/* Если передан onBack (из модалки) — вызываем его, иначе старый setMode */}
+      <Button
+        styled={{
+          marginTop: 25,
+          display: onBack ? "none" : "block",
+        }}
+        onClick={() => {
+          if (onBack) onBack();
+          else if (setMode) setMode((prev) => ({ ...prev, calculators: false }));
+        }}
+      >
+        ← Назад
+      </Button>
+
+      <h2 className="calculator-title">{activeCalc.title}</h2>
+
+      {activeCalc.image_url && (
+        <div style={{ marginBottom: "20px" }}>
+          <ImageToggle src={activeCalc.image_url} alt="Иллюстрация к калькулятору" />
+        </div>
+      )}
+
+      <p className="calculator-formula">
+        Формула: <code>{activeCalc.formula}</code>
+      </p>
+
+      <form
+        className="calculator-form"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const result = calculateFormula(activeCalc.formula, variableValues);
+          setCalcResult(result);
+        }}
+      >
+        {activeCalc.variables?.map((variable: any) => (
+          <div key={variable.name} className="calculator-input-group">
+            <label htmlFor={variable.name}>{variable.name}</label>
+            <small>{variable.description}</small>
+            <input
+              id={variable.name}
+              type="number"
+              step="any"
+              required
+              onChange={(e) =>
+                setVariableValues((prev) => ({
+                  ...prev,
+                  [variable.name]: parseFloat(e.target.value) || 0,
+                }))
               }
-            }}
-          >
-            {mode.calculators.variables.map((variable) => (
-              <div key={variable.name} className="calculator-input-group">
-                <label htmlFor={variable.name}>{variable.name}</label>
-                <small>{variable.description}</small>
-                <input
-                  id={variable.name}
-                  type="number"
-                  step="any"
-                  required
-                  onChange={(e) =>
-                    setVariableValues((prev) => ({
-                      ...prev,
-                      [variable.name]: parseFloat(e.target.value),
-                    }))
-                  }
-                />
-              </div>
-            ))}
-            <Button typeBtn="submit" styled={{ width: 100 }}>
-              Рассчитать
-            </Button>
-          </form>
-          {calcResult !== null && (
-            <div className="calculator-result">
-              Результат:{" "}
-              <strong>
-                {calcResult} {mode.calculators.result_unit}
-              </strong>
-              {onApplyResult && typeof calcResult === "number" && (
-                <Button
-                  onClick={handleApplyToForm}
-                  styled={{ marginTop: 10, marginLeft: 10, backgroundColor: "#28a745" }}
-                >
-                  Вставить в количество
-                </Button>
-              )}
-            </div>
-          )}
-          {user && (
-            <Button disabled={isSaving} onClick={() => handleSave()} styled={{ width: 100, marginTop: 40 }}>
-              Сохранить
+            />
+          </div>
+        ))}
+        <Button typeBtn="submit" styled={{ width: 100 }}>
+          Рассчитать
+        </Button>
+      </form>
+
+      {calcResult !== null && (
+        <div className="calculator-result">
+          Результат:{" "}
+          <strong>
+            {calcResult} {activeCalc.result_unit}
+          </strong>
+          {onApplyResult && typeof calcResult === "number" && (
+            <Button onClick={handleApplyToForm} styled={{ marginTop: 10, marginLeft: 10, backgroundColor: "#28a745" }}>
+              Вставить в количество
             </Button>
           )}
         </div>
       )}
-    </>
+
+      {user && (
+        <Button disabled={isSaving} onClick={handleSave} styled={{ width: 100, marginTop: 40 }}>
+          Сохранить
+        </Button>
+      )}
+    </div>
   );
 }
 

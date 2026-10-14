@@ -1,26 +1,20 @@
 import "./Management.css";
-import { useState, Dispatch, SetStateAction } from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Owner from "../src/5201928801548877058.jpg";
 import Programmer from "../src/anton.jpg";
 import Feedback from "./Feedback";
 import BannerFeedback from "./BannerFeedback";
-import { Mode } from "../type";
 import Button from "./Button";
 import ImageToggle from "./ImageToggle";
 
-interface ManagementProps {
-  setMode: Dispatch<SetStateAction<Mode>>;
-}
-
-function Management({ setMode }: ManagementProps) {
+function Management() {
+  const navigate = useNavigate();
   const [feedbackModal, setFeedbackModal] = useState(false);
   return (
     <div className="management__container">
       <div className="management__blockinfo">
-        <Button
-          styled={{ marginBottom: 25, marginTop: 13 }}
-          onClick={() => setMode((prev) => ({ ...prev, management: false }))}
-        >
+        <Button styled={{ marginBottom: 25, marginTop: 13 }} onClick={() => navigate(-1)}>
           ← Назад
         </Button>
         <div className="management__card">

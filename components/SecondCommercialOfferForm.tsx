@@ -780,7 +780,7 @@ export default function SecondCommercialOfferForm({
                     referencebook: false,
                     fileimport: false,
                   }}
-                  setMode={() => {}}
+                  onBack={() => setActiveCalculator(null)}
                   onApplyResult={handleApplyCalcResult}
                 />
               </div>
