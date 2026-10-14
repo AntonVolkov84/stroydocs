@@ -279,10 +279,10 @@ function PublicCommercial() {
                 <span className="public-com__label">Email владельца:</span>
                 <span className="public-com__email">{item.email}</span>
               </div>
-
-              <div className="public-com__actions">
+              {/* 
+              {<div className="public-com__actions">
                 <Button onClick={() => handleViewOffer(item)}>Просмотреть</Button>
-              </div>
+              </div>} Скрыто по желанию клиента*/}
             </div>
           ))}
 
