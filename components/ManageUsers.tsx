@@ -5,14 +5,11 @@ import "./ManageUsers.css";
 import { useAppContext } from "../services/AppContext";
 import { User } from "../type";
 
-interface ManageUserProps {
-  currentUserEmail: string;
-}
-
-export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
+export default function ManageUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [findByEmail, setFindByEmail] = useState<string>("");
-  const { confirm } = useAppContext();
+  const { confirm, user } = useAppContext();
+  const currentUserEmail = user?.email || "";
 
   const fetchUsers = async () => {
     try {
@@ -89,7 +86,7 @@ export default function ManageUsers({ currentUserEmail }: ManageUserProps) {
               .filter(
                 (user) =>
                   user.email.toLowerCase().includes(findByEmail.toLowerCase()) ||
-                  user.username.toLowerCase().includes(findByEmail.toLowerCase())
+                  user.username.toLowerCase().includes(findByEmail.toLowerCase()),
               )
               .map((user) => (
                 <tr key={user.id}>

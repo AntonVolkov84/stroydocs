@@ -8,6 +8,7 @@ import { Calculator } from "../components/ManageCalculator";
 import { uploadImageToCloudinary, delFromStorage } from "../services/cloudinaryService";
 import { ReturnOfCloudinaryUpload } from "../type";
 import { useAppContext } from "../services/AppContext";
+import { useLocation } from "react-router-dom";
 
 interface CalculatorForm {
   title: string;
@@ -17,11 +18,8 @@ interface CalculatorForm {
   imageUri?: string;
   imagePublicId?: string;
 }
-interface Props {
-  selectedCalculator: Calculator | null;
-  onUpdated?: () => void;
-}
-export default function CalculatorConstructor({ selectedCalculator, onUpdated }: Props) {
+
+export default function CalculatorConstructor() {
   const {
     control,
     register,
@@ -49,6 +47,8 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
     name: "variables",
   });
   const { alert } = useAppContext();
+  const location = useLocation();
+  const selectedCalculator = location.state?.selectedCalculator || null;
   useEffect(() => {
     if (selectedCalculator) {
       setIsEditing(true);
@@ -153,7 +153,6 @@ export default function CalculatorConstructor({ selectedCalculator, onUpdated }:
 
       setIsEditing(false);
       reset();
-      onUpdated?.();
     } catch (error: any) {
       console.error("Ошибка:", error.message);
       await alert({

@@ -8,7 +8,7 @@ import Button from "../components/Button";
 function SavedCalculators() {
   const [savedCalculatorData, setSavedCalculatorData] = useState<SavedCalculatorData[] | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  const { user, confirm } = useAppContext();
+  const { user, confirm, alert } = useAppContext();
 
   const getSavedCalculatorData = async () => {
     if (!user) return;
@@ -26,7 +26,12 @@ function SavedCalculators() {
     });
 
     if (!confirmResult) return;
-    await deleteSavedCalculator(id);
+    const res = await deleteSavedCalculator(id);
+    if (res.message)
+      await alert({
+        title: res.message,
+        message: "",
+      });
     getSavedCalculatorData();
   };
 

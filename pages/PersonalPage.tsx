@@ -1,58 +1,15 @@
 import "./PersonalPage.css";
 import { useState, useEffect } from "react";
 import * as authServices from "../services/authServices";
-import { Link, useNavigate } from "react-router-dom";
-import Button from "../components/Button";
-import ConstructorCalculator from "../components/ConstructorCalculator";
-import ManageCalculator from "../components/ManageCalculator";
-import ManageUsers from "../components/ManageUsers";
-import CreatingNews from "../components/CreatingNews";
-import SavedCalculators from "../components/SavedCalculators";
-import Commercial from "../components/Commercial";
-import CompanyProfile from "../components/CompanyProfile";
+import { Link, useNavigate, Outlet } from "react-router-dom"; // 👈 Добавили Outlet
 import { useAppContext } from "../services/AppContext";
-import ManageReferenceBooks from "../components/ManageReferenceBooks";
-
-export interface Calculator {
-  id: number;
-  title: string;
-  formula: string;
-  variables: Record<string, any>;
-  author_email: string;
-  result_unit: string;
-  created_at: string;
-  updated_at: string;
-  image_url?: string;
-  image_public_id?: string;
-}
 
 export default function PersonalPage() {
   const [isSuperAdmin, setIsSuperAdmin] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
-  const [constructorCalculator, setConstructorCalculator] = useState<boolean>(false);
-  const [managerCalculator, setManagerCalculator] = useState<boolean>(false);
-  const [managerUser, setManagerUser] = useState<boolean>(false);
-  const [manageReferenceBooks, setManageReferenceBooks] = useState(false);
-  const [creatingNews, setCreatingNews] = useState<boolean>(false);
-  const [selectedCalculator, setSelectedCalculator] = useState<Calculator | null>(null);
-  const [savedCalculator, setSavedCalculator] = useState<boolean>(false);
-  const [savedCommercialOffer, setSavedCommercialOffer] = useState<boolean>(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { user, setUser } = useAppContext();
-  const currentUserEmail = user?.email;
-
-  const clearState = () => {
-    setManagerCalculator(false);
-    setConstructorCalculator(false);
-    setManagerUser(false);
-    setCreatingNews(false);
-    setSavedCalculator(false);
-    setSavedCommercialOffer(false);
-    setSelectedCalculator(null);
-    setManageReferenceBooks(false);
-    setMenuOpen(false);
-  };
 
   useEffect(() => {
     if (!user) return;
@@ -69,132 +26,77 @@ export default function PersonalPage() {
   const handleLogOut = (): void => {
     setUser(null);
     authServices.logout();
+    navigate("/login");
   };
+
   return (
     <div className="personalpage">
       <aside className="personalpage__sidebar">
-        <h2>{isAdmin ? "Профиль Администратора" : "Профиль"} </h2>
+        <h2>{isAdmin ? "Профиль Администратора" : "Профиль"}</h2>
         <button className="personalpage__menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
           ☰ Меню
         </button>
         <ul className={menuOpen ? "show" : ""}>
-          <Link to="/dashboard" className="personalpage__sidebar-dashboard" onClick={() => {}}>
+          <Link to="/dashboard" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
             На главную
           </Link>
-          <li
-            onClick={() => {
-              clearState();
-              setSavedCalculator(true);
-            }}
+          <Link
+            to="/personal/saved-calculators"
+            className="personalpage__sidebar-dashboard"
+            onClick={() => setMenuOpen(false)}
           >
             Сохраненные данные по калькуляторам
-          </li>
-          <li
-            onClick={() => {
-              clearState();
-              setSavedCommercialOffer(true);
-            }}
+          </Link>
+          <Link
+            to="/personal/commercial"
+            className="personalpage__sidebar-dashboard"
+            onClick={() => setMenuOpen(false)}
           >
             Сохраненные документы
-          </li>
+          </Link>
           {isSuperAdmin && (
-            <li
-              onClick={() => {
-                clearState();
-                setManagerUser(true);
-              }}
-            >
+            <Link to="/personal/users" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
               Управление пользователями
-            </li>
-          )}
-          {isAdmin && (
-            <li
-              onClick={() => {
-                clearState();
-                setCreatingNews(true);
-              }}
-            >
-              Управление новостями
-            </li>
+            </Link>
           )}
           {isAdmin && (
             <>
-              <li
-                onClick={() => {
-                  clearState();
-                  setConstructorCalculator(true);
-                }}
+              <Link to="/personal/news" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
+                Управление новостями
+              </Link>
+              <Link
+                to="/personal/calculator-create"
+                className="personalpage__sidebar-dashboard"
+                onClick={() => setMenuOpen(false)}
               >
                 Создание калькулятора
-              </li>
-              <li
-                onClick={() => {
-                  clearState();
-                  setManagerCalculator(true);
-                }}
+              </Link>
+              <Link
+                to="/personal/calculators"
+                className="personalpage__sidebar-dashboard"
+                onClick={() => setMenuOpen(false)}
               >
                 Управление калькуляторами
-              </li>
-              <li
-                onClick={() => {
-                  clearState();
-                  setManageReferenceBooks(true);
-                }}
+              </Link>
+              <Link
+                to="/personal/reference-books"
+                className="personalpage__sidebar-dashboard"
+                onClick={() => setMenuOpen(false)}
               >
                 Управление справочниками
-              </li>
+              </Link>
             </>
           )}
           <li onClick={() => navigate("/changepassword")}>Сменить пароль</li>
           <li onClick={() => handleLogOut()}>Выход</li>
         </ul>
       </aside>
+
       <main className="personalpage__main">
         <h1>
           Добро пожаловать, {user?.name} {user?.surname}
         </h1>
-        {creatingNews && <CreatingNews />}
-        {constructorCalculator ? (
-          <div className="personalpage__content">
-            <ConstructorCalculator
-              selectedCalculator={selectedCalculator}
-              onUpdated={() => setManagerCalculator(true)}
-            />
-            <Button
-              onClick={() => {
-                setConstructorCalculator(false);
-                setSelectedCalculator(null);
-              }}
-              children="Отмена"
-            />
-          </div>
-        ) : (
-          <>
-            {managerCalculator ? (
-              <ManageCalculator
-                setManagerCalculator={setManagerCalculator}
-                setConstructorCalculator={setConstructorCalculator}
-                setSelectedCalculator={setSelectedCalculator}
-              />
-            ) : (
-              <>{managerUser && user && <ManageUsers currentUserEmail={user.email} />}</>
-            )}
-          </>
-        )}
-        {manageReferenceBooks && (isAdmin || isSuperAdmin) && <ManageReferenceBooks />}
-        {savedCommercialOffer && <Commercial />}
-        {savedCalculator && <SavedCalculators />}
-        {!managerCalculator &&
-          !constructorCalculator &&
-          !managerUser &&
-          !manageReferenceBooks &&
-          !creatingNews &&
-          !savedCalculator &&
-          !savedCommercialOffer && (
-            <div className="personalpage__content">
-              <CompanyProfile />
-            </div>
-          )}
+        <Outlet />
       </main>
     </div>
   );

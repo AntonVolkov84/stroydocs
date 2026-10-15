@@ -54,9 +54,9 @@ export const deleteCalculator = async (id: number): Promise<{ message: string }>
       { id: id },
       {
         withCredentials: true,
-      }
+      },
     );
-    return response.data;
+    return response.data || { message: "Калькулятор успешно удален" };
   } catch (error) {
     console.error("Ошибка при получении калькуляторов:", error);
     return { message: "Ошибка при удалении калькулятора" };
@@ -95,10 +95,11 @@ export const getSaveCalculatorResults = async (id: string | number) => {
 };
 export const deleteSavedCalculator = async (id: number | string) => {
   try {
-    await axios.delete(`${apiUrl}/stroydocs/delsavedcalc`, {
+    const response = await axios.delete(`${apiUrl}/stroydocs/delsavedcalc`, {
       params: { savedCalcId: id },
       withCredentials: true,
     });
+    return response.data || { message: "Калькулятор успешно удален" };
   } catch (error) {
     console.log("deleteSavedCalculator", error);
   }

@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import * as authServices from "../services/authServices";
 import "./ChangePasswordPage.css";
+import { useAppContext } from "../services/AppContext";
 
 interface ChangePasswordForm {
   password: string;
@@ -14,16 +15,14 @@ interface User {
   username: string;
   emailConfirmed: boolean;
 }
-interface ChangePasswordPageProps {
-  user: User | null;
-}
 
-export default function ChangePasswordPage({ user }: ChangePasswordPageProps) {
+export default function ChangePasswordPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { user } = useAppContext();
 
   const {
     register,

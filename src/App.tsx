@@ -19,7 +19,15 @@ import CommercialOffer0Page from "../pages/CommercialOffer0Page";
 import BillOfQuantitiesPage from "../pages/BillOfQuantitiesPage";
 import CommercialOffer1Page from "../pages/CommercialOffer1Page";
 import FileImportPage from "../pages/FileImportPage";
+import Commercial from "../components/Commercial";
 import ReferenceBookPage from "../pages/ReferenceBookPage";
+import CompanyProfile from "../components/CompanyProfile";
+import SavedCalculators from "../components/SavedCalculators";
+import ManageUsers from "../components/ManageUsers";
+import CreatingNews from "../components/CreatingNews";
+import ConstructorCalculator from "../components/ConstructorCalculator";
+import ManageCalculator from "../components/ManageCalculator";
+import ManageReferenceBooks from "../components/ManageReferenceBooks";
 
 function AppRoutes() {
   const { user, loading } = useAppContext();
@@ -31,9 +39,8 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/confirm-email" element={<ConfirmEmail />} />
       <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
-      <Route path="/changepassword" element={<ChangePasswordPage user={user} />} />
+      <Route path="/changepassword" element={<ChangePasswordPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/personalpage" element={user && user.emailconfirmed ? <PersonalPage /> : <Navigate to="/login" />} />
       <Route element={<MainLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="servicepage" element={<ServicePage />} />
@@ -47,6 +54,19 @@ function AppRoutes() {
         <Route path="/referencebook" element={<ReferenceBookPage />} />
         <Route path="/fileimport" element={<FileImportPage />} />
         <Route path="*" element={<NoPage />} />
+      </Route>
+      <Route path="/personal" element={user && user.emailconfirmed ? <PersonalPage /> : <Navigate to="/login" />}>
+        <Route index element={<CompanyProfile />} />
+        {/* Сохраненные документы */}
+        <Route path="commercial" element={<Commercial />} /> {/* Или оставить /commercial на верхнем уровне */}
+        {/* Сохраненные калькуляторы */}
+        <Route path="saved-calculators" element={<SavedCalculators />} />
+        {/* Админские разделы */}
+        <Route path="users" element={<ManageUsers />} />
+        <Route path="news" element={<CreatingNews />} />
+        <Route path="calculator-create" element={<ConstructorCalculator />} />
+        <Route path="calculators" element={<ManageCalculator />} />
+        <Route path="reference-books" element={<ManageReferenceBooks />} />
       </Route>
     </Routes>
   );

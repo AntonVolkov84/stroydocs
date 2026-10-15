@@ -38,7 +38,7 @@ export default function LoginPage() {
           message: "",
         });
       } else {
-        navigate("/personalpage");
+        navigate("/personal");
       }
     } else {
       await alert({

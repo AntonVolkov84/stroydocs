@@ -16,7 +16,7 @@ import * as userService from "../services/userService";
 import axios from "axios";
 const apiUrl: string = import.meta.env.VITE_API_URL;
 function Commercial() {
-  const { user, confirm, prompt, alert, setMode, setExportedRows, setExportData } = useAppContext();
+  const { user, confirm, prompt, alert } = useAppContext();
   const [sendingOfferForm, setSendingOfferForm] = useState<boolean>(false);
   const [savedOfferData, setSavedOfferData] = useState<SavedOfferData[] | null>(null);
   const [savedOfferDataSecondForm, setSavedOfferDataSecondForm] = useState<SavedOfferDataSecondForm[] | null>(null);

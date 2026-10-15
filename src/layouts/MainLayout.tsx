@@ -35,7 +35,7 @@ export default function MainLayout() {
                 </a>
               </div>
               <div className="dashboard-top-right">
-                <Link to="/personalpage" className="dashboard-top-link">
+                <Link to="/personal" className="dashboard-top-link">
                   Личный кабинет
                 </Link>
                 <div className="social-icons">

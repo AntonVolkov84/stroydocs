@@ -1,10 +1,11 @@
 import "./ManageCalculator.css";
 import Button from "./Button";
 import { useEffect, useState } from "react";
-import { Dispatch, SetStateAction } from "react";
+import { useNavigate } from "react-router-dom"; // 👈 Добавили роутер
 import { delFromStorage } from "../services/cloudinaryService";
 import * as calculatorService from "../services/calculatorService";
 import { useAppContext } from "../services/AppContext";
+
 export interface Calculator {
   id: number;
   title: string;
@@ -17,18 +18,12 @@ export interface Calculator {
   image_url?: string;
   image_public_id?: string;
 }
-interface ManageCalculatorProps {
-  setSelectedCalculator: (calc: Calculator) => void;
-  setManagerCalculator: Dispatch<SetStateAction<boolean>>;
-  setConstructorCalculator: Dispatch<SetStateAction<boolean>>;
-}
-export default function ManageCalculator({
-  setSelectedCalculator,
-  setConstructorCalculator,
-  setManagerCalculator,
-}: ManageCalculatorProps) {
+
+export default function ManageCalculator() {
   const [calculators, setCalculators] = useState<Calculator[] | null>(null);
   const { alert } = useAppContext();
+  const navigate = useNavigate(); // 👈 Инициализируем навигацию
+
   const fetchCalculators = async (): Promise<void> => {
     try {
       const data = await calculatorService.getAllCalculators();
@@ -37,12 +32,14 @@ export default function ManageCalculator({
       console.error("Ошибка при получении калькуляторов", err);
     }
   };
+
   useEffect(() => {
     fetchCalculators();
   }, []);
+
   const removeCalculator = async (id: number, publicId: string) => {
     try {
-      await delFromStorage(publicId);
+      if (publicId) await delFromStorage(publicId);
       const result = await calculatorService.deleteCalculator(id);
       fetchCalculators();
       await alert({
@@ -57,6 +54,7 @@ export default function ManageCalculator({
       });
     }
   };
+
   return (
     <div className="calculator-manager-container">
       <h2 className="calculator-manager-title">Управление калькуляторами</h2>
@@ -82,9 +80,9 @@ export default function ManageCalculator({
                   <div className="actions-buttons">
                     <Button
                       onClick={() => {
-                        setConstructorCalculator(true);
-                        setManagerCalculator(false);
-                        setSelectedCalculator(calc);
+                        navigate("/personal/calculator-create", {
+                          state: { selectedCalculator: calc },
+                        });
                       }}
                       className="edit-btn"
                     >
@@ -92,11 +90,7 @@ export default function ManageCalculator({
                     </Button>
                     <Button
                       onClick={() => {
-                        if (calc.image_public_id) {
-                          removeCalculator(calc.id, calc.image_public_id);
-                        } else {
-                          removeCalculator(calc.id, "");
-                        }
+                        removeCalculator(calc.id, calc.image_public_id || "");
                       }}
                       className="button_btn--red-hover"
                     >
