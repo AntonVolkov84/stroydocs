@@ -345,24 +345,16 @@ function Commercial() {
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
-                        setExportData({
-                          offerId: offer.id,
-                          title: offer.title,
-                          taxRate: offer.taxrate,
-                          userId: offer.userid,
-                          rows: offer.rows,
+                        navigate("/forms/commercial-offer-0", {
+                          state: {
+                            rows: offer.rows,
+                            title: offer.title,
+                            offerId: offer.id,
+                            userId: offer.userid,
+                            taxRate: offer.taxrate,
+                            showBackButton: true,
+                          },
                         });
-                        navigate("/dashboard");
-                        setMode({
-                          calculators: false,
-                          form: true,
-                          form1: false,
-                          form2: false,
-                          referencebook: false,
-                          management: false,
-                          fileimport: false,
-                        });
-                        setExportedRows(offer.rows);
                       }}
                     >
                       Просмотреть
@@ -411,24 +403,16 @@ function Commercial() {
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
-                        setExportData({
-                          offerId: offer.id,
-                          title: offer.title,
-                          taxRate: offer.taxrate,
-                          userId: offer.userid,
-                          rows: offer.rows,
+                        navigate("/forms/commercial-offer-1", {
+                          state: {
+                            rows: offer.rows,
+                            title: offer.title,
+                            offerId: offer.id,
+                            userId: offer.userid,
+                            taxRate: offer.taxrate,
+                            showBackButton: true,
+                          },
                         });
-                        navigate("/dashboard");
-                        setMode({
-                          calculators: false,
-                          form: false,
-                          form1: true,
-                          form2: false,
-                          referencebook: false,
-                          management: false,
-                          fileimport: false,
-                        });
-                        setExportedRows(offer.rows);
                       }}
                     >
                       Просмотреть
@@ -478,29 +462,20 @@ function Commercial() {
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
-                        setExportData({
-                          id: bill.id,
-                          title: bill.title,
-                          userid: bill.userid,
-                          rows: bill.rows,
-                          updated_at: bill.updated_at,
-                          taxrate: bill.taxrate,
+                        navigate("/forms/bill-of-quantities", {
+                          state: {
+                            rows: bill.rows,
+                            title: bill.title,
+                            offerId: bill.id,
+                            userId: bill.userid,
+                            showBackButton: true,
+                          },
                         });
-                        navigate("/dashboard");
-                        setMode({
-                          calculators: false,
-                          form: false,
-                          form1: false,
-                          form2: true,
-                          referencebook: false,
-                          management: false,
-                          fileimport: false,
-                        });
-                        setExportedRows(bill.rows);
                       }}
                     >
-                      Просмотреть
+                      Открыть ведомость
                     </Button>
+
                     <Button
                       disabled={sendingOfferForm}
                       onClick={async () => {

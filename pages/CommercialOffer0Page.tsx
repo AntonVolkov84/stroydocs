@@ -16,11 +16,7 @@ export default function CommercialOffer0Page() {
       initialOfferId={stateData?.offerId}
       initialTaxRate={stateData?.taxRate}
       tableOwnerId={stateData?.userId}
-      onUpdateSuccess={() => navigate("/dashboard")}
-      // Переход в ведомость через роутер с передачей данных в state
-      setExportedRows={(rows: any) => {
-        // Можно сохранить в контекст или передать дальше через navigate state
-      }}
+      onUpdateSuccess={() => {}}
     />
   );
 }

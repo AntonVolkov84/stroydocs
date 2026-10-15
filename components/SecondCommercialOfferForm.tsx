@@ -8,6 +8,7 @@ import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import * as calculatorService from "../services/calculatorService";
 import Calculator from "./Calculator";
+import { useNavigate } from "react-router-dom";
 
 const defaultRow = {
   name: "",
@@ -29,15 +30,12 @@ type SecondFormRowData = {
 };
 
 interface SecondCommercialOfferFormProps {
-  setMode?: React.Dispatch<React.SetStateAction<Mode>>;
   initialRows?: ExportedRowsType | null;
   initialTaxRate?: string | number;
   initialTitle?: string;
-  key?: string | number;
   showBackButton?: boolean;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
-  setExportedRows?: Dispatch<SetStateAction<ExportedRowsType>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferDataSecondForm | null>>;
   clearMode?: () => void;
   tableOwnerId?: string | number;
@@ -60,21 +58,18 @@ const normalizeRows = (incomingRows?: any[] | null): SecondFormRowData[] => {
 };
 
 export default function SecondCommercialOfferForm({
-  setMode,
   initialRows,
   initialTaxRate,
-  key,
   showBackButton = true,
   initialTitle,
   initialOfferId,
-  setExportedRows,
   onUpdateSuccess,
   setSelectedOffer,
   tableOwnerId,
   clearMode,
 }: SecondCommercialOfferFormProps) {
   const [rows, setRows] = useState<SecondFormRowData[]>(() => normalizeRows(initialRows));
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (initialRows && initialRows.length > 0) {
       setRows(normalizeRows(initialRows));
@@ -378,25 +373,12 @@ export default function SecondCommercialOfferForm({
         price,
       };
     });
-
-    if (setExportedRows) {
-      setExportedRows({
+    navigate("/forms/commercial-offer-0", {
+      state: {
         rows: convertedRows,
         taxRate: taxPercent,
-      } as any);
-    }
-
-    if (setMode) {
-      setMode({
-        form: true,
-        fileimport: false,
-        form1: false,
-        calculators: false,
-        management: false,
-        form2: false,
-        referencebook: false,
-      });
-    }
+      },
+    });
   };
 
   const exportInBillOfQuantities = async () => {
@@ -407,20 +389,12 @@ export default function SecondCommercialOfferForm({
         quantity: row.quantity,
       };
     });
-    if (setExportedRows) {
-      setExportedRows(convertedRows);
-    }
-    if (setMode) {
-      setMode({
-        form: false,
-        form1: false,
-        calculators: false,
-        management: false,
-        form2: true,
-        referencebook: false,
-        fileimport: false,
-      });
-    }
+    navigate("/forms/bill-of-quantities", {
+      state: {
+        rows: convertedRows,
+        taxRate: taxPercent,
+      },
+    });
   };
   const isOwner = !tableOwnerId || (user && String(tableOwnerId) === String(user.id));
 
@@ -435,9 +409,8 @@ export default function SecondCommercialOfferForm({
         <div className="commercial__controlUnit">
           <Button
             onClick={() => {
-              if (setMode) {
-                setMode((prev) => ({ ...prev, form1: false }));
-              } else if (clearMode) clearMode();
+              if (clearMode) clearMode();
+              else navigate(-1);
             }}
           >
             ← Назад
@@ -445,10 +418,8 @@ export default function SecondCommercialOfferForm({
 
           <Button onClick={() => exportInForm0()}>🔀 Экспорт в форму 0</Button>
           <Button onClick={() => exportInBillOfQuantities()}>🔀 Экспорт в ведомость</Button>
-          {showBackButton ? (
-            <Button onClick={handleSave} disabled={!isOwner}>
-              💾 Сохранить
-            </Button>
+          {showBackButton && !isOwner ? (
+            <Button onClick={handleSave}>💾 Сохранить</Button>
           ) : (
             <Button onClick={handleUpdate} disabled={!isOwner}>
               💾 Изменить
@@ -462,9 +433,8 @@ export default function SecondCommercialOfferForm({
           {showBackButton && (
             <Button
               onClick={() => {
-                if (setMode) {
-                  setMode((prev) => ({ ...prev, form1: false }));
-                } else if (clearMode) clearMode();
+                if (clearMode) clearMode();
+                else navigate(-1);
               }}
             >
               ← Назад

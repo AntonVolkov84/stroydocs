@@ -13,16 +13,12 @@ import Calculator from "./Calculator";
 import { useNavigate } from "react-router-dom";
 
 interface CommercialOfferFormProps {
-  setMode?: React.Dispatch<React.SetStateAction<Mode>>;
   initialRows?: RowData[] | ExportedRowsType | null;
   initialTaxRate?: number | string;
   initialTitle?: string;
-  showBackButton?: boolean;
-  key?: string | number;
   initialOfferId?: number | string;
   onUpdateSuccess?: () => void;
   clearMode?: () => void;
-  setExportedRows?: Dispatch<SetStateAction<ExportedRowsType>>;
   setSelectedOffer?: Dispatch<SetStateAction<SavedOfferData | null>>;
   tableOwnerId?: string | number;
 }
@@ -47,23 +43,19 @@ const normalizeRows = (incomingRows?: any | null): RowData[] => {
 };
 
 const CommercialOfferForm = ({
-  setMode,
   initialRows,
   initialTaxRate,
-  showBackButton = true,
   initialTitle,
   initialOfferId,
-  key,
   clearMode,
   onUpdateSuccess,
-  setExportedRows,
   setSelectedOffer,
   tableOwnerId,
 }: CommercialOfferFormProps) => {
   const [rows, setRows] = useState<RowData[]>(() => normalizeRows(initialRows));
   const navigate = useNavigate();
   // Безопасное получение списка строк для проверок
-  const extractedRowsList = Array.isArray(initialRows) ? initialRows : initialRows?.rows;
+  const extractedRowsList = Array.isArray(initialRows) ? initialRows : (initialRows as any)?.rows;
 
   // 2. Обновление state при задержке пропсов
   useEffect(() => {
@@ -75,7 +67,7 @@ const CommercialOfferForm = ({
   // Функция для первичного получения налога
   const getInitialTaxRate = (): number | string => {
     if (initialRows && !Array.isArray(initialRows) && typeof initialRows === "object" && "taxRate" in initialRows) {
-      return (initialRows as ExportedRowsType).taxRate ?? initialTaxRate ?? 20;
+      return (initialRows as Record<string, any>).taxRate ?? initialTaxRate ?? 20;
     }
     return initialTaxRate ?? 20;
   };
@@ -85,7 +77,7 @@ const CommercialOfferForm = ({
   // Синхронизация налога
   useEffect(() => {
     if (initialRows && typeof initialRows === "object" && !Array.isArray(initialRows) && "taxRate" in initialRows) {
-      const extractedTax = (initialRows as ExportedRowsType).taxRate;
+      const extractedTax = (initialRows as Record<string, any>).taxRate;
       if (extractedTax !== undefined && extractedTax !== null) {
         setTaxRate(extractedTax);
       }
@@ -430,7 +422,7 @@ const CommercialOfferForm = ({
         )}
         {user ? (
           <>
-            {!initialRows ? (
+            {!initialRows && !isOwner ? (
               <Button onClick={() => handleSave()} disabled={!isOwner} styled={{ marginBottom: 20 }}>
                 Сохранить
               </Button>

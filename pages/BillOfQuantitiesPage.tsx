@@ -13,7 +13,7 @@ export default function BillOfQuantitiesPage() {
       initialTitle={stateData?.title}
       initialOfferId={stateData?.offerId}
       tableOwnerId={stateData?.userId}
-      onUpdateSuccess={() => navigate("/dashboard")}
+      onUpdateSuccess={() => {}}
     />
   );
 }

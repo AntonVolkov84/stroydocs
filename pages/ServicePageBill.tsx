@@ -168,28 +168,15 @@ function ServicePageBill() {
       ...row,
       quantity: String(row.quantity ?? ""),
     }));
-
-    setExportData({
-      id: bill.id,
-      title: bill.title,
-      userid: bill.userid,
-      rows: bill.rows,
-      updated_at: bill.updated_at as string,
+    navigate("/forms/bill-of-quantities", {
+      state: {
+        rows: bill.rows,
+        title: bill.title,
+        offerId: bill.id,
+        userId: bill.userid,
+        showBackButton: true,
+      },
     });
-
-    // Режим работы для ведомости объемов (form2 / billbook)
-    setMode({
-      calculators: false,
-      form: false,
-      form1: false,
-      form2: true,
-      referencebook: false,
-      management: false,
-      fileimport: false,
-    });
-
-    setExportedRows(formattedRows);
-    navigate("/dashboard");
   };
 
   return (

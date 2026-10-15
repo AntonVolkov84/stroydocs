@@ -11,13 +11,11 @@ import * as commercialOfferService from "../services/commercialOfferService";
 interface BillOfQuantitiesProps {
   clearMode?: () => void;
   showBackButton?: boolean;
-  setMode?: Dispatch<SetStateAction<any>>;
   initialRows?: RowsBillOfQuantities[] | null;
   initialTitle?: string;
   initialOfferId?: string | number;
   onUpdateSuccess?: () => void;
   setSelectedBill?: Dispatch<SetStateAction<SavedBillOfQuantitiesData | null>>;
-  key?: string | number;
   tableOwnerId?: string | number;
 }
 
@@ -28,7 +26,6 @@ const BillOfQuantitiesForm = ({
   initialRows,
   initialOfferId,
   onUpdateSuccess,
-  key,
   setSelectedBill,
   tableOwnerId,
 }: BillOfQuantitiesProps) => {
@@ -97,15 +94,15 @@ const BillOfQuantitiesForm = ({
   };
   const saveBillOfQuantities = async () => {
     let finalTitle: string = title;
-    if (!finalTitle) {
-      const userInput = await prompt({
-        title: "Придумайте название сохраняемой ведомости",
-        message: "",
-        placeholder: "Название",
-      });
-      if (!userInput) return;
-      finalTitle = userInput;
-    }
+
+    const userInput = await prompt({
+      title: "Придумайте название сохраняемой ведомости",
+      message: "",
+      placeholder: "Название",
+    });
+    if (!userInput) return;
+    finalTitle = userInput;
+
     if (!user || !finalTitle) {
       return;
     }
@@ -232,8 +229,8 @@ const BillOfQuantitiesForm = ({
 
         {user ? (
           <>
-            {showBackButton ? (
-              <Button disabled={!isOwner} onClick={() => saveBillOfQuantities()} styled={{ marginBottom: 20 }}>
+            {showBackButton && !isOwner ? (
+              <Button onClick={() => saveBillOfQuantities()} styled={{ marginBottom: 20 }}>
                 Сохранить
               </Button>
             ) : (

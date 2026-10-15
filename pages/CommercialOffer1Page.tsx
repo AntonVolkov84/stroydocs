@@ -14,7 +14,7 @@ export default function CommercialOffer1Page() {
       initialOfferId={stateData?.offerId}
       initialTaxRate={stateData?.taxRate}
       tableOwnerId={stateData?.userId}
-      onUpdateSuccess={() => navigate("/dashboard")}
+      onUpdateSuccess={() => {}}
       setExportedRows={(data: any) => {
         // Если из Формы 1 экспортируют в Форму 0 или в Ведомость,
         // мы можем перехватить данные и отправить их через navigate state на нужный роут
