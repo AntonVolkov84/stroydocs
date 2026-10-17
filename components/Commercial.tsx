@@ -393,15 +393,15 @@ function Commercial() {
             <thead>
               <tr>
                 <th>Название</th>
-                <th>Дата сохранения</th>
-                <th>Действия</th>
+                <th className="commercial__actions-data">Дата сохранения</th>
+                <th className="commercial__actions-col">Действия</th>
               </tr>
             </thead>
             <tbody>
               {savedOfferData.map((offer) => (
                 <tr key={offer.id}>
                   <td>{offer.title}</td>
-                  <td>{formatDate(offer.created_at)}</td>
+                  <td className="commercial__actions-data">{formatDate(offer.created_at)}</td>
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
@@ -420,6 +420,7 @@ function Commercial() {
                       Просмотреть
                     </Button>
                     <Button
+                      styled={{ marginTop: "5px" }}
                       disabled={sendingOfferForm}
                       onClick={() => {
                         sendForm(offer);
@@ -427,10 +428,15 @@ function Commercial() {
                     >
                       Отправить форму
                     </Button>
-                    <Button className="button_btn--red-hover" onClick={() => handleDelete(offer.id)}>
+                    <Button
+                      styled={{ marginTop: "5px" }}
+                      className="button_btn--red-hover"
+                      onClick={() => handleDelete(offer.id)}
+                    >
                       Удалить
                     </Button>
                     <Button
+                      styled={{ marginTop: "5px" }}
                       className={offer.isPublic || offer.ispublic ? "button_btn--red-hover" : ""}
                       onClick={async () => await togglePublicStatusCommercialOffer(Number(offer.id))}
                     >
@@ -451,15 +457,15 @@ function Commercial() {
             <thead>
               <tr>
                 <th>Название</th>
-                <th>Дата сохранения</th>
-                <th>Действия</th>
+                <th className="commercial__actions-data">Дата сохранения</th>
+                <th className="commercial__actions-col">Действия</th>
               </tr>
             </thead>
             <tbody>
               {savedOfferDataSecondForm.map((offer) => (
                 <tr key={offer.id}>
                   <td>{offer.title}</td>
-                  <td>{formatDate(offer.created_at)}</td>
+                  <td className="commercial__actions-data">{formatDate(offer.created_at)}</td>
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
@@ -478,6 +484,7 @@ function Commercial() {
                       Просмотреть
                     </Button>
                     <Button
+                      styled={{ marginTop: "5px" }}
                       disabled={sendingOfferForm}
                       onClick={async () => {
                         sendForm(offer);
@@ -485,10 +492,15 @@ function Commercial() {
                     >
                       Отправить форму
                     </Button>
-                    <Button className="button_btn--red-hover" onClick={() => handleDeleteSecondForm(offer.id)}>
+                    <Button
+                      styled={{ marginTop: "5px" }}
+                      className="button_btn--red-hover"
+                      onClick={() => handleDeleteSecondForm(offer.id)}
+                    >
                       Удалить
                     </Button>
                     <Button
+                      styled={{ marginTop: "5px" }}
                       className={offer.isPublic || offer.ispublic ? "button_btn--red-hover" : ""}
                       onClick={async () => await togglePublicStatusCommercialOfferSecondForm(Number(offer.id))}
                     >
@@ -510,15 +522,15 @@ function Commercial() {
             <thead>
               <tr>
                 <th>Название</th>
-                <th>Дата сохранения</th>
-                <th>Действия</th>
+                <th className="commercial__actions-data">Дата сохранения</th>
+                <th className="commercial__actions-col">Действия</th>
               </tr>
             </thead>
             <tbody>
               {savedBillOfQuantitiesData.map((bill) => (
                 <tr key={bill.id}>
                   <td>{bill.title}</td>
-                  <td>{formatDate(bill.updated_at)}</td>
+                  <td className="commercial__actions-data">{formatDate(bill.updated_at)}</td>
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
@@ -537,6 +549,7 @@ function Commercial() {
                     </Button>
 
                     <Button
+                      styled={{ marginTop: "5px" }}
                       disabled={sendingOfferForm}
                       onClick={async () => {
                         sendForm(bill);
@@ -544,10 +557,15 @@ function Commercial() {
                     >
                       Отправить форму
                     </Button>
-                    <Button className="button_btn--red-hover" onClick={() => handleDeleteBillOfquantities(bill.id)}>
+                    <Button
+                      styled={{ marginTop: "5px" }}
+                      className="button_btn--red-hover"
+                      onClick={() => handleDeleteBillOfquantities(bill.id)}
+                    >
                       Удалить
                     </Button>
                     <Button
+                      styled={{ marginTop: "5px" }}
                       className={bill.ispublic ? "button_btn--red-hover" : ""}
                       onClick={async () => await togglePublicStatusBillOfQuantities(Number(bill.id))}
                     >
@@ -569,15 +587,15 @@ function Commercial() {
             <thead>
               <tr>
                 <th>Название</th>
-                <th>Дата сохранения</th>
-                <th>Действия</th>
+                <th className="commercial__actions-data">Дата сохранения</th>
+                <th className="commercial__actions-col">Действия</th>
               </tr>
             </thead>
             <tbody>
               {savedSpecifications.map((spec) => (
                 <tr key={spec.id}>
                   <td>{spec.title}</td>
-                  <td>{spec.updatedAt ? formatDate(spec.updatedAt) : "—"}</td>
+                  <td className="commercial__actions-data">{spec.updatedAt ? formatDate(spec.updatedAt) : "—"}</td>
                   <td className="commercial__actions">
                     <Button
                       onClick={() => {
@@ -594,10 +612,14 @@ function Commercial() {
                     >
                       Открыть спецификацию
                     </Button>
-                    <Button disabled={sendingOfferForm} onClick={() => sendForm(spec)}>
+                    <Button styled={{ marginTop: "5px" }} disabled={sendingOfferForm} onClick={() => sendForm(spec)}>
                       Отправить форму
                     </Button>
-                    <Button className="button_btn--red-hover" onClick={() => handleDeleteSpecification(spec.id)}>
+                    <Button
+                      styled={{ marginTop: "5px" }}
+                      className="button_btn--red-hover"
+                      onClick={() => handleDeleteSpecification(spec.id)}
+                    >
                       Удалить
                     </Button>
                   </td>

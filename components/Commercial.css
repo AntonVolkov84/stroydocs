@@ -11,18 +11,6 @@
 .commercial__table-title {
   margin-top: 15px;
 }
-.commercial__table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-.commercial__table th,
-.commercial__table td {
-  border: 1px solid #ccc;
-  padding: 12px;
-  text-align: left;
-}
 
 .commercial__table th {
   background-color: #f4f4f4;
@@ -33,13 +21,44 @@
   margin-left: 0;
   padding-right: 10px;
 }
-.commercial__actions {
-  display: flex;
-  gap: 10px;
+.commercial__actions-col {
+  max-width: 200px !important;
 }
-@media (max-width: 1420px) {
-  .commercial__actions {
-    flex-direction: column;
-    min-width: 85px;
-  }
+.commercial__container {
+  overflow-x: auto;
+}
+
+.commercial__table {
+  width: 100%;
+  min-width: 560px;
+  table-layout: fixed;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.commercial__table th,
+.commercial__table td {
+  border: 1px solid #ccc;
+  padding: 12px;
+  text-align: left;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+
+.commercial__table th {
+  background-color: #f4f4f4;
+}
+
+/* 1-й столбец (Название) — плавает, остальные фиксированные */
+.commercial__table th:nth-child(2) {
+  width: 130px;
+}
+.commercial__table th:nth-child(3) {
+  width: 200px;
+}
+
+/* кнопки в «Действиях» — друг под другом на всю ширину ячейки */
+.commercial__actions button {
+  display: block;
+  width: 100%;
 }
