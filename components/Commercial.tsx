@@ -11,6 +11,8 @@ import {
   PayloadSavedBillOfQuantities,
   SavedBillOfQuantitiesData,
 } from "../type";
+import * as specificationService from "../services/specificationService";
+import type { SavedSpecificationData } from "../services/specificationService";
 import Button from "../components/Button";
 import * as userService from "../services/userService";
 import axios from "axios";
@@ -21,12 +23,31 @@ function Commercial() {
   const [savedOfferData, setSavedOfferData] = useState<SavedOfferData[] | null>(null);
   const [savedOfferDataSecondForm, setSavedOfferDataSecondForm] = useState<SavedOfferDataSecondForm[] | null>(null);
   const [savedBillOfQuantitiesData, setSavedBillOfQuantitiesData] = useState<SavedBillOfQuantitiesData[] | null>(null);
+  const [savedSpecifications, setSavedSpecifications] = useState<SavedSpecificationData[] | null>(null);
   const navigate = useNavigate();
   const getSavedOfferData = async () => {
     if (!user) return;
     const id = user.id;
     const data = await commercialOfferService.getCommercialOffers(id);
     setSavedOfferData(data);
+  };
+  const getSavedSpecificationsData = async () => {
+    if (!user) return;
+    const data = await specificationService.getSavedSpecifications(user.id);
+    setSavedSpecifications(data ?? []);
+  };
+
+  const handleDeleteSpecification = async (id: number | string) => {
+    if (!user) return;
+    const confirmResult = await confirm({
+      title: "Удалить сохранённую спецификацию",
+      message: "Вы уверены, она будет стерта из Ваших сохранений?",
+      confirmText: "Да",
+      cancelText: "Нет",
+    });
+    if (!confirmResult) return;
+    await specificationService.removeSavedSpecification(id, user.id);
+    await getSavedSpecificationsData();
   };
   const getSavedOfferSecondFormData = async () => {
     if (!user) return;
@@ -175,7 +196,15 @@ function Commercial() {
     }
   };
 
-  const sendForm = async (offer: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData) => {
+  function isSpecification(
+    o: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData | SavedSpecificationData,
+  ): o is SavedSpecificationData {
+    return !!o && Array.isArray((o as any).rows) && (o as any).rows.length > 0 && "manufacturer" in (o as any).rows[0];
+  }
+
+  const sendForm = async (
+    offer: SavedOfferData | SavedOfferDataSecondForm | SavedBillOfQuantitiesData | SavedSpecificationData,
+  ) => {
     let recieverEmail = await prompt({
       title: "Укажите эл почту получателя формы",
       message: "",
@@ -203,6 +232,36 @@ function Commercial() {
       await alert({
         title: "Нет смысла отправлять себе!",
         message: "У тебя уже есть эта форма",
+      });
+      return setSendingOfferForm(false);
+    }
+    if (isSpecification(offer)) {
+      const res = await userService.getUserId(recieverEmail);
+      if (!res) {
+        await commercialOfferService.savePendingDocument({
+          email: recieverEmail,
+          title: offer.title,
+          taxRate: 20, // у спецификации налога нет, поле обязательно на беке
+          rows: offer.rows,
+          type: "specification",
+          receiver: recieverEmail,
+          sender: `${user?.name} ${user?.surname}`,
+        });
+        await alert({
+          title: "Такой получатель не зарегистрирован",
+          message:
+            "Возможно, Вы не верно ввели данные, либо получатель еще не зарегистрирован на сайте. В таком случае он получить сообщение на почту с информацией, что ему отправлены документы",
+        });
+        return setSendingOfferForm(false);
+      }
+      const result = await specificationService.saveSpecification({
+        title: offer.title,
+        userId: res,
+        rows: offer.rows,
+      });
+      await alert({
+        title: result.ok ? "Спецификация отправлена" : result.message,
+        message: "",
       });
       return setSendingOfferForm(false);
     }
@@ -322,6 +381,7 @@ function Commercial() {
     getSavedOfferData();
     getSavedOfferSecondFormData();
     getSavedBillOfQuantitisData();
+    getSavedSpecificationsData();
   }, []);
 
   return (
@@ -502,6 +562,52 @@ function Commercial() {
       )}
       {!savedBillOfQuantitiesData ||
         (savedBillOfQuantitiesData.length === 0 && <p>Нет сохранённых ведомостей объемов работ</p>)}
+      <h2 className="commercial__table-title">Сохранённые спецификации</h2>
+      {savedSpecifications && savedSpecifications.length > 0 && (
+        <div>
+          <table className="commercial__table">
+            <thead>
+              <tr>
+                <th>Название</th>
+                <th>Дата сохранения</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {savedSpecifications.map((spec) => (
+                <tr key={spec.id}>
+                  <td>{spec.title}</td>
+                  <td>{spec.updatedAt ? formatDate(spec.updatedAt) : "—"}</td>
+                  <td className="commercial__actions">
+                    <Button
+                      onClick={() => {
+                        navigate("/forms/specificationformpage", {
+                          state: {
+                            rows: spec.rows,
+                            title: spec.title,
+                            offerId: spec.id,
+                            userId: spec.userId,
+                            showBackButton: true,
+                          },
+                        });
+                      }}
+                    >
+                      Открыть спецификацию
+                    </Button>
+                    <Button disabled={sendingOfferForm} onClick={() => sendForm(spec)}>
+                      Отправить форму
+                    </Button>
+                    <Button className="button_btn--red-hover" onClick={() => handleDeleteSpecification(spec.id)}>
+                      Удалить
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      {savedSpecifications && savedSpecifications.length === 0 && <p>Нет сохранённых спецификаций.</p>}
     </div>
   );
 }

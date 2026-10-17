@@ -148,12 +148,11 @@ function Calculator({ mode, setMode, onApplyResult, onBack }: CalculatorProps) {
 
       {calcResult !== null && (
         <div className="calculator-result">
-          Результат:{" "}
           <strong>
-            {calcResult} {activeCalc.result_unit}
+            Результат: {calcResult} {activeCalc.result_unit}
           </strong>
           {onApplyResult && typeof calcResult === "number" && (
-            <Button onClick={handleApplyToForm} styled={{ marginTop: 10, marginLeft: 10, backgroundColor: "#28a745" }}>
+            <Button onClick={handleApplyToForm} styled={{ marginTop: 10, backgroundColor: "#28a745", width: "35%" }}>
               Вставить в количество
             </Button>
           )}

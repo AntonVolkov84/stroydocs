@@ -28,6 +28,7 @@ import CreatingNews from "../components/CreatingNews";
 import ConstructorCalculator from "../components/ConstructorCalculator";
 import ManageCalculator from "../components/ManageCalculator";
 import ManageReferenceBooks from "../components/ManageReferenceBooks";
+import SpecificationFormPage from "../pages/SpecificationFormPage";
 
 function AppRoutes() {
   const { user, loading } = useAppContext();
@@ -51,6 +52,7 @@ function AppRoutes() {
         <Route path="/forms/commercial-offer-0" element={<CommercialOffer0Page />} />
         <Route path="/forms/bill-of-quantities" element={<BillOfQuantitiesPage />} />
         <Route path="/forms/commercial-offer-1" element={<CommercialOffer1Page />} />
+        <Route path="/forms/specificationformpage" element={<SpecificationFormPage />} />
         <Route path="/referencebook" element={<ReferenceBookPage />} />
         <Route path="/fileimport" element={<FileImportPage />} />
         <Route path="*" element={<NoPage />} />

@@ -108,6 +108,13 @@ export default function MainLayout() {
                     <Link to="/forms/bill-of-quantities" style={{ padding: "10px" }} className="dashboard-submenu-href">
                       Ведомость объёмов работ
                     </Link>
+                    <Link
+                      to="/forms/specificationformpage"
+                      style={{ padding: "10px" }}
+                      className="dashboard-submenu-href"
+                    >
+                      Спецификация
+                    </Link>
                     <Link to="/fileimport" style={{ padding: "10px" }} className="dashboard-submenu-href">
                       Импорт файлов
                     </Link>

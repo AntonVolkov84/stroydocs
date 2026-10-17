@@ -185,7 +185,7 @@ export type PromptOptions = Omit<PromptModalProps, "open" | "onConfirm" | "onCan
 export interface PayloadPendingDoc {
   email: string;
   title: string;
-  rows: RowCommercialOfferSecondForm[] | RowCommercialOffer[] | RowsBillOfQuantities[];
+  rows: RowCommercialOfferSecondForm[] | RowCommercialOffer[] | RowsBillOfQuantities[] | SpecRowData[];
   taxRate: number | string;
   type: string;
   receiver: string;
@@ -254,4 +254,14 @@ export interface ExportedDataInBillOfQuantities {
   name: string;
   unit: string;
   quantity: string;
+}
+export interface SpecRowData {
+  name: string;
+  mark: string;
+  code: string;
+  manufacturer: string;
+  unit: string;
+  quantity: number;
+  mass: string;
+  note: string;
 }
