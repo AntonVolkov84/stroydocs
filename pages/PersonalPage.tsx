@@ -40,6 +40,9 @@ export default function PersonalPage() {
           <Link to="/dashboard" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
             На главную
           </Link>
+          <Link to="/personal/company" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
+            Данные предприятия
+          </Link>
           <Link
             to="/personal/saved-calculators"
             className="personalpage__sidebar-dashboard"
@@ -87,7 +90,7 @@ export default function PersonalPage() {
               </Link>
             </>
           )}
-          <li onClick={() => navigate("/changepassword")}>Сменить пароль</li>
+          <li onClick={() => navigate("/personal")}>Сменить пароль</li>
           <li onClick={() => handleLogOut()}>Выход</li>
         </ul>
       </aside>

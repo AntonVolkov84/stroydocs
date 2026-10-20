@@ -15,6 +15,7 @@
   max-width: 975px; /* В 1.5 раза больше исходных 650px */
   width: 100%;
   box-sizing: border-box;
+  margin: 0 auto;
 }
 .company-card__header {
   display: flex;

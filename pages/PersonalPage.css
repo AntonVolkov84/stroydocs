@@ -48,6 +48,7 @@
   flex-grow: 1;
   padding: 40px;
   overflow-y: auto;
+  text-align: center;
 }
 
 .personalpage__main h1 {

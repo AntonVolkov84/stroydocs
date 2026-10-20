@@ -37,12 +37,11 @@ function AppRoutes() {
   }
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
       <Route path="/confirm-email" element={<ConfirmEmail />} />
       <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
-      <Route path="/changepassword" element={<ChangePasswordPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route element={<MainLayout />}>
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="servicepage" element={<ServicePage />} />
         <Route path="servicepagebill" element={<ServicePageBill />} />
@@ -56,19 +55,18 @@ function AppRoutes() {
         <Route path="/referencebook" element={<ReferenceBookPage />} />
         <Route path="/fileimport" element={<FileImportPage />} />
         <Route path="*" element={<NoPage />} />
-      </Route>
-      <Route path="/personal" element={user && user.emailconfirmed ? <PersonalPage /> : <Navigate to="/login" />}>
-        <Route index element={<CompanyProfile />} />
-        {/* Сохраненные документы */}
-        <Route path="commercial" element={<Commercial />} /> {/* Или оставить /commercial на верхнем уровне */}
-        {/* Сохраненные калькуляторы */}
-        <Route path="saved-calculators" element={<SavedCalculators />} />
-        {/* Админские разделы */}
-        <Route path="users" element={<ManageUsers />} />
-        <Route path="news" element={<CreatingNews />} />
-        <Route path="calculator-create" element={<ConstructorCalculator />} />
-        <Route path="calculators" element={<ManageCalculator />} />
-        <Route path="reference-books" element={<ManageReferenceBooks />} />
+        <Route path="/personal" element={user && user.emailconfirmed ? <PersonalPage /> : <Navigate to="/login" />}>
+          <Route index element={<Commercial />} />
+          <Route path="company" element={<CompanyProfile />} />
+          <Route path="commercial" element={<Commercial />} />
+          <Route path="saved-calculators" element={<SavedCalculators />} />
+          <Route path="users" element={<ManageUsers />} />
+          <Route path="news" element={<CreatingNews />} />
+          <Route path="calculator-create" element={<ConstructorCalculator />} />
+          <Route path="calculators" element={<ManageCalculator />} />
+          <Route path="reference-books" element={<ManageReferenceBooks />} />
+          <Route path="changepassword" element={<ChangePasswordPage />} />
+        </Route>
       </Route>
     </Routes>
   );

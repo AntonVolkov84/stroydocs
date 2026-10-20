@@ -1,9 +1,6 @@
 // src/layouts/MainLayout.tsx
 import { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import telegram from "../icons/telegram.svg";
-import youtube from "../icons/youtube.svg";
-import facebook from "../icons/facebook.svg";
 import Logo from "../logo.jpg";
 import ApkFile from "../stroydoks.apk";
 import "../../pages/Dashboard.css";
@@ -35,20 +32,9 @@ export default function MainLayout() {
                 </a>
               </div>
               <div className="dashboard-top-right">
-                <Link to="/personal" className="dashboard-top-link">
+                <Link to="personal" className="dashboard-top-link">
                   Личный кабинет
                 </Link>
-                <div className="social-icons">
-                  <a href="https://youtube.com" className="social-icons-item" target="_blank" rel="noreferrer">
-                    <img className="inverted-icon" src={youtube} alt="YouTube" />
-                  </a>
-                  <a href="https://facebook.com" className="social-icons-item" target="_blank" rel="noreferrer">
-                    <img className="inverted-icon" src={facebook} alt="Facebook" />
-                  </a>
-                  <a href="https://telegram.org" className="social-icons-item" target="_blank" rel="noreferrer">
-                    <img className="inverted-icon" src={telegram} alt="Telegram" />
-                  </a>
-                </div>
               </div>
             </div>
           </div>
