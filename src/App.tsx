@@ -25,7 +25,6 @@ import CompanyProfile from "../components/CompanyProfile";
 import SavedCalculators from "../components/SavedCalculators";
 import ManageUsers from "../components/ManageUsers";
 import CreatingNews from "../components/CreatingNews";
-import ConstructorCalculator from "../components/ConstructorCalculator";
 import ManageCalculator from "../components/ManageCalculator";
 import ManageReferenceBooks from "../components/ManageReferenceBooks";
 import SpecificationFormPage from "../pages/SpecificationFormPage";
@@ -62,7 +61,6 @@ function AppRoutes() {
           <Route path="saved-calculators" element={<SavedCalculators />} />
           <Route path="users" element={<ManageUsers />} />
           <Route path="news" element={<CreatingNews />} />
-          <Route path="calculator-create" element={<ConstructorCalculator />} />
           <Route path="calculators" element={<ManageCalculator />} />
           <Route path="reference-books" element={<ManageReferenceBooks />} />
           <Route path="changepassword" element={<ChangePasswordPage />} />

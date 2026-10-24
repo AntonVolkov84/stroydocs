@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom"; // 👈 Добавили роу�
 import { delFromStorage } from "../services/cloudinaryService";
 import * as calculatorService from "../services/calculatorService";
 import { useAppContext } from "../services/AppContext";
+import ConstructorCalculator from "./ConstructorCalculator";
 
 export interface Calculator {
   id: number;
@@ -22,7 +23,7 @@ export interface Calculator {
 export default function ManageCalculator() {
   const [calculators, setCalculators] = useState<Calculator[] | null>(null);
   const { alert } = useAppContext();
-  const navigate = useNavigate(); // 👈 Инициализируем навигацию
+  const navigate = useNavigate();
 
   const fetchCalculators = async (): Promise<void> => {
     try {
@@ -58,6 +59,7 @@ export default function ManageCalculator() {
   return (
     <div className="calculator-manager-container">
       <h2 className="calculator-manager-title">Управление калькуляторами</h2>
+      <ConstructorCalculator />
       <div className="calculator-table-wrapper">
         <table className="calculator-table">
           <thead>

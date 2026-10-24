@@ -68,13 +68,6 @@ export default function PersonalPage() {
                 Управление новостями
               </Link>
               <Link
-                to="/personal/calculator-create"
-                className="personalpage__sidebar-dashboard"
-                onClick={() => setMenuOpen(false)}
-              >
-                Создание калькулятора
-              </Link>
-              <Link
                 to="/personal/calculators"
                 className="personalpage__sidebar-dashboard"
                 onClick={() => setMenuOpen(false)}
