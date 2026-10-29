@@ -37,19 +37,6 @@ export default function PersonalPage() {
           ☰ Меню
         </button>
         <ul className={menuOpen ? "show" : ""}>
-          <Link to="/dashboard" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
-            На главную
-          </Link>
-          <Link to="/personal/company" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
-            Данные предприятия
-          </Link>
-          <Link
-            to="/personal/saved-calculators"
-            className="personalpage__sidebar-dashboard"
-            onClick={() => setMenuOpen(false)}
-          >
-            Сохраненные данные по калькуляторам
-          </Link>
           <Link
             to="/personal/commercial"
             className="personalpage__sidebar-dashboard"
@@ -57,16 +44,19 @@ export default function PersonalPage() {
           >
             Сохраненные документы
           </Link>
-          {isSuperAdmin && (
-            <Link to="/personal/users" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
-              Управление пользователями
-            </Link>
-          )}
+          <Link
+            to="/personal/saved-calculators"
+            className="personalpage__sidebar-dashboard"
+            onClick={() => setMenuOpen(false)}
+          >
+            Сохраненные данные калькулятов
+          </Link>
+          <Link to="/personal/company" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
+            Данные предприятия
+          </Link>
+
           {isAdmin && (
             <>
-              <Link to="/personal/news" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
-                Управление новостями
-              </Link>
               <Link
                 to="/personal/calculators"
                 className="personalpage__sidebar-dashboard"
@@ -81,7 +71,15 @@ export default function PersonalPage() {
               >
                 Управление справочниками
               </Link>
+              <Link to="/personal/news" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
+                Управление новостями
+              </Link>
             </>
+          )}
+          {isSuperAdmin && (
+            <Link to="/personal/users" className="personalpage__sidebar-dashboard" onClick={() => setMenuOpen(false)}>
+              Управление пользователями
+            </Link>
           )}
           <li onClick={() => navigate("/personal")}>Сменить пароль</li>
           <li onClick={() => handleLogOut()}>Выход</li>
